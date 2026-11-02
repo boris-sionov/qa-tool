@@ -492,6 +492,16 @@ an app whose earlier stamp failed. Each run logs one of `[Install] Stamped envir
 `[Install] No installed app matches a bundled environment icon`, or `[Install] Could not stamp …` —
 start there when an icon does not turn up.
 
+**Missing icon files are repaired first, for any sideloaded app** (`repairMissingIcons`). webOS
+file names are case-sensitive and the IPK tooling does not check them: Cellcom TV (1.0.0, 1.0.1)
+ships `largeicon.png` but declares `largeIcon.png`, so the launcher finds no icon and draws a
+maroon `iconColor` tile with no logo. For each developer app whose `appinfo.json` names an icon the
+folder lacks (`missingIcons()`, `src/app/shared/webos-icon-repair.ts`), the file is created — from
+the app's bundled brand artwork (`brandIcon()`, which then also replaces its other declared icons so
+both tiles match), otherwise from the file that differs only in case. Logged as
+`[Install] <id>: created largeIcon.png (was largeicon.png) from …`. Like the stamp, it has to
+re-run after every install, since installing the IPK takes the file away again.
+
 ### Environment Icons
 
 Every FreeTV build ships the same green icon, so two of them side by side — on a TV's home screen,

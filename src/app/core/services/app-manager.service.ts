@@ -23,6 +23,8 @@ import {LgRemoteService, SsapApp} from "./lg-remote.service";
 import {IconCacheService} from "./icon-cache.service";
 import {environmentIcon, readBundledIcon} from "../../shared/app-environment-icons";
 import {appEnvironment, isPriorityApp} from "../../shared/known-apps";
+import {brandIcon} from "../../shared/app-brand-icons";
+import {MissingIcon, missingIcons} from "../../shared/webos-icon-repair";
 import {info as logInfo, warn as logWarn} from "@tauri-apps/plugin-log";
 
 const APP_ROOTS: ReadonlyArray<[string, PackageSource]> = [
@@ -251,6 +253,8 @@ export class AppManagerService {
         try {
             // `list`, not `load`: pushing the app list now would race the icon cache we clear below.
             const packages = await this.list(device);
+            // First, so a FreeTV build whose icon was missing gets the file the stamp below writes to.
+            await this.repairMissingIcons(device, packages, result, progress);
             installLog(`Looking for environment icons among ${packages.map(p => p.id).join(', ') || '(no apps)'}`);
             for (const pkg of packages) {
                 const icon = environmentIcon('webos', pkg.id, pkg.title);
@@ -308,6 +312,68 @@ export class AppManagerService {
     }
 
     /**
+     * Gives a sideloaded app the icon file its `appinfo.json` names but its IPK does not hold.
+     *
+     * webOS file names are case-sensitive and nothing in the IPK tooling checks them: Cellcom TV
+     * ships `largeicon.png` and declares `largeIcon.png`, so the launcher finds no icon and draws
+     * a tile in the app's `iconColor` with no logo. The missing file is created from its
+     * case-mismatched twin — or, for an app we ship brand artwork for, from that artwork, which
+     * then replaces the app's other declared icons too so both of its tiles match. The IPK's own
+     * Cellcom icons are an older logo at 80 px, which is why the artwork wins over the twin.
+     *
+     * Like the stamp, it walks every developer app rather than the one just installed, and has
+     * to re-run after each install because installing the IPK takes the file away again.
+     */
+    private async repairMissingIcons(
+        device: Device, packages: PackageInfo[], result: IconStampResult, progress?: InstallProgressHandler,
+    ): Promise<void> {
+        for (const pkg of packages) {
+            const folder = pkg.folderPath?.replace(/\/+$/, '');
+            if (!folder?.startsWith('/media/developer/')) continue;
+            const paths = await this.findIconPaths(device, pkg);
+            if (!paths.missing.length) continue;
+
+            // FreeTV is left to the environment stamp that runs next.
+            const brand = isPriorityApp(pkg.id, pkg.title) ? null : brandIcon(pkg.id, pkg.title);
+            const artwork = brand ? await readBundledIcon(brand).then(c => isPng(c) ? c : null).catch(() => null) : null;
+            const source = (missing: MissingIcon): Promise<Uint8Array | null> => artwork
+                ? Promise.resolve(artwork)
+                : missing.caseMatch
+                    ? this.file.read(device, `${folder}/${missing.caseMatch}`, undefined, 'buffer').then(b => new Uint8Array(b))
+                    : Promise.resolve(null);
+
+            progress?.(undefined, `Repairing the icon of ${pkg.title || pkg.id}...`);
+            const created: string[] = [];
+            try {
+                for (const missing of paths.missing) {
+                    const content = await source(missing);
+                    if (!content) {
+                        // Nothing to make it from. Not a problem for the dialog: it would repeat
+                        // on every install for an app QA did not just install.
+                        installLog(`${pkg.id}: declares ${missing.name}, which is not in ${folder}`);
+                        continue;
+                    }
+                    await this.file.write(device, `${folder}/${missing.name}`, content);
+                    created.push(missing.caseMatch ? `${missing.name} (was ${missing.caseMatch})` : missing.name);
+                }
+                if (artwork) {
+                    for (const path of paths.declared.filter(path => path.startsWith(`${folder}/`))) {
+                        await this.replaceIcon(device, path, artwork);
+                    }
+                }
+            } catch (e) {
+                result.problems.push(`${pkg.id}: could not repair its icon: ${e instanceof Error ? e.message : String(e)}`);
+                continue;
+            }
+            if (!created.length) continue;
+            this.iconCache.delete(pkg.id);
+            const what = artwork ? `${brand!.replace(/^.*\//, '')} artwork` : 'a copy of its own icon';
+            installLog(`${pkg.id}: created ${created.join(', ')} from ${what}`);
+            result.stamped.push(`${pkg.id} → ${created.join(', ')} from ${what}`);
+        }
+    }
+
+    /**
      * Overwrites one icon file, and puts the old one back if the new one did not land.
      *
      * The old file is unlinked rather than overwritten in place, which is the only way `prisoner`
@@ -359,7 +425,7 @@ export class AppManagerService {
      */
     async findIconPaths(device: Device, pkg: PackageInfo): Promise<IconPaths> {
         const folder = pkg.folderPath?.replace(/\/+$/, '');
-        if (!folder) return {declared: [], candidates: []};
+        if (!folder) return {declared: [], candidates: [], missing: []};
         const quoted = `'${folder.replace(/'/g, `'\\''`)}'`;
         const output = await this.cmd.exec(device,
             `cat ${quoted}/appinfo.json 2>/dev/null; echo; echo '${ICON_SCAN_MARKER}'; ls -1 ${quoted} 2>/dev/null; true`,
@@ -390,7 +456,9 @@ export class AppManagerService {
 
         const declaredPaths = [...new Set(named.map(absolute))].filter(exists);
         const candidates = [...new Set([...named, ...scanned].map(absolute))].filter(exists);
-        return {declared: declaredPaths, candidates};
+        // Only with a listing to compare against: an empty one means `ls` failed, not an empty app.
+        const missing = present.size ? missingIcons([declared?.icon, declared?.largeIcon], present) : [];
+        return {declared: declaredPaths, candidates, missing};
     }
 
     async remove(device: Device, id: string): Promise<void> {
@@ -708,11 +776,17 @@ export interface IconPaths {
     declared: string[];
     /** Everything that might hold the icon, declared first — for reading only. */
     candidates: string[];
+    /** Icons appinfo.json declares that the folder does not hold — see `repairMissingIcons`. */
+    missing: MissingIcon[];
 }
 
 /** What `applyEnvironmentIcons` did, so the caller can tell the user rather than only the log. */
 export interface IconStampResult {
-    /** `"tv.freetv.portal.preprod → PreProd"` for each app that got its icon replaced. */
+    /**
+     * `"tv.freetv.portal.preprod → PreProd"` for each app that got its icon replaced, and
+     * `"cellcom-tv → largeIcon.png (was largeicon.png) from …"` for each one whose missing icon
+     * file was created.
+     */
     stamped: string[];
     /** Why a FreeTV build did not get one, in words a person can act on. */
     problems: string[];
