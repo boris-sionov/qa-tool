@@ -446,7 +446,6 @@ only with the Linux-only `sync-secret-service` feature in `src-tauri/Cargo.toml`
 `keyring` silently falls back to an in-memory mock: the token is "saved", gone by the next call,
 and the token form keeps coming back. Building it needs `libdbus-1-dev`.
 
-
 Rows show only the version and its release day (and a Debug tag) — the tab says what the build
 is. The UI is one shared panel, `ConfluenceBuildsComponent`: it takes a page and a list of build
 kinds, each a file-name pattern, and shows the newest row that carries each kind. Newest *per
