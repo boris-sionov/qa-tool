@@ -107,6 +107,15 @@ jobs:
           Copy-Item src-tauri\binaries\sdb-x86_64-pc-windows-msvc.exe `
                     src-tauri\binaries\sdb-aarch64-pc-windows-msvc.exe
 
+      - name: Copy binaries for the 32-bit build (Windows x64)
+        if: matrix.target == 'windows-x64'
+        shell: pwsh
+        run: |
+          Copy-Item src-tauri\binaries\adb-x86_64-pc-windows-msvc.exe `
+                    src-tauri\binaries\adb-i686-pc-windows-msvc.exe
+          Copy-Item src-tauri\binaries\sdb-x86_64-pc-windows-msvc.exe `
+                    src-tauri\binaries\sdb-i686-pc-windows-msvc.exe
+
       - name: Build (Windows x64)
         if: matrix.target == 'windows-x64'
         run: |
