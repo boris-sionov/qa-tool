@@ -55,4 +55,8 @@ export class TizenComponent implements OnInit {
     openVidaa(): void {
         this.router.navigate(['/vidaa']);
     }
+
+    openPhone(): void {
+        this.router.navigate(['/android-phone']);
+    }
 }
