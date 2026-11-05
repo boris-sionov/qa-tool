@@ -5,9 +5,9 @@ repository. This is the single agent-instructions file — there is no `CLAUDE.m
 
 ---
 
-# Smart TV QA Tool
+# QA Tool
 
-A unified **Tauri 2** (Rust backend) + **Angular 18.2** desktop application for managing apps across Samsung Tizen, Android TV, and LG WebOS Smart TVs (VIDAA in design). Requires Node 20+ and Rust 1.92+.
+A unified **Tauri 2** (Rust backend) + **Angular 18.2** desktop application for managing apps across Samsung Tizen, Android TV, LG WebOS and VIDAA smart TVs. Requires Node 20+ and Rust 1.92+.
 
 ---
 
@@ -38,7 +38,7 @@ Karma does not use Chrome — `scripts/karma-tauri-launcher.js` registers `Tauri
 
 **Build outputs** land in the *workspace* target dir at the repo root (`Cargo.toml` declares a
 workspace whose only member is `src-tauri`), **not** `src-tauri/target/`:
-- macOS: `target/release/bundle/dmg/Smart TV QA Tool_<version>_aarch64.dmg`
+- macOS: `target/release/bundle/dmg/QA Tool_<version>_aarch64.dmg`
 - Windows: `target/release/bundle/msi/*.msi`, `.../nsis/*.exe`
 - Linux: `target/release/bundle/deb/*.deb`, `.../rpm/*.rpm`, `.../appimage/*.AppImage`
 
@@ -79,7 +79,9 @@ fields `build-info.js` records). `HEAD` — a detached checkout, as CI's tag bui
 
 ## Logs
 
-`~/Library/Logs/com.smarttv.qa-tool/Smart TV QA Tool.log` (macOS), via `tauri_plugin_log`.
+`~/Library/Logs/com.smarttv.qa-tool/QA Tool.log` (macOS), via `tauri_plugin_log`. The folder is the
+Tauri `identifier`, the file name the `productName`; builds from before the rename wrote
+`Smart TV QA Tool.log` in the same folder.
 
 **`console.log` does not reach it.** A release build opens no devtools, so a frontend line logged
 that way is gone. To put one in the file, call the plugin's `info`/`warn` directly — `installLog`
@@ -132,9 +134,11 @@ code path that may see all three platforms.
 | `local-file` | `plugins/local_file.rs` | Host filesystem |
 | `adb-manager` | `plugins/samsung_tizen.rs` | **Both** Android TV ADB *and* Tizen SDB |
 | `lg-remote` | `plugins/lg_remote.rs` | LG remote-control keys |
+| `vidaa` | `plugins/vidaa.rs` | VIDAA DevKit relay session |
 
-**Key insight:** `plugins/adb.rs` is a helper module imported by `samsung_tizen.rs`, not a separately
-registered plugin. Every ADB *and* Tizen call from Angular goes through `invoke('plugin:adb-manager|...')`.
+**Key insight:** `plugins/adb.rs`, `apk_library.rs` and `confluence.rs` are helper modules whose
+commands are registered by `samsung_tizen.rs`, not separate plugins. Every ADB, Tizen, APK-library
+and Confluence call from Angular goes through `invoke('plugin:adb-manager|...')`.
 
 ### Adding a Tauri Command — Three Places, Not One
 
@@ -152,19 +156,40 @@ releases. `acl_tests` in `samsung_tizen.rs` now parses the three lists and fails
 they disagree.
 
 Cargo package name is still `devman` and the binary `webos-dev-manager` (fork leftovers) — the
-product name `Smart TV QA Tool` comes from `tauri.conf.json`.
+product name `QA Tool` comes from `tauri.conf.json`.
+
+### Legacy Names That Hold User Data
+
+The app was called **Smart TV QA Tool** until it gained Android phones; the repo was
+`boris-sionov/smart-tv-qa-tool`. The user-visible name changed, but these identifiers did not,
+because each one is where an installed copy keeps its data. Renaming any of them without a
+migration loses that data silently on the next install:
+
+| Identifier | Where | Renaming it would lose |
+|---|---|---|
+| `com.smarttv.qa-tool` | Tauri `identifier` (`tauri.conf.json`) | the app data dir, the log folder, and the WebView's `localStorage` — every saved Tizen / Android TV device, the Tizen cert profile and Studio path, the APK library location |
+| `com.smarttv.qa-tool` | keychain service (`confluence.rs`) | the Confluence token; QA would have to paste it again |
+| `smart-tv-qa-*` | `localStorage` keys (Tizen state, LG apps scope) | the values under those keys |
+| `smartTvQaTool:ignoreVersionUntil` | `localStorage` (`update.service.ts`) | a dismissed update prompt |
+| `SmartTVQATool` | Samsung remote client name (`samsung_tizen.rs`) | the TV's pairing token; every TV would ask to allow the remote again |
+| `smart-tv-qa-tool` | Linux `provides` / `conflicts` / `replaces` / `obsoletes` (`tauri.conf.json`) | nothing — kept on purpose so the renamed `qa-tool` package replaces the old one |
+
+Keep them as they are, like `devman` / `webos-dev-manager`.
 
 ### Route Structure
 
 ```
 /                   → PlatformSelectorModule  (lazy)
 /lg                 → LgComponent (eager) + lazy child modules:
-    apps / files / terminal / debug / info / devices
+    apps / files / terminal / debug / info / devices  (+ nav-more, eager)
 /android-tv         → AndroidTvModule  (lazy)
 /tizen              → TizenModule      (lazy)
+/vidaa              → VidaaModule      (lazy)
+/android-phone      → AndroidPhoneModule (lazy) — phone list, then /android-phone/<serial> for its apps
 ```
 
-Each platform module owns its own `devices/`, `apps/`, and `info/` sub-routes.
+Each platform module owns its own `devices/`, `apps/`, and `info/` sub-routes — except VIDAA,
+which has only `apps/` and `info/` (the connection code is per session, so there is no device list).
 
 ### DeviceProvider Interface
 
@@ -323,6 +348,81 @@ The 2.0 rewrite is the exception: `freetv-tizen-2.0-icon.png` already carries a 
 the same place ours would go, so a 2.0 build installs that artwork unchanged and gets no version
 badge. Giving it one needs an unbadged 2.0 base.
 
+#### Prerequisites Check
+
+Entering Samsung runs `tizen_check_prerequisites` quietly (`TizenRequirementsService.autoCheck`):
+once per app start when everything is there, on every entry while something is missing. The first
+time it finds something missing it opens the list. **Requirements**, next to Add New Device on the
+Samsung Manage page, opens it any time, and turns amber while something is missing. A warning (no DUIDs) does not
+count as missing. The dialog also opens Tizen Studio's **Device Manager** and **Certificate
+Manager** (on macOS through `open` on their `.app` bundles — the bare binaries the code used to
+start are not there, or not executable).
+The dialog (`plugins/tizen_prereq.rs` behind it) lists each check with ✓ / ! / ✕, what it found and how to fix it.
+Only the signed install needs anything on the machine — list, launch, kill and debug speak SDB over
+TCP themselves — so the checks are what that flow calls:
+
+| Check | Fails when |
+|---|---|
+| Bundled sdb | the `sdb` sidecar is missing or `sdb version` does not answer |
+| Tizen Studio | neither the saved path (`smart-tv-qa-tizen-studio-path`) nor a default location holds `tools/ide/bin/tizen`; a saved path that has gone missing fails even if another install is found, since the install uses the saved one |
+| Tizen CLI | `tizen version` does not print `Tizen CLI x.y.z` |
+| Tizen Studio sdb | `<studio>/tools/sdb version` fails — `tizen install` connects through it |
+| Java for the Tizen CLI | the Java `tizen.sh` would pick (`sdk.info` `JDK_PATH`, then `<studio>/jdk`, then `java` on the PATH) does not answer `-version` |
+| Certificate profiles | `profiles.xml` (via `cert_profiles_path`, the file the install reads) is missing or empty |
+| Selected certificate | no profile saved, the saved name is not a profile — the wizard takes it from the `.p12`'s folder name, which need not match — or its author / distributor key file is gone |
+| TVs covered by certificates | *warning* only: no distributor profile lists `<TestDevice>` DUIDs, so per-TV matching cannot work |
+
+Below the list the dialog shows how to fix each miss **for the OS the check ran on** (the command
+returns `std::env::consts::OS` / `ARCH`): what to download, numbered install steps and links that
+open in the system browser (`appExternalLink`). The text lives in `tizen-fix-guides.ts`.
+
+Tizen Studio is deprecated; its last release, **6.1** (14 April 2025), is what the guide links to
+directly — `download.tizen.org/sdk/Installer/tizen-studio_6.1/web-{cli,ide}_Tizen_Studio_6.1_<os>`
+(`macos-64.bin` / `.dmg`, `windows-64.exe`, `ubuntu-64.bin`; CLI-only ≈ 280 MB, IDE ≈ 650 MB).
+Bump `STUDIO_VERSION` if a newer one ever appears.
+
+**The guide installs the CLI only, without a window.** Both installers take `--accept-license`:
+
+```bash
+./web-cli_Tizen_Studio_6.1_macos-64.bin --accept-license ~/tizen-studio
+~/tizen-studio/package-manager/package-manager-cli.bin install --accept-license Certificate-Manager,cert-add-on
+```
+
+The CLI install already has the tizen CLI, sdb, a JDK and Device Manager (`device-manager-product`
+is in `COMMON-MANDATORY`). Certificate Manager is not in it; `cert-add-on` is the Samsung
+Certificate Extension, from an extension repository that is active by default. The second command
+first updates every installed package, then pulls `BASELINE-COMMON` — over 10 minutes and ≈ 2 GB in
+all. Run on macOS on 2026-10-29 into an empty `HOME` (with `JAVA_TOOL_OPTIONS=-Duser.home=…`, since
+Java ignores `$HOME`); Windows and Linux use the same flags (`package-manager-cli.exe` on Windows)
+but were not run. Signing and installing a WGT from that install was not tried — the TV Extensions
+are not in it.
+
+**Creating a Samsung certificate has no CLI.** The Samsung extension is only an Eclipse plugin
+(`org.tizen.common.cert_*.jar`) that signs in through `account.samsung.com` in a browser and asks
+`svdca.samsungqbe.com` for the author and distributor certificates; `tizen certificate` makes a
+plain Tizen author certificate, which a retail Samsung TV refuses. Importing a profile the team
+already made is CLI-only: `tizen security-profiles add -A -n <profile> -a author.p12 -p … -d
+distributor.p12 -dp …`, which the certificate guide spells out. Device Manager is not needed either:
+`sdb connect` / `devices` and our own DUID read cover what QA used it for.
+
+Everything else is a page:
+
+| Link | For |
+|---|---|
+| `download.tizen.org/sdk/Installer/` | folder listing — fallback if the 6.1 files move |
+| developer.samsung.com *Installing TV SDK* / *Creating certificates* | TV Extensions + Samsung Certificate Extension (≥ 2.0.73; older ones can no longer create certificates), certificate profiles |
+| `adoptium.net/temurin/releases/` | Java, only when Studio's bundled `jdk/` is gone |
+
+`developer.tizen.org` / `docs.tizen.org` now redirect to samsungtizenos.com, and that site's
+"Installation guide" link is a GitHub 404 — do not link either. Tizen Studio's binaries (`sdb`,
+the bundled JDK) are x86_64 only, so on Apple Silicon the guide starts with installing Rosetta.
+Windows installs to `C:\tizen-studio`, which is now one of the `studio_candidates()`.
+
+`tizen version` starts a JVM (~4 s), so the dialog shows a spinner; each tool call is capped at
+30 s. To see the result for this machine without the UI:
+`cargo test -p devman tizen_prereq -- --ignored --nocapture` (set `TIZEN_CERT_PROFILE` to check a
+saved profile).
+
 #### Certificate ↔ TV Matching (the other cause of `[118, -12]`)
 
 A Samsung *distributor* certificate is issued for a fixed list of TV DUIDs. Signing with a profile
@@ -400,9 +500,9 @@ plain nginx/Apache/`python3 -m http.server` listings, which cannot take uploads.
 `apk_library_fetch` (downloads to the app cache, `apk-library/`), `apk_library_upload`,
 `apk_manifest` (package id and versionName out of the binary manifest), `play_store_listing`.
 
-**Three tabs.** Store / PROD is the freetv-server library — every Google-signed store build of
+**Four tabs.** Store / PROD is the freetv-server library — every Google-signed store build of
 `tv.freetv.androidtv`, the live one marked; Add version refuses any other package. UAT (and its
-debug build) and PROD Debug come from Confluence (see [Confluence Release Pages](#confluence-release-pages)). Each store row is the version's leading number (`1.1.50-(26010150)` reads `1.1.50`), its date
+debug build) and PROD Debug come from Confluence (see [Confluence Release Pages](#confluence-release-pages)); Firebase lists Firebase App Distribution releases (see [Firebase App Distribution](#firebase-app-distribution)). Each store row is the version's leading number (`1.1.50-(26010150)` reads `1.1.50`), its date
 and an Install button. The date is the file's mtime on the server — an upload stamps today, so
 for back-filled builds set it to the Play Console date with `touch -d`, as was done for the
 1.1.x–1.10.3 store builds.
@@ -427,6 +527,43 @@ releases is kept; Play Console (Test and release → Latest releases and bundles
 answers `INSTALL_FAILED_VERSION_DOWNGRADE`; a different signing key (store build over a CI one)
 answers `INSTALL_FAILED_UPDATE_INCOMPATIBLE`. Both make the dialog offer uninstall-and-install,
 which clears the app's data, so it asks first.
+
+#### Firebase App Distribution
+
+The Firebase tab of the library lists the releases of a FreeTV Android app in Firebase App
+Distribution and installs one through the same `adb install -r -d` path. The panel is
+`FirebaseBuildsComponent` (`android-tv/library/`). The Rust side is `plugins/firebase.rs` on
+`adb-manager`, with the commands `firebase_account`, `firebase_sign_in`, `firebase_sign_out`,
+`firebase_apps`, `firebase_releases` and `firebase_fetch`.
+
+- **Who can use it:** project members as the console shows them. Tester-only accounts have no
+  public API.
+- **Sign-in:** Google's installed-app OAuth flow with PKCE.
+  - The system browser opens the sign-in page, which redirects to a one-shot listener on
+    `127.0.0.1:<random port>`.
+  - A webview popup is not an option: Google refuses sign-in inside embedded webviews.
+  - The scope is `cloud-platform openid email`.
+  - The refresh token and the email live in the keychain (service `com.smarttv.qa-tool`, account
+    `firebase-refresh-token`). The access token lives in memory only.
+  - When Google answers `invalid_grant`, the saved sign-in is dropped and the tab asks again.
+- **APIs:**
+  - Apps: `firebase.googleapis.com/v1beta1/projects/-:searchApps`, Android only, FreeTV first.
+  - Releases: `firebaseappdistribution.googleapis.com/v1/projects/<number>/apps/<appId>/releases`.
+    The project number is the second field of the app id.
+- **Download:** `binaryDownloadUri` is signed and lasts about an hour, so `firebase_fetch` reads
+  the release again right before downloading. The APK goes to the app cache, under `firebase/`.
+- **OAuth client:** a "Desktop app" client in the FreeTV Firebase project, compiled in from
+  `FIREBASE_OAUTH_CLIENT_ID` / `FIREBASE_OAUTH_CLIENT_SECRET` (`option_env!`).
+  - Locally, export both before `npm run start` / `npm run build`.
+  - CI takes them from repo secrets of the same names.
+  - Without them the tab says sign-in is not configured.
+  - Changing them needs a clean Rust rebuild, because `option_env!` is not tracked:
+    `touch src-tauri/src/plugins/firebase.rs`.
+- **One-time setup in Google Cloud for that project:**
+  1. Enable the *Firebase App Distribution API* and the *Firebase Management API*.
+  2. Set the OAuth consent screen to **Internal**. That limits sign-in to freetv.tv accounts and
+     needs no Google verification.
+  3. Create the Desktop OAuth client.
 
 #### Confluence Release Pages
 
@@ -460,6 +597,55 @@ kind*, not the top row — 1.28.2 on Releases Smart TV has Samsung but no LG bui
 VIDAA is not here: its install links never change (`vidaa-presets.ts`). **There is no Samsung store
 build**: Samsung re-signs a published app and offers no download of it, and a retail TV refuses
 to hand an installed app back over `sdb`.
+
+### Android Phone (ADB over USB)
+
+`/android-phone` (`src/app/android-phone/`) has the same Apps / Info / Manage pages as the other
+platforms. `PhoneStateService` polls the USB phones every 2 s while the section is open and picks
+the **current** phone: the last one picked (`smart-tv-qa-phone-selected`) while it is connected,
+otherwise the first ready one. Apps and Info open straight on it and follow it; with none ready
+they show `PhoneStatusComponent` — adb broken (it is the bundled sidecar, so that means a broken
+install: reinstall, or `npm run setup`), no phone (numbered setup steps, keeps waiting), waiting for
+Allow, or connecting. Manage lists every phone. The shell owns the "Allow USB debugging?" popup.
+
+It shows the few apps QA tests on phones. It shares the bundled adb and the install / uninstall / force-stop
+commands with Android TV; what differs lives in `plugins/adb_phone.rs` (on `adb-manager`):
+
+| Command | Does |
+|---|---|
+| `adb_list_usb_devices` | `adb devices -l`, only entries with a `usb:` field (TVs over TCP have none); `model:` with `_` → space. The page polls it every 2 s, so a phone appears when it is plugged in |
+| `adb_list_packages_matching` | installed packages matching patterns (exact id, or a prefix ending in `*`) with `versionName` from `dumpsys package` |
+| `adb_launch_launcher` | `monkey -p <id> -c android.intent.category.LAUNCHER 1`. Android TV's `am start -a MAIN -p <id>` does not resolve on a phone without the LAUNCHER category |
+| `adb_install_multiple` | one app's APKs together: `install-multiple -r -d` (one path: `install -r -d`). A `Failure [` line on stdout counts as an error even with exit code 0 |
+| `adb_install_xapk` | unzips an XAPK (APKPure-style: base + split APKs, `manifest.json`, optional `Android/obb/…`) to a temp dir, installs the APKs together, pushes OBB files to the same path under `/sdcard`; returns `package_name` |
+| `adb_save_logcat` | `logcat -d -v threadtime` written to the path the save dialog returned (Downloads by default, `<model>_logcat_<time>.txt`) |
+| `brew_installed` | whether Homebrew is there (PATH, `/opt/homebrew/bin`, `/usr/local/bin`); without it the scrcpy popup starts with brew.sh's install command |
+| `scrcpy_open` | mirrors the screen in a scrcpy window; `false` when scrcpy is not installed, and the page then shows `ScrcpyHelpComponent` with the install command for the OS |
+
+**Plugging a phone in** goes through adb states: `authorizing` / `connecting` / `offline` for a
+moment (the card shows a spinner, "Connecting"), then `unauthorized` until someone taps Allow, then
+`device`. While a phone is `unauthorized`, `PhoneApprovalComponent` pops up — the same message as
+Android TV's `AdbApprovalComponent` — and the phone list closes it once the phone lists as
+`device` (or is unplugged). Closed by hand, it does not reopen until the phone is re-plugged; the
+card's "Allow on phone" badge reopens it.
+
+**Install APK / XAPK** takes several files at once. APKs are grouped by the package their manifest
+declares (`apk_manifest`), so the split APKs of one app go in together; each XAPK is its own
+install. Apps install one after another; a refused replace (other key, release downgrade) asks to
+uninstall first, per app, and one failure does not stop the rest — a summary lists each.
+
+**The app list is a fixed filter**, `PHONE_APPS` in `phone.service.ts`: FreeTV
+(`tv.freetv.mobile.android*`, so `.uat` and any other environment suffix too) and Mizrahi Tefahot's
+account app (`com.MizrahiTefahot.nh`). Everything else on the phone is hidden.
+
+**scrcpy is not bundled.** It is found on PATH and in the places a GUI app's PATH misses
+(`/opt/homebrew/bin`, `/usr/local/bin`, WinGet's `%LOCALAPPDATA%\Microsoft\WinGet\Links`), and
+started with `--always-on-top` (a child of the tool opens behind its window otherwise) and
+`ADB=<our sidecar adb>`: Homebrew's or scrcpy's own adb is usually another version, and
+two adb versions keep killing each other's server, which drops every connected TV. A scrcpy that
+exits within 1.5 s is reported with its `ERROR` lines (its log goes to
+`$TMPDIR/scrcpy-<serial>.log`). Install: `brew install scrcpy`, `winget install --exact
+Genymobile.scrcpy`, `sudo apt install scrcpy` — <https://scrcpy.org/>.
 
 ### LG WebOS (Luna API)
 - **Connection:** SSH port 22 / 9922, Ed25519 key auth
@@ -584,12 +770,14 @@ nothing packaged. These are the pairs QA installs with:
 
 | Environment | App URL | Icon URL |
 |---|---|---|
-| PreProd | `https://uat-web.freetv.tv/apps/smarttv/preprod/hisense/index.html` | `https://raw.githubusercontent.com/boris-sionov/smart-tv-qa-tool/main/src/assets/lg-icons/freetv-lg-preprod-icon.png` |
-| UAT | `https://uat-web.freetv.tv/apps/smarttv/web/index.html` | `https://raw.githubusercontent.com/boris-sionov/smart-tv-qa-tool/main/src/assets/lg-icons/freetv-lg-uat-icon.png` |
-| Prod | `https://web.freetv.tv/apps/smarttv/web/index.html` | `https://raw.githubusercontent.com/boris-sionov/smart-tv-qa-tool/main/src/assets/lg-icons/freetv-lg-store-icon.png` |
+| PreProd | `https://uat-web.freetv.tv/apps/smarttv/preprod/hisense/index.html` | `https://raw.githubusercontent.com/boris-sionov/qa-tool/main/src/assets/lg-icons/freetv-lg-preprod-icon.png` |
+| UAT | `https://uat-web.freetv.tv/apps/smarttv/web/index.html` | `https://raw.githubusercontent.com/boris-sionov/qa-tool/main/src/assets/lg-icons/freetv-lg-uat-icon.png` |
+| Prod | `https://web.freetv.tv/apps/smarttv/web/index.html` | `https://raw.githubusercontent.com/boris-sionov/qa-tool/main/src/assets/lg-icons/freetv-lg-store-icon.png` |
 
 The icons are the webOS badged ones (see [Environment Icons](#environment-icons)), served from this
 repo's `main` — renaming or moving those files breaks every Hisense install that points at them.
+TVs installed before the repo was renamed point at `boris-sionov/smart-tv-qa-tool`, which GitHub
+redirects; a later repo called `smart-tv-qa-tool` would take those URLs over.
 
 FreeTV hosts no icon of its own for these builds. `uat-web.freetv.tv` answers **every** unknown path
 with the app's index page and a 200, `icon.png` included, so a 200 there proves nothing — check the
@@ -605,6 +793,25 @@ per **target triple**, so `src-tauri/binaries/` must contain e.g. `adb-aarch64-a
 `sdb-x86_64-pc-windows-msvc.exe`. A build fails with "binary not found" when the triple for the
 current target is missing — `npm run setup` fetches the host ones; CI copies/duplicates them for
 cross-compiled targets (see `.github/workflows/release.yml`).
+
+### Building On Linux ARM64 (e.g. Asahi Ubuntu)
+
+Checked on Ubuntu 26.04 arm64, 2026-11-04. Build deps, all from Ubuntu's own repositories:
+
+```bash
+sudo apt-get install -y build-essential pkg-config cmake perl file libssl-dev libwebkit2gtk-4.1-dev \
+  libayatana-appindicator3-dev librsvg2-dev libxdo-dev libdbus-1-dev rustc cargo nodejs npm adb
+```
+
+- **adb:** Google publishes no arm64 Linux platform-tools, so `download-adb.sh` fetches an x86_64
+  binary that does not run. Use Ubuntu's: `cp /usr/bin/adb src-tauri/binaries/adb-aarch64-unknown-linux-gnu`.
+- **sdb:** Samsung publishes x86_64 only. `download-sdb.sh` still places it, which the build needs,
+  but it cannot run without x86 emulation — **Tizen does not work on an ARM Linux host.**
+- **Build** only the `.deb` (`npm run build -- --bundles deb`); AppImage needs linuxdeploy for arm64.
+- **Install:** the `.deb` puts the sidecar at `/usr/bin/adb`, which Ubuntu's `adb` package owns, so
+  `apt install` refuses. The files are identical, so `sudo dpkg -i --force-overwrite <deb>`. Removing
+  the app later deletes `/usr/bin/adb`; `sudo apt install --reinstall adb` puts it back.
+- Logs: `~/.local/share/com.smarttv.qa-tool/logs/webos-dev-manager.log`.
 
 ---
 
@@ -648,6 +855,7 @@ smooth transitions.
 | Android TV | ✅ Full — install, launch, kill, device info | ADB (Rust sidecar) |
 | LG WebOS | ✅ Working — install, launch, kill, inspect, stress test | SSH + Luna API |
 | VIDAA (Hisense) | ✅ Working — install, launch, close, remove (no logs / inspect yet) | VIDAA DevKit relay (WebSocket) |
+| Android Phone | ✅ USB phones: FreeTV + Mizrahi apps — install, launch, kill, remove, logcat, scrcpy mirror | ADB over USB |
 
 ---
 
@@ -1138,8 +1346,8 @@ In `src/app/tizen/apps/tizen-apps.component.ts`:
 
 #### Other Fixes
 - LG WebOS app buttons: fixed wrapping (5 buttons: Inspect/Launch/Kill/Stress/Remove stayed on one row by switching from `grid` with hardcoded 4 columns to `flex`)
-- Dead code removed: `extract-icons.ts`, `samsung-tizen.service.ts`, `permissions/vidaa/`, `permissions/samsung-tizen/`, `icon.png` (root), `scripts/generate-lg-badge-previews.js`
-- Workspace file renamed: `FreeTV-QA-Tool.code-workspace` → `Smart-TV-QA-Tool.code-workspace`
+- Dead code removed: `extract-icons.ts`, `samsung-tizen.service.ts`, `permissions/vidaa/` (since re-added for the VIDAA plugin), `permissions/samsung-tizen/`, `icon.png` (root), `scripts/generate-lg-badge-previews.js`
+- Workspace file renamed: `FreeTV-QA-Tool.code-workspace` → `Smart-TV-QA-Tool.code-workspace` (now `QA-Tool.code-workspace`)
 - `.gitignore` updated: added `*.wgt`, `*.apk`, `.history/`, session notes
 
 ---

@@ -285,7 +285,7 @@ pub struct TizenStudioInfo {
     pub profiles: Vec<TizenCertProfile>,
 }
 
-fn parse_cert_profiles(xml_path: &str) -> Vec<TizenCertProfile> {
+pub(super) fn parse_cert_profiles(xml_path: &str) -> Vec<TizenCertProfile> {
     let Ok(content) = std::fs::read_to_string(xml_path) else { return vec![] };
     let active = regex::Regex::new(r#"<profiles[^>]+active="([^"]+)""#)
         .unwrap()
@@ -377,7 +377,7 @@ fn pick_cert_profile(
 
 /// `profiles.xml` lives in `tizen-studio-data`, a sibling of the Tizen Studio
 /// install dir, falling back to the one under $HOME.
-fn cert_profiles_path(tizen_studio_path: &str) -> String {
+pub(super) fn cert_profiles_path(tizen_studio_path: &str) -> String {
     if let Some(parent) = std::path::Path::new(tizen_studio_path).parent() {
         let candidate = parent.join("tizen-studio-data/profile/profiles.xml");
         if candidate.exists() {
@@ -1293,6 +1293,17 @@ pub(crate) async fn tizen_read_wgt_info(file_path: String) -> Result<TizenWgtInf
     })
 }
 
+/// Where Tizen Studio installs by default, in the order `tizen_detect_studio` tries them.
+pub(super) fn studio_candidates(home: &str) -> Vec<String> {
+    vec![
+        format!("{home}/tizen-studio"),
+        format!("{home}/.local/share/tizen-studio"),
+        "/opt/tizen-studio".to_owned(),
+        // The Windows installer's default.
+        r"C:\tizen-studio".to_owned(),
+    ]
+}
+
 #[tauri::command]
 pub(crate) async fn tizen_detect_studio(home_dir: String) -> Result<TizenStudioInfo, Error> {
     let home = if home_dir.is_empty() {
@@ -1303,13 +1314,7 @@ pub(crate) async fn tizen_detect_studio(home_dir: String) -> Result<TizenStudioI
         home_dir.clone()
     };
 
-    let candidates = vec![
-        format!("{home}/tizen-studio"),
-        format!("{home}/.local/share/tizen-studio"),
-        "/opt/tizen-studio".to_owned(),
-    ];
-
-    for path in &candidates {
+    for path in &studio_candidates(&home) {
         #[cfg(target_os = "windows")]
         let tizen_bin = format!(r"{path}\tools\ide\bin\tizen.bat");
         #[cfg(not(target_os = "windows"))]
@@ -1336,28 +1341,52 @@ pub(crate) async fn tizen_detect_studio(home_dir: String) -> Result<TizenStudioI
     ))
 }
 
-#[tauri::command]
-pub(crate) async fn tizen_open_certificate_manager(studio_path: String) -> Result<(), Error> {
-    #[cfg(target_os = "windows")]
-    let bin = format!(r"{studio_path}\tools\certificate-manager\certificate-manager.exe");
-    #[cfg(not(target_os = "windows"))]
-    let bin = format!("{studio_path}/tools/certificate-manager/certificate-manager");
-    std::process::Command::new(&bin)
-        .spawn()
-        .map_err(|e| Error::new(format!("Failed to open Certificate Manager: {e}")))?;
+/// Starts one of Tizen Studio's GUI tools. On macOS each one is an `.app` — the bare
+/// `certificate-manager` binary does not exist there, and `bin/device-manager` is a script without
+/// the execute bit — so it goes through `open`. Linux runs the launcher script with bash.
+fn open_studio_tool(studio_path: &str, name: &str, mac_app: &str, unix_bin: &str, windows_exe: &str) -> Result<(), Error> {
+    let mut cmd = if cfg!(target_os = "macos") {
+        let mut c = std::process::Command::new("open");
+        c.arg(format!("{studio_path}/{mac_app}"));
+        c
+    } else if cfg!(target_os = "windows") {
+        std::process::Command::new(format!(r"{studio_path}\{windows_exe}"))
+    } else {
+        let mut c = std::process::Command::new("bash");
+        c.arg(format!("{studio_path}/{unix_bin}"));
+        c
+    };
+    let status = cmd.spawn().map_err(|e| Error::new(format!("Failed to open {name}: {e}")))?;
+    // `open` answers at once; anything else keeps running as the tool itself.
+    if cfg!(target_os = "macos") {
+        let out = status.wait_with_output()?;
+        if !out.status.success() {
+            return Err(Error::new(format!("Failed to open {name}: is it installed in {studio_path}?")));
+        }
+    }
     Ok(())
 }
 
 #[tauri::command]
+pub(crate) async fn tizen_open_certificate_manager(studio_path: String) -> Result<(), Error> {
+    open_studio_tool(
+        &studio_path,
+        "Certificate Manager",
+        "tools/certificate-manager/certificate-manager.app",
+        "tools/certificate-manager/certificate-manager",
+        r"tools\certificate-manager\certificate-manager.exe",
+    )
+}
+
+#[tauri::command]
 pub(crate) async fn tizen_open_device_manager(studio_path: String) -> Result<(), Error> {
-    #[cfg(target_os = "windows")]
-    let bin = format!(r"{studio_path}\tools\device-manager\bin\device-manager.exe");
-    #[cfg(not(target_os = "windows"))]
-    let bin = format!("{studio_path}/tools/device-manager/bin/device-manager");
-    std::process::Command::new(&bin)
-        .spawn()
-        .map_err(|e| Error::new(format!("Failed to open Device Manager: {e}")))?;
-    Ok(())
+    open_studio_tool(
+        &studio_path,
+        "Device Manager",
+        "tools/device-manager/bin/device-manager.app",
+        "tools/device-manager/bin/device-manager",
+        r"tools\device-manager\bin\device-manager.exe",
+    )
 }
 
 // ── Samsung SmartTV Remote Control (WebSocket, port 8002 wss) ────────────────
@@ -1523,6 +1552,7 @@ pub fn plugin<R: Runtime>(name: &'static str) -> TauriPlugin<R> {
             tizen_press_key,
             tizen_open_certificate_manager,
             tizen_open_device_manager,
+            super::tizen_prereq::tizen_check_prerequisites,
             super::adb::adb_list_devices,
             super::adb::adb_connect,
             super::adb::adb_disconnect,
@@ -1532,6 +1562,14 @@ pub fn plugin<R: Runtime>(name: &'static str) -> TauriPlugin<R> {
             super::adb::adb_force_stop,
             super::adb::adb_uninstall,
             super::adb::adb_install,
+            super::adb_phone::adb_list_usb_devices,
+            super::adb_phone::adb_list_packages_matching,
+            super::adb_phone::adb_launch_launcher,
+            super::adb_phone::scrcpy_open,
+            super::adb_phone::adb_save_logcat,
+            super::adb_phone::adb_install_multiple,
+            super::adb_phone::adb_install_xapk,
+            super::adb_phone::brew_installed,
             super::apk_library::apk_library_list,
             super::apk_library::apk_library_fetch,
             super::apk_library::apk_manifest,
@@ -1544,6 +1582,12 @@ pub fn plugin<R: Runtime>(name: &'static str) -> TauriPlugin<R> {
             super::confluence::confluence_forget_token,
             super::confluence::confluence_releases,
             super::confluence::confluence_fetch,
+            super::firebase::firebase_account,
+            super::firebase::firebase_sign_in,
+            super::firebase::firebase_sign_out,
+            super::firebase::firebase_apps,
+            super::firebase::firebase_releases,
+            super::firebase::firebase_fetch,
         ])
         .build()
 }
