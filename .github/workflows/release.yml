@@ -85,8 +85,14 @@ jobs:
         run: |
           mkdir -p src-tauri/binaries
           bash scripts/download-sdb.sh
-          cp src-tauri/binaries/sdb-aarch64-apple-darwin \
-             src-tauri/binaries/sdb-x86_64-apple-darwin
+          # A universal build compiles once per arch and bundles under the universal name, and each
+          # looks up the sidecar by its own triple. platform-tools' adb is universal; Samsung's sdb is
+          # Intel-only and runs under Rosetta, so the same file serves every name.
+          for bin in adb sdb; do
+            for triple in x86_64-apple-darwin universal-apple-darwin; do
+              cp src-tauri/binaries/$bin-aarch64-apple-darwin src-tauri/binaries/$bin-$triple
+            done
+          done
 
       - name: Download SDB binary (Windows)
         if: runner.os == 'Windows'
@@ -103,6 +109,15 @@ jobs:
                     src-tauri\binaries\adb-aarch64-pc-windows-msvc.exe
           Copy-Item src-tauri\binaries\sdb-x86_64-pc-windows-msvc.exe `
                     src-tauri\binaries\sdb-aarch64-pc-windows-msvc.exe
+
+      - name: Copy binaries for the 32-bit build (Windows x64)
+        if: matrix.target == 'windows-x64'
+        shell: pwsh
+        run: |
+          Copy-Item src-tauri\binaries\adb-x86_64-pc-windows-msvc.exe `
+                    src-tauri\binaries\adb-i686-pc-windows-msvc.exe
+          Copy-Item src-tauri\binaries\sdb-x86_64-pc-windows-msvc.exe `
+                    src-tauri\binaries\sdb-i686-pc-windows-msvc.exe
 
       - name: Build (Windows x64)
         if: matrix.target == 'windows-x64'
@@ -136,12 +151,12 @@ jobs:
           separator: "\n"
           read-gitignore: false
           files: |
-            src-tauri/target/**/bundle/deb/*.deb
-            src-tauri/target/**/bundle/rpm/*.rpm
-            src-tauri/target/**/bundle/appimage/*.AppImage
-            src-tauri/target/**/bundle/msi/*.msi
-            src-tauri/target/**/bundle/nsis/*.exe
-            src-tauri/target/**/bundle/dmg/*.dmg
+            target/**/bundle/deb/*.deb
+            target/**/bundle/rpm/*.rpm
+            target/**/bundle/appimage/*.AppImage
+            target/**/bundle/msi/*.msi
+            target/**/bundle/nsis/*.exe
+            target/**/bundle/dmg/*.dmg
 
       - name: Upload Artifact (snapshot)
         uses: actions/upload-artifact@v4
