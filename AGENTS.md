@@ -444,6 +444,7 @@ Auth is the user's **Personal Access Token**, Bearer. It is checked against
 `/rest/api/user/current` before it is kept, and kept only in the OS keychain (`keyring`, service
 `com.smarttv.qa-tool`, account `confluence-token`) — never in a file or `localStorage`, and the
 frontend has no command that reads it back. A refused token brings the token form back.
+
 Rows show only the version and its release day (and a Debug tag) — the tab says what the build
 is. The UI is one shared panel, `ConfluenceBuildsComponent`: it takes a page and a list of build
 kinds, each a file-name pattern, and shows the newest row that carries each kind. Newest *per
