@@ -864,6 +864,7 @@ smooth transitions.
 | Priority | Item | Notes |
 |----------|------|-------|
 | Now | Fix Samsung Tizen Info tab | Branch: `fix-samsung-info`; reads `/etc/info.ini` via `tizen_get_device_info` — check the fields returned vs displayed, the `TizenInfoEntry` parsing, and the UI mapping |
+| Now | One-click ADB setup (Android) | Check adb, **Install ADB** button, add to PATH; likely fixes Android on Windows (bundle lacks `AdbWinApi.dll`) — plan in `docs/superpowers/specs/2026-11-05-adb-setup-design.md` |
 | Now | VIDAA logs / Inspect | Ask VIDAA via the PEM to open DevTools (9226) — [questions](#vidaa-hisense--implementation-plan) |
 | Soon | LG WebOS into `DeviceProviderFactory` | Wrap `RemoteLunaService` / `RemoteCommandService` in `WebOSProvider` |
 | Soon | Screenshot from Samsung TV | `sdb shell 0 screencapture` + `sdb pull` (not on all firmware), or CDP `Page.captureScreenshot` on a debug build |
