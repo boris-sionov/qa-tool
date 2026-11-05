@@ -441,6 +441,12 @@ Auth is the user's **Personal Access Token**, Bearer. It is checked against
 `com.smarttv.qa-tool`, account `confluence-token`) — never in a file or `localStorage`, and the
 frontend has no command that reads it back. A refused token brings the token form back.
 
+On Linux the keychain is the Secret Service (GNOME Keyring / KWallet), which `keyring` reaches
+only with the Linux-only `sync-secret-service` feature in `src-tauri/Cargo.toml`. Without it
+`keyring` silently falls back to an in-memory mock: the token is "saved", gone by the next call,
+and the token form keeps coming back. Building it needs `libdbus-1-dev`.
+
+
 Rows show only the version and its release day (and a Debug tag) — the tab says what the build
 is. The UI is one shared panel, `ConfluenceBuildsComponent`: it takes a page and a list of build
 kinds, each a file-name pattern, and shows the newest row that carries each kind. Newest *per
