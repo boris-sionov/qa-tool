@@ -5,6 +5,10 @@ on:
     types: [ published ]
   workflow_dispatch:
 
+# Attaching the bundles edits the release, which the repo's default read-only token refuses (403).
+permissions:
+  contents: write
+
 env:
   NODE_VERSION: '20.x'
   # Compiled into the app for Firebase App Distribution sign-in; empty leaves it switched off.
