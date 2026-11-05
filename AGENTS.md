@@ -132,9 +132,11 @@ code path that may see all three platforms.
 | `local-file` | `plugins/local_file.rs` | Host filesystem |
 | `adb-manager` | `plugins/samsung_tizen.rs` | **Both** Android TV ADB *and* Tizen SDB |
 | `lg-remote` | `plugins/lg_remote.rs` | LG remote-control keys |
+| `vidaa` | `plugins/vidaa.rs` | VIDAA DevKit relay session |
 
-**Key insight:** `plugins/adb.rs` is a helper module imported by `samsung_tizen.rs`, not a separately
-registered plugin. Every ADB *and* Tizen call from Angular goes through `invoke('plugin:adb-manager|...')`.
+**Key insight:** `plugins/adb.rs`, `apk_library.rs` and `confluence.rs` are helper modules whose
+commands are registered by `samsung_tizen.rs`, not separate plugins. Every ADB, Tizen, APK-library
+and Confluence call from Angular goes through `invoke('plugin:adb-manager|...')`.
 
 ### Adding a Tauri Command — Three Places, Not One
 
@@ -159,12 +161,14 @@ product name `Smart TV QA Tool` comes from `tauri.conf.json`.
 ```
 /                   → PlatformSelectorModule  (lazy)
 /lg                 → LgComponent (eager) + lazy child modules:
-    apps / files / terminal / debug / info / devices
+    apps / files / terminal / debug / info / devices  (+ nav-more, eager)
 /android-tv         → AndroidTvModule  (lazy)
 /tizen              → TizenModule      (lazy)
+/vidaa              → VidaaModule      (lazy)
 ```
 
-Each platform module owns its own `devices/`, `apps/`, and `info/` sub-routes.
+Each platform module owns its own `devices/`, `apps/`, and `info/` sub-routes — except VIDAA,
+which has only `apps/` and `info/` (the connection code is per session, so there is no device list).
 
 ### DeviceProvider Interface
 
@@ -440,7 +444,6 @@ Auth is the user's **Personal Access Token**, Bearer. It is checked against
 `/rest/api/user/current` before it is kept, and kept only in the OS keychain (`keyring`, service
 `com.smarttv.qa-tool`, account `confluence-token`) — never in a file or `localStorage`, and the
 frontend has no command that reads it back. A refused token brings the token form back.
-
 Rows show only the version and its release day (and a Debug tag) — the tab says what the build
 is. The UI is one shared panel, `ConfluenceBuildsComponent`: it takes a page and a list of build
 kinds, each a file-name pattern, and shows the newest row that carries each kind. Newest *per
@@ -600,6 +603,25 @@ per **target triple**, so `src-tauri/binaries/` must contain e.g. `adb-aarch64-a
 `sdb-x86_64-pc-windows-msvc.exe`. A build fails with "binary not found" when the triple for the
 current target is missing — `npm run setup` fetches the host ones; CI copies/duplicates them for
 cross-compiled targets (see `.github/workflows/release.yml`).
+
+### Building On Linux ARM64 (e.g. Asahi Ubuntu)
+
+Checked on Ubuntu 26.04 arm64, 2026-11-04. Build deps, all from Ubuntu's own repositories:
+
+```bash
+sudo apt-get install -y build-essential pkg-config cmake perl file libssl-dev libwebkit2gtk-4.1-dev \
+  libayatana-appindicator3-dev librsvg2-dev libxdo-dev libdbus-1-dev rustc cargo nodejs npm adb
+```
+
+- **adb:** Google publishes no arm64 Linux platform-tools, so `download-adb.sh` fetches an x86_64
+  binary that does not run. Use Ubuntu's: `cp /usr/bin/adb src-tauri/binaries/adb-aarch64-unknown-linux-gnu`.
+- **sdb:** Samsung publishes x86_64 only. `download-sdb.sh` still places it, which the build needs,
+  but it cannot run without x86 emulation — **Tizen does not work on an ARM Linux host.**
+- **Build** only the `.deb` (`npm run build -- --bundles deb`); AppImage needs linuxdeploy for arm64.
+- **Install:** the `.deb` puts the sidecar at `/usr/bin/adb`, which Ubuntu's `adb` package owns, so
+  `apt install` refuses. The files are identical, so `sudo dpkg -i --force-overwrite <deb>`. Removing
+  the app later deletes `/usr/bin/adb`; `sudo apt install --reinstall adb` puts it back.
+- Logs: `~/.local/share/com.smarttv.qa-tool/logs/webos-dev-manager.log`.
 
 ---
 
@@ -1133,7 +1155,7 @@ In `src/app/tizen/apps/tizen-apps.component.ts`:
 
 #### Other Fixes
 - LG WebOS app buttons: fixed wrapping (5 buttons: Inspect/Launch/Kill/Stress/Remove stayed on one row by switching from `grid` with hardcoded 4 columns to `flex`)
-- Dead code removed: `extract-icons.ts`, `samsung-tizen.service.ts`, `permissions/vidaa/`, `permissions/samsung-tizen/`, `icon.png` (root), `scripts/generate-lg-badge-previews.js`
+- Dead code removed: `extract-icons.ts`, `samsung-tizen.service.ts`, `permissions/vidaa/` (since re-added for the VIDAA plugin), `permissions/samsung-tizen/`, `icon.png` (root), `scripts/generate-lg-badge-previews.js`
 - Workspace file renamed: `FreeTV-QA-Tool.code-workspace` → `Smart-TV-QA-Tool.code-workspace`
 - `.gitignore` updated: added `*.wgt`, `*.apk`, `.history/`, session notes
 
