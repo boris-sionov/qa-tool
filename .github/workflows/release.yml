@@ -127,7 +127,9 @@ jobs:
         if: matrix.target == 'windows-x64'
         run: |
           rustup target add i686-pc-windows-msvc
+          # PowerShell fails a step on its last command only, so a failed x64 bundle would pass.
           npm run build -- --features=vendored-openssl --target x86_64-pc-windows-msvc
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run build -- --features=vendored-openssl --target i686-pc-windows-msvc
 
       - name: Build (Windows ARM64)
@@ -152,10 +154,12 @@ jobs:
       - name: Name Installers By Platform
         shell: bash
         run: |
-          shopt -s globstar nullglob
+          # No globstar: macOS ships bash 3.2. Bundles sit in target/release or target/<triple>/release.
+          shopt -s nullglob
           version=$(node -p "require('./package.json').version")
           mkdir -p release-files
-          for f in target/**/bundle/{deb,rpm,appimage,msi,nsis,dmg}/*.{deb,rpm,AppImage,msi,exe,dmg}; do
+          for f in target/release/bundle/*/* target/*/release/bundle/*/*; do
+            case "$f" in *.deb|*.rpm|*.AppImage|*.msi|*.exe|*.dmg) ;; *) continue ;; esac
             name=$(basename "$f")
             case "$name" in
               *universal*)                  platform=macos-intel-and-apple-silicon ;;
