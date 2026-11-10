@@ -13,3 +13,4 @@ pub mod samsung_tizen;
 pub mod shell;
 pub mod tizen_prereq;
 pub mod vidaa;
+pub mod vidaa_devtools;
