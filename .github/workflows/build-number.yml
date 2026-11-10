@@ -1,6 +1,7 @@
 name: Build Number
 
-# Bumps src/build-info.json once per merge to main, so the counter tracks landed PRs.
+# Bumps src/build-info.json once per merge to main, so the counter tracks landed PRs, and sets the
+# app version to 1.BUILD.0 in package.json / package-lock.json (scripts/version-for.js).
 #
 # The bump lives here rather than in each PR branch: two PRs open at once both touch the same
 # line of build-info.json and conflict on the second merge, and a bump at PR time counts PRs
@@ -15,6 +16,13 @@ on:
 
 permissions:
   contents: write
+
+# Merges landing together queue instead of racing for the same counter. GitHub keeps one pending
+# run per group, so a third merge inside one run replaces the second's: the counter then rises by
+# 2 for 3 merges, which still gives every build a unique, higher version.
+concurrency:
+  group: build-number
+  cancel-in-progress: false
 
 jobs:
   bump:
@@ -36,15 +44,16 @@ jobs:
       - name: Commit
         run: |
           set -euo pipefail
-          if git diff --quiet -- src/build-info.json; then
+          if git diff --quiet -- src/build-info.json package.json package-lock.json; then
             echo "build-info.json unchanged — nothing to commit"
             exit 0
           fi
           build=$(node -p "require('./src/build-info.json').build")
+          version=$(node -p "require('./package.json').version")
           git config user.name  'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/build-info.json
-          git commit -m "chore: build ${build} [skip ci]"
+          git add src/build-info.json package.json package-lock.json
+          git commit -m "chore: build ${build} — v${version} [skip ci]"
           # Another merge can land while this runs; rebase onto it rather than failing the push.
           for attempt in 1 2 3; do
             if git push; then

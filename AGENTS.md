@@ -20,7 +20,7 @@ npm run setup:win       # Windows (PowerShell)
 
 # Development
 npm run start           # Tauri dev server with Angular hot-reload (port 4281)
-npm run build           # Production build (bumps the build number first — see Versioning)
+npm run build           # Production build (version = last merge's 1.BUILD — see Versioning)
 
 # Angular CLI — use npm run ng, NOT npx ng (wrapper sets required Tauri env vars)
 npm run ng -- generate component foo
@@ -46,34 +46,61 @@ workspace whose only member is `src-tauri`), **not** `src-tauri/target/`:
 
 ## Versioning & Build Number
 
-`package.json` `version` is the single source of semver — `src-tauri/tauri.conf.json` reads it via
-`"version": "../package.json"`. Bundle filenames come from it.
+**The version is the build number: `1.BUILD`.** Every merge to main raises the build counter, and
+the version follows it, so there is one number and nothing to edit by hand. The app shows `1.36`;
+`package.json`, the installers and release tags carry `1.36.0`.
 
-The build number is separate and generated:
+The Windows installer (MSI) takes `X.Y.Z` only with X and Y ≤ 255, so the counter sits in Y and
+rolls over (`scripts/version-for.js`, which self-checks when run: `node scripts/version-for.js`):
+
+```
+major = 1 + floor(build / 256),  minor = build % 256,  version = major.minor.0
+```
+
+| build | version | shown |
+|---|---|---|
+| 36 | `1.36.0` | `1.36` |
+| 255 | `1.255.0` | `1.255` |
+| 256 | `2.0.0` | `2.0` |
+| 300 | `2.44.0` | `2.44` |
 
 | File | Role |
 |------|------|
-| `scripts/build-info.js` | Generator. `--bump` increments, `--force` always increments |
-| `src/build-info.json` | Generated **and committed** — holds the counter, commit, branch, timestamp |
-| `src/app/core/build-info.ts` | Typed accessor: `BUILD_INFO`, `APP_VERSION` (`"1.0.0 (build 12)"`) |
+| `scripts/version-for.js` | `versionFor(build)` — the formula above |
+| `scripts/build-info.js` | Generator. `--bump` raises the counter (`--force`: always) **and** writes `versionFor(build)` into `package.json` and `package-lock.json` |
+| `src/build-info.json` | Generated **and committed** — counter, version, commit, branch, timestamp |
+| `src/app/core/build-info.ts` | Typed accessor: `BUILD_INFO`, `APP_VERSION` (`"1.36"`) |
 
-Wiring: **`.github/workflows/build-number.yml` owns the counter.** It runs `build-info.js --bump
---force` on every push to `main` and commits the result, so the number counts merged PRs. The bump
-lives there rather than in each PR branch because two open PRs both touch the same line and
+`src-tauri/tauri.conf.json` reads the version from `package.json` (`"version": "../package.json"`),
+so bundle filenames (`QA Tool_1.36.0_…`) and `release.yml`'s file names follow without wiring.
+`Cargo.toml`'s version is internal and stays.
+
+Wiring: **`.github/workflows/build-number.yml` owns the counter.** On every push to `main` it runs
+`build-info.js --bump --force` and commits `build-info.json`, `package.json` and
+`package-lock.json` as `chore: build N — v1.N.0 [skip ci]`, so the number counts merged PRs. The
+bump lives there rather than in each PR branch because two open PRs both touch the same line and
 conflict on the second merge, and bumping at PR time would count PRs opened rather than shipped.
 
+Merges landing together queue (`concurrency: build-number`) instead of racing for the counter —
+on 2026-11-09 two merges raced and one bump was lost. GitHub keeps one *pending* run per group, so
+a third merge inside one run replaces the second's queued run and the counter rises by 2 for 3
+merges. Every build still gets a unique, higher version; that is accepted.
+
 `prebuild` and `prestart` both run `build-info.js` without `--bump`: they refresh the commit,
-branch and timestamp for the build at hand but leave the counter to CI, so a local `npm run build`
-reports the same number as the artifact CI would produce from that commit. The script still
-supports `--bump` (conditional on HEAD moving or a dirty tree) and `--bump --force`.
+branch and timestamp for the build at hand but leave the counter and `package.json` to CI, so a
+local `npm run build` reports the same version as the artifact CI would produce from that commit.
 
 No push loop: a push made with `GITHUB_TOKEN` does not trigger workflows, and the commit is
 additionally tagged `[skip ci]`.
 
-Because only a merge moves the counter, a build from a branch or with uncommitted changes carries
-the number of the last merge. `APP_VERSION` says so instead of passing for that build:
-`1.0.0 (build 15+ · feat/foo a1b2c3d, modified)` (`versionLabel`, from the `branch` and `dirty`
-fields `build-info.js` records). `HEAD` — a detached checkout, as CI's tag builds are — counts as main.
+Because only a merge moves the version, a build from a branch or with uncommitted changes carries
+the version of the last merge. `APP_VERSION` says so instead of passing for that build:
+`1.36+ · feat/foo a1b2c3d, modified` (`versionLabel`, from the `branch` and `dirty` fields
+`build-info.js` records). `HEAD` — a detached checkout, as CI's tag builds are — counts as main.
+
+**Releases stay manual.** Publish one when wanted, tagged `v<package.json version>` at that commit
+(`v1.36.0`). There is **no update prompt**: `UpdateService` (`core/services/update.service.ts`) can
+fetch the latest release and compare semver, but nothing calls it — wiring it up is separate work.
 
 `APP_VERSION` is displayed in the platform-selector footer, the LG sidebar, and LG → More → Version.
 
