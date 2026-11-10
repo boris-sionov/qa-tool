@@ -9,6 +9,8 @@ import {InlineEditorComponent} from "./inline-editor/inline-editor.component";
 import {LgComponent} from "../lg/lg.component";
 import {RemoveConfirmation, RemoveDeviceComponent} from "../remove-device/remove-device.component";
 import {SharedModule} from "../shared/shared.module";
+import {ScanDevicesComponent} from "../shared/components/scan-devices/scan-devices.component";
+import {noop} from "rxjs";
 
 @Component({
     selector: 'app-devices',
@@ -62,5 +64,12 @@ export class DevicesComponent {
 
     addDevice() {
         this.lg?.openSetupDevice(true);
+    }
+
+    /** Scan the network; a picked TV opens the add wizard with its address filled in. */
+    async scanDevices(saved: Device[] | null) {
+        const scanned = await ScanDevicesComponent.open(this.modals, 'webos', (saved ?? []).map(d => d.host))
+            .catch(noop);
+        if (scanned) this.lg?.openSetupDevice(true, scanned);
     }
 }

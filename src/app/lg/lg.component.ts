@@ -10,6 +10,7 @@ import {isNonNull} from "../shared/operators";
 import {APP_VERSION} from '../core/build-info';
 import {DeviceChooserComponent} from "./device-chooser/device-chooser.component";
 import {DevicesComponent} from "../devices/devices.component";
+import {ScannedTv} from "../shared/components/scan-devices/scan-devices.component";
 
 @Component({
     selector: 'app-lg',
@@ -65,12 +66,14 @@ export class LgComponent implements OnInit {
         });
     }
 
-    openSetupDevice(cancellable: boolean): void {
+    /** `scanned`: a TV Scan Devices found, whose address and name the form starts with. */
+    openSetupDevice(cancellable: boolean, scanned?: ScannedTv): void {
         const ref = this.modalService.open(WizardComponent, {
             size: 'xl', centered: true, scrollable: true,
             injector: Injector.create({
                 providers: [
-                    {provide: 'cancellable', useValue: cancellable}
+                    {provide: 'cancellable', useValue: cancellable},
+                    {provide: 'scannedTv', useValue: scanned ?? null},
                 ]
             }),
         });

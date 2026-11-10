@@ -1,4 +1,4 @@
-@import "../../add-device/wizard/wizard.component";
+@import "../../../add-device/wizard/wizard.component";
 
 .ms-auto { margin-left: auto; }
 
@@ -52,7 +52,7 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
 
   > .bi { font-size: 20px; color: #7E92B0; }
-  &.android { border-color: rgba(74, 222, 128, 0.35); > .bi { color: #4ADE80; } }
+  &.ready { border-color: rgba(74, 222, 128, 0.35); > .bi { color: #4ADE80; } }
 }
 
 .scan-main { flex: 1; min-width: 0; }
@@ -72,3 +72,5 @@
   &.ok { background: rgba(74, 222, 128, 0.15); color: #4ADE80; }
   &.warn { background: rgba(250, 204, 21, 0.12); color: #FACC15; }
 }
+
+.scan-hint { margin-top: 14px; color: #A8B8CC; font-size: 13px; }

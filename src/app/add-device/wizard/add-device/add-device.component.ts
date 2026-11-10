@@ -1,4 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Inject, Input, OnInit, Optional, Output, ViewChild} from '@angular/core';
+import {ScannedTv} from "../../../shared/components/scan-devices/scan-devices.component";
 import {DeviceConnectionMode} from "../mode-select/mode-select.component";
 import {Device, NewDeviceAuthentication} from "../../../types";
 import {DeviceEditorComponent, SetupAuthInfoUnion} from "../../device-editor/device-editor.component";
@@ -25,7 +26,16 @@ export class AddDeviceComponent implements OnInit {
     @Output()
     deviceAdded: EventEmitter<Device> = new EventEmitter();
 
-    constructor(private modals: NgbModal, private deviceManager: DeviceManagerService) {
+    /** Filled from Scan Devices; otherwise the user types them. */
+    host?: string;
+    name = 'tv';
+
+    constructor(private modals: NgbModal, private deviceManager: DeviceManagerService,
+                @Optional() @Inject('scannedTv') scanned: ScannedTv | null) {
+        if (scanned) {
+            this.host = scanned.ip;
+            this.name = lgDeviceName(scanned.name);
+        }
     }
 
     ngOnInit(): void {
@@ -57,4 +67,11 @@ export class AddDeviceComponent implements OnInit {
             progress.close();
         }
     }
+}
+
+/** A device name the editor accepts (`^[_a-zA-Z][a-zA-Z0-9#_-]*`): `[LG] webOS TV QNED86T6A` → `QNED86T6A`. */
+export function lgDeviceName(castName: string | null): string {
+    const name = (castName ?? '').replace(/^\[LG\]\s*(webOS TV\s*)?/i, '').trim().replace(/[^a-zA-Z0-9#_-]+/g, '_');
+    if (!name) return 'tv';
+    return /^[_a-zA-Z]/.test(name) ? name : `tv_${name}`;
 }

@@ -294,7 +294,7 @@ export class AdbService implements DeviceProvider {
         return invoke<void>('plugin:adb-manager|tailscale_up');
     }
 
-    /** Every device on this computer's /24 network, with its MAC and which probed ports answer. */
+    /** The Android TVs, LG and Samsung TVs on this computer's /24 network. */
     async lanScan(): Promise<LanDevice[]> {
         return invoke<LanDevice[]>('plugin:adb-manager|lan_scan');
     }
@@ -341,10 +341,12 @@ export class AdbService implements DeviceProvider {
     }
 }
 
-/** A device `lanScan` found. 5555 open = ADB is on, i.e. an Android TV ready to add. */
+/** A TV `lanScan` found. `ready`: the port the tool connects through answers (ADB, LG dev mode, SDB). */
 export interface LanDevice {
     ip: string;
     mac: string | null;
     name: string | null;
+    platform: Platform;
+    ready: boolean;
     openPorts: number[];
 }

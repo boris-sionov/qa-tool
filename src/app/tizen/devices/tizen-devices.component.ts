@@ -6,6 +6,7 @@ import {MessageDialogComponent} from '../../shared/components/message-dialog/mes
 import {tizenSerial, TizenDevice, TizenStateService} from '../tizen-state.service';
 import {TizenRequirementsService} from '../tizen-requirements.service';
 import {TizenWizardComponent} from '../wizard/tizen-wizard.component';
+import {ScanDevicesComponent} from '../../shared/components/scan-devices/scan-devices.component';
 
 @Component({
     selector: 'app-tizen-devices',
@@ -34,6 +35,24 @@ export class TizenDevicesComponent implements OnInit {
         ref.result.then(() => {
             this.devices = this.state.getSavedDevices();
         }).catch(noop);
+    }
+
+    /** Scan the network; a picked TV opens the add wizard with IP and name filled in. */
+    openScan(): void {
+        ScanDevicesComponent.open(this.modalService, 'tizen', this.devices.map(d => d.ip))
+            .then(({ip, name, ready}) => {
+                const ref = this.modalService.open(TizenWizardComponent, {
+                    size: 'lg', centered: true, scrollable: true,
+                });
+                const instance = ref.componentInstance as TizenWizardComponent;
+                instance.ip = ip;
+                instance.name = name ?? '';
+                // SDB already answers, so the enable-developer-mode guide is moot
+                if (ready) instance.startStep = 2;
+                return ref.result;
+            })
+            .then(() => this.devices = this.state.getSavedDevices())
+            .catch(noop);
     }
 
     selectDevice(dev: TizenDevice): void {

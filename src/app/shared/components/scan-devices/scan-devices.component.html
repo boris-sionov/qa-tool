@@ -1,0 +1,67 @@
+<div class="wizard-modal">
+  <div class="wizard-header">
+    <div class="header-text">
+      <h5 class="wizard-title">Scan for {{ labels.title }}</h5>
+    </div>
+    <button class="close-btn" (click)="modal.dismiss()" aria-label="Close">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="wizard-body">
+    <div class="scan-toolbar">
+      <span class="scan-count">
+        @if (scanning) {
+          <span class="spinner-border spinner-border-sm"></span> Scanning the network…
+        } @else {
+          {{ devices.length }} {{ devices.length === 1 ? 'TV' : 'TVs' }} found
+        }
+      </span>
+      <button class="filter-btn ms-auto" [disabled]="scanning" (click)="scan()">
+        <i class="bi bi-arrow-clockwise"></i> Rescan
+      </button>
+    </div>
+
+    @if (error) {
+      <div class="scan-error"><i class="bi bi-exclamation-triangle-fill"></i> {{ error }}</div>
+    }
+
+    @if (!scanning && !error && devices.length === 0) {
+      <p class="scan-empty">
+        No {{ labels.title }} found. Check that the TV is on (not in standby) and on the same network
+        as this computer. Guest or office Wi-Fi that isolates devices hides every TV.
+      </p>
+    }
+
+    <div class="scan-list">
+      @for (d of devices; track d.ip) {
+        <div class="scan-row" [class.ready]="d.ready">
+          <i class="bi bi-tv"></i>
+          <div class="scan-main">
+            <div class="scan-ip">
+              @if (d.name) { <span class="scan-name">{{ d.name }}</span> }
+              {{ d.ip }}
+            </div>
+            <div class="scan-meta">{{ d.mac || 'MAC unknown' }}</div>
+          </div>
+          @if (d.ready) {
+            <span class="tag ok">{{ labels.ready }}</span>
+          } @else {
+            <span class="tag warn" [title]="'To connect, ' + labels.hint">{{ labels.notReady }}</span>
+          }
+          @if (isSaved(d)) {
+            <span class="tag">Saved</span>
+          } @else {
+            <button class="filter-btn active" (click)="pick(d)">
+              <i class="bi bi-plus-lg"></i> Add
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    @if (!scanning && devices.length && !allReady) {
+      <p class="scan-hint"><i class="bi bi-info-circle"></i> {{ labels.notReady }}: {{ labels.hint }}.</p>
+    }
+  </div>
+</div>

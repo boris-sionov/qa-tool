@@ -13,7 +13,6 @@ import {AndroidTvWizardComponent} from './wizard/android-tv-wizard.component';
 import {ApkLibraryComponent} from './library/apk-library.component';
 import {FirebaseBuildsComponent} from './library/firebase-builds.component';
 import {AdbApprovalComponent} from './approval/adb-approval.component';
-import {AndroidTvScanComponent} from './scan/android-tv-scan.component';
 
 const routes: Routes = [
     {
@@ -38,7 +37,6 @@ const routes: Routes = [
         ApkLibraryComponent,
         FirebaseBuildsComponent,
         AdbApprovalComponent,
-        AndroidTvScanComponent,
     ],
     imports: [
         CommonModule,
