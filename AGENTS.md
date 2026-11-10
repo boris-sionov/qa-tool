@@ -490,6 +490,24 @@ DUID comparison is containment-based (`0 duid` can echo more than the bare id) a
   placeholder. Nothing is written to the device — an installed APK's launcher banner is baked into
   the APK and cannot be changed over ADB, so this is our list only, not the TV's home screen.
 
+#### Scan Devices (Manage Devices)
+
+**Scan Devices** on the Android TV Manage page finds TVs instead of typing an IP. `lan_scan`
+(`plugins/net_scan.rs`, on `adb-manager`) probes every address in this computer's /24 on TCP 5555,
+8008, 8009, 22, 80, 443 and 62078 (about 3 s), then reads `arp` so a device with no open port still
+lists by its MAC. The dialog lists **every** device; **Android TV only** keeps those answering on
+5555, which means network ADB is on. That does not mean this computer is approved: the add wizard
+still handles the "Allow USB debugging?" prompt.
+
+- **Name** comes from Google Cast, `http://<ip>:8008/setup/eureka_info?params=name` — the name set
+  on the TV, read with no prompt. ADB would give the model but makes the TV ask to allow it.
+- **Cast** tag: answers Cast but not ADB — an LG / Samsung TV, a Chromecast, or an Android TV with
+  network debugging off.
+- **Add** opens the add wizard at the form step, IP and name filled in.
+- /24 only. Guest or office Wi-Fi with client isolation shows nothing; macOS may ask for Local
+  Network permission the first time.
+- On the real network: `cargo test -p devman live_scan -- --ignored --nocapture`.
+
 #### APK Library (Install from library)
 
 A shared set of APKs — store builds per version, older releases to go back to — that the apps

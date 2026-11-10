@@ -11,6 +11,10 @@
           {{ devices.length }} {{ devices.length === 1 ? 'device' : 'devices' }} saved
         </p>
       </div>
+      <button class="add-device-btn scan" (click)="openScan()">
+        <i class="bi bi-wifi"></i>
+        <span>Scan Devices</span>
+      </button>
       <button class="add-device-btn" (click)="openAddWizard()">
         <i class="bi bi-plus-lg"></i>
         <span>Add New Device</span>

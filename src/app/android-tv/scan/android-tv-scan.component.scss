@@ -1,0 +1,74 @@
+@import "../../add-device/wizard/wizard.component";
+
+.ms-auto { margin-left: auto; }
+
+.scan-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.scan-count { color: #A8B8CC; font-size: 13px; }
+
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(91, 159, 245, 0.35);
+  background: rgba(91, 159, 245, 0.08);
+  color: #A8B8CC;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) { color: #fff; border-color: #5B9FF5; }
+  &.active { background: #5B9FF5; border-color: #5B9FF5; color: #fff; }
+  &:disabled { opacity: 0.5; cursor: default; }
+}
+
+.scan-error {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.12);
+  color: #FF6B6B;
+  margin-bottom: 12px;
+}
+
+.scan-empty { color: #A8B8CC; font-size: 14px; }
+
+.scan-list { display: flex; flex-direction: column; gap: 8px; }
+
+.scan-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  > .bi { font-size: 20px; color: #7E92B0; }
+  &.android { border-color: rgba(74, 222, 128, 0.35); > .bi { color: #4ADE80; } }
+}
+
+.scan-main { flex: 1; min-width: 0; }
+.scan-ip { color: #fff; font-weight: 600; font-family: monospace; }
+.scan-name { font-family: inherit; margin-right: 8px; }
+.scan-meta { color: #7E92B0; font-size: 12px; font-family: monospace; }
+
+.tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(168, 184, 204, 0.12);
+  color: #A8B8CC;
+
+  &.ok { background: rgba(74, 222, 128, 0.15); color: #4ADE80; }
+  &.warn { background: rgba(250, 204, 21, 0.12); color: #FACC15; }
+}

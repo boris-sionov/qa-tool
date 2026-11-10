@@ -294,6 +294,11 @@ export class AdbService implements DeviceProvider {
         return invoke<void>('plugin:adb-manager|tailscale_up');
     }
 
+    /** Every device on this computer's /24 network, with its MAC and which probed ports answer. */
+    async lanScan(): Promise<LanDevice[]> {
+        return invoke<LanDevice[]>('plugin:adb-manager|lan_scan');
+    }
+
     async openLibraryFolderChooser(): Promise<string | null> {
         return showOpenDialog({title: 'APK library folder', directory: true, multiple: false});
     }
@@ -334,4 +339,12 @@ export class AdbService implements DeviceProvider {
             multiple: false,
         });
     }
+}
+
+/** A device `lanScan` found. 5555 open = ADB is on, i.e. an Android TV ready to add. */
+export interface LanDevice {
+    ip: string;
+    mac: string | null;
+    name: string | null;
+    openPorts: number[];
 }

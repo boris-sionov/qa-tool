@@ -8,6 +8,7 @@ pub mod devmode;
 pub mod file;
 pub mod firebase;
 pub mod lg_remote;
+pub mod net_scan;
 pub mod local_file;
 pub mod samsung_tizen;
 pub mod shell;
