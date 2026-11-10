@@ -490,6 +490,24 @@ DUID comparison is containment-based (`0 duid` can echo more than the bare id) a
   placeholder. Nothing is written to the device — an installed APK's launcher banner is baked into
   the APK and cannot be changed over ADB, so this is our list only, not the TV's home screen.
 
+#### Scan Devices (Manage Devices)
+
+**Scan Devices** on the Android TV Manage page finds TVs instead of typing an IP. `lan_scan`
+(`plugins/net_scan.rs`, on `adb-manager`) probes every address in this computer's /24 on TCP 5555,
+8008, 8009, 22, 80, 443 and 62078 (about 3 s), then reads `arp` so a device with no open port still
+lists by its MAC. The dialog lists **every** device; **Android TV only** keeps those answering on
+5555, which means network ADB is on. That does not mean this computer is approved: the add wizard
+still handles the "Allow USB debugging?" prompt.
+
+- **Name** comes from Google Cast, `http://<ip>:8008/setup/eureka_info?params=name` — the name set
+  on the TV, read with no prompt. ADB would give the model but makes the TV ask to allow it.
+- **Cast** tag: answers Cast but not ADB — an LG / Samsung TV, a Chromecast, or an Android TV with
+  network debugging off.
+- **Add** opens the add wizard at the form step, IP and name filled in.
+- /24 only. Guest or office Wi-Fi with client isolation shows nothing; macOS may ask for Local
+  Network permission the first time.
+- On the real network: `cargo test -p devman live_scan -- --ignored --nocapture`.
+
 #### APK Library (Install from library)
 
 A shared set of APKs — store builds per version, older releases to go back to — that the apps
@@ -683,6 +701,16 @@ of the app list, so neither identifies the app well enough to rely on. Walking t
 an app whose earlier stamp failed. Each run logs one of `[Install] Stamped environment icons: …`,
 `[Install] No installed app matches a bundled environment icon`, or `[Install] Could not stamp …` —
 start there when an icon does not turn up.
+
+**Missing icon files are repaired first, for any sideloaded app** (`repairMissingIcons`). webOS
+file names are case-sensitive and the IPK tooling does not check them: Cellcom TV (1.0.0, 1.0.1)
+ships `largeicon.png` but declares `largeIcon.png`, so the launcher finds no icon and draws a
+maroon `iconColor` tile with no logo. For each developer app whose `appinfo.json` names an icon the
+folder lacks (`missingIcons()`, `src/app/shared/webos-icon-repair.ts`), the file is created — from
+the app's bundled brand artwork (`brandIcon()`, which then also replaces its other declared icons so
+both tiles match), otherwise from the file that differs only in case. Logged as
+`[Install] <id>: created largeIcon.png (was largeicon.png) from …`. Like the stamp, it has to
+re-run after every install, since installing the IPK takes the file away again.
 
 ### Environment Icons
 

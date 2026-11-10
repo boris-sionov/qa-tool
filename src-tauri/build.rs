@@ -89,6 +89,7 @@ fn main() {
                     "play_store_listing",
                     "tailscale_state",
                     "tailscale_up",
+                    "lan_scan",
                     "confluence_token_saved",
                     "confluence_save_token",
                     "confluence_forget_token",

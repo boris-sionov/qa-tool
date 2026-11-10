@@ -25,6 +25,7 @@ permissions = [
   "allow-play-store-listing",
   "allow-tailscale-state",
   "allow-tailscale-up",
+  "allow-lan-scan",
   "allow-confluence-token-saved",
   "allow-confluence-save-token",
   "allow-confluence-forget-token",

@@ -93,6 +93,12 @@ $border-color: rgba(91, 159, 245, 0.2);
     transform: translateY(-2px);
     box-shadow: 0 8px 22px rgba(91, 159, 245, 0.45);
   }
+
+  &.scan {
+    background: rgba(91, 159, 245, 0.12);
+    border: 1px solid rgba(91, 159, 245, 0.45);
+    box-shadow: none;
+  }
 }
 
 .hero-avatar {

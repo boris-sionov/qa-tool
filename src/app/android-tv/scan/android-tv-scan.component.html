@@ -1,0 +1,73 @@
+<div class="wizard-modal">
+  <div class="wizard-header">
+    <div class="header-text">
+      <h5 class="wizard-title">Scan Network</h5>
+    </div>
+    <button class="close-btn" (click)="modal.dismiss()" aria-label="Close">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="wizard-body">
+    <div class="scan-toolbar">
+      <button class="filter-btn" [class.active]="androidOnly" [disabled]="scanning"
+              (click)="androidOnly = !androidOnly" [attr.aria-pressed]="androidOnly">
+        <i class="bi bi-funnel-fill"></i>
+        Android TV only ({{ androidCount }})
+      </button>
+      <span class="scan-count">
+        @if (scanning) {
+          <span class="spinner-border spinner-border-sm"></span> Scanning…
+        } @else {
+          {{ shown.length }} of {{ devices.length }} devices
+        }
+      </span>
+      <button class="filter-btn ms-auto" [disabled]="scanning" (click)="scan()">
+        <i class="bi bi-arrow-clockwise"></i> Rescan
+      </button>
+    </div>
+
+    @if (error) {
+      <div class="scan-error"><i class="bi bi-exclamation-triangle-fill"></i> {{ error }}</div>
+    }
+
+    @if (!scanning && !error && shown.length === 0) {
+      <p class="scan-empty">
+        @if (androidOnly) {
+          No Android TV with ADB on was found. Check that the TV is awake, on the same network,
+          and has ADB / network debugging enabled.
+        } @else {
+          No devices found. Guest or office Wi-Fi often blocks devices from seeing each other.
+        }
+      </p>
+    }
+
+    <div class="scan-list">
+      @for (d of shown; track d.ip) {
+        <div class="scan-row" [class.android]="isAndroidTv(d)">
+          <i class="bi" [class.bi-android2]="isAndroidTv(d)" [class.bi-cast]="isCastOnly(d)"
+             [class.bi-hdd-network]="!isAndroidTv(d) && !isCastOnly(d)"></i>
+          <div class="scan-main">
+            <div class="scan-ip">
+              @if (d.name) { <span class="scan-name">{{ d.name }}</span> }
+              {{ d.ip }}
+            </div>
+            <div class="scan-meta">
+              {{ d.mac || 'MAC unknown' }}
+              @if (d.openPorts.length) { · ports {{ d.openPorts.join(', ') }} }
+            </div>
+          </div>
+          @if (isAndroidTv(d)) { <span class="tag ok">Android TV · ADB on</span> }
+          @if (isCastOnly(d)) { <span class="tag warn" title="Answers Google Cast but not ADB: an LG/Samsung TV, a Chromecast, or an Android TV with network debugging off">Cast</span> }
+          @if (isSaved(d)) {
+            <span class="tag">Saved</span>
+          } @else if (isAndroidTv(d)) {
+            <button class="filter-btn active" (click)="modal.close({ip: d.ip, name: d.name})">
+              <i class="bi bi-plus-lg"></i> Add
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
