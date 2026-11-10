@@ -492,20 +492,32 @@ DUID comparison is containment-based (`0 duid` can echo more than the bare id) a
 
 #### Scan Devices (Manage Devices)
 
-**Scan Devices** on the Android TV Manage page finds TVs instead of typing an IP. `lan_scan`
-(`plugins/net_scan.rs`, on `adb-manager`) probes every address in this computer's /24 on TCP 5555,
-8008, 8009, 22, 80, 443 and 62078 (about 3 s), then reads `arp` so a device with no open port still
-lists by its MAC. The dialog lists **every** device; **Android TV only** keeps those answering on
-5555, which means network ADB is on. That does not mean this computer is approved: the add wizard
-still handles the "Allow USB debugging?" prompt.
+**Scan Devices** on the Android TV, Samsung and LG Manage pages finds TVs instead of typing an IP.
+Each page lists only its own platform. One shared dialog, `ScanDevicesComponent`
+(`shared/components/scan-devices/`), opened with the platform. Add opens that page's own add
+flow with the IP and name filled in.
 
-- **Name** comes from Google Cast, `http://<ip>:8008/setup/eureka_info?params=name` — the name set
-  on the TV, read with no prompt. ADB would give the model but makes the TV ask to allow it.
-- **Cast** tag: answers Cast but not ADB — an LG / Samsung TV, a Chromecast, or an Android TV with
-  network debugging off.
-- **Add** opens the add wizard at the form step, IP and name filled in.
-- /24 only. Guest or office Wi-Fi with client isolation shows nothing; macOS may ask for Local
-  Network permission the first time.
+`lan_scan` (`plugins/net_scan.rs`, on `adb-manager`) probes every address in this computer's /24
+(about 3.5 s) and tells the platform from the ports that answer:
+
+| Platform | Recognised by | `ready` (can connect) | Name from |
+|---|---|---|---|
+| Android TV | 5555 (ADB) | always | Google Cast `:8008/setup/eureka_info?params=name` |
+| LG webOS | 3000 **and** 3001 (SSAP) | 9922 open: Dev Mode on | Cast (`[LG] webOS TV QNED86T6A`); some sets don't answer Cast |
+| Samsung Tizen | 8001 + 8002 (remote API), or 26101 | 26101 open: Developer mode on | `:8001/api/v2/` → `name · modelName`, HTML-escaped (`55&quot;`) |
+
+Ports go in pairs so a laptop with a dev server on 3000 is not taken for an LG. Checked on the
+office network on 2026-11-10: 18 TVs (7 Android TV, 6 LG, 5 Samsung). VIDAA (36669) is left out: it
+connects by DevKit code, not IP, so it has no device list.
+
+- Names are read with no prompt on the TV. ADB/SDB would give more, but ask the TV to allow it.
+- Not ready = the platform's developer mode is off; the dialog says how to turn it on. A Samsung
+  TV that is ready opens the add wizard past the developer-mode guide.
+- LG device names must match `^[_a-zA-Z][a-zA-Z0-9#_-]*`, so `lgDeviceName()` turns the Cast
+  name into `QNED86T6A`. The address reaches the old webosbrew wizard through the `scannedTv`
+  injection token, next to `cancellable`.
+- A TV in standby answers nothing. /24 only. Guest or office Wi-Fi with client isolation shows
+  nothing; macOS may ask for Local Network permission the first time.
 - On the real network: `cargo test -p devman live_scan -- --ignored --nocapture`.
 
 #### APK Library (Install from library)

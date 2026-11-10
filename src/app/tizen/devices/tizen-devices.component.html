@@ -14,6 +14,10 @@
         <i class="bi" [class.bi-clipboard-check]="!requirements.missing" [class.bi-exclamation-triangle-fill]="requirements.missing"></i>
         <span>Requirements</span>
       </button>
+      <button class="requirements-btn" type="button" (click)="openScan()">
+        <i class="bi bi-wifi"></i>
+        <span>Scan Devices</span>
+      </button>
       <button class="add-device-btn" (click)="openAddWizard()">
         <i class="bi bi-plus-lg"></i>
         <span>Add New Device</span>

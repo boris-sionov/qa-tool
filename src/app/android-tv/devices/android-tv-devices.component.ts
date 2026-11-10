@@ -5,7 +5,7 @@ import {AdbService} from '../../core/services/adb.service';
 import {AdbStateService, deviceSerial, SavedDevice} from '../adb-state.service';
 import {MessageDialogComponent} from '../../shared/components/message-dialog/message-dialog.component';
 import {AndroidTvWizardComponent} from '../wizard/android-tv-wizard.component';
-import {AndroidTvScanComponent} from '../scan/android-tv-scan.component';
+import {ScanDevicesComponent} from '../../shared/components/scan-devices/scan-devices.component';
 
 @Component({
     selector: 'app-android-tv-devices',
@@ -33,8 +33,8 @@ export class AndroidTvDevicesComponent implements OnInit {
 
     /** Scan the network; a picked TV opens the add wizard on its form step with the IP filled in. */
     openScan(): void {
-        this.modalService.open(AndroidTvScanComponent, {size: 'lg', centered: true, scrollable: true})
-            .result.then(({ip, name}: {ip: string; name: string | null}) => {
+        ScanDevicesComponent.open(this.modalService, 'android-tv', this.devices.map(d => d.ip))
+            .then(({ip, name}) => {
                 const ref = this.modalService.open(AndroidTvWizardComponent, {
                     size: 'lg', centered: true, scrollable: true,
                 });

@@ -13,6 +13,10 @@
           {{ devices?.length || 0 }} {{ (devices?.length || 0) === 1 ? 'device' : 'devices' }} saved
         </p>
       </div>
+      <button class="add-device-btn scan" (click)="scanDevices(devices)">
+        <i class="bi bi-wifi"></i>
+        <span>Scan Devices</span>
+      </button>
       <button class="add-device-btn" (click)="addDevice()">
         <i class="bi bi-plus-circle-fill"></i>
         <span>Add Device</span>
