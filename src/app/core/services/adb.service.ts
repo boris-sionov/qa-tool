@@ -9,6 +9,21 @@ export interface AdbDevice {
     state: 'device' | 'offline' | 'unauthorized' | string;
 }
 
+/** An APK in the shared library — a folder on this Mac or a web server's file list. */
+export interface LibraryApk {
+    name: string;
+    /** A path for a folder library, a URL for a server one. */
+    location: string;
+    size: number | null;
+    /** A ms timestamp for a folder; the listing's own date text for a server. */
+    modified: string | null;
+}
+
+export interface PlayListing {
+    version: string | null;
+    updated: number | null;
+}
+
 export interface AdbPackageInfo {
     id: string;
     name: string;
@@ -124,6 +139,48 @@ export class AdbService implements DeviceProvider {
         return invoke<void>('plugin:adb-manager|adb_disconnect', {serial});
     }
 
+    /**
+     * Makes sure ADB holds a working connection to `serial`, reconnecting when it does not.
+     *
+     * `adb devices` alone is not enough: the adb server outlives the app, and after the TV sleeps
+     * or changes network it keeps listing the old transport as `device` until a command on it
+     * fails. So a listed device must also answer a `getprop` within a few seconds; otherwise the
+     * transport is dropped and connected afresh.
+     *
+     * Resolves `unauthorized` when the TV is reachable but has not allowed this computer yet —
+     * it is showing the "Allow USB debugging?" prompt. Throws when the TV cannot be reached.
+     */
+    async ensureConnected(serial: string): Promise<'device' | 'unauthorized'> {
+        const state = async () => (await this.listConnectedDevices())
+            .find(d => d.serial === serial)?.state;
+        if (await state() === 'device' && await this.responds(serial)) return 'device';
+
+        await this.disconnect(serial).catch(() => undefined);
+        // `adb connect` to an address nothing answers on waits out the OS TCP timeout — 75 s on
+        // macOS. Give up well before that; a TV that answers at all connects in about a second.
+        let connectError: unknown;
+        await Promise.race([
+            this.connect(serial),
+            new Promise((_, reject) => setTimeout(
+                () => reject(new Error(`No answer from ${serial} — is the TV on, and on this network?`)), 10000)),
+        ]).catch(e => connectError = e);
+        let s = await state();
+        if (s === 'offline') {
+            // The transport is still coming up; give it a moment before calling it failed.
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            s = await state();
+        }
+        if (s === 'device' || s === 'unauthorized') return s;
+        throw connectError ?? new Error(`${serial} is ${s ?? 'not connected'}`);
+    }
+
+    private responds(serial: string): Promise<boolean> {
+        return Promise.race([
+            this.getProp(serial, 'ro.serialno').then(() => true, () => false),
+            new Promise<boolean>(resolve => setTimeout(() => resolve(false), 5000)),
+        ]);
+    }
+
     async listPackages(serial: string): Promise<AdbPackageInfo[]> {
         return invoke<AdbPackageInfo[]>('plugin:adb-manager|adb_list_packages', {serial});
     }
@@ -198,8 +255,47 @@ export class AdbService implements DeviceProvider {
         return invoke<void>('plugin:adb-manager|adb_uninstall', {serial, packageId});
     }
 
-    async install(serial: string, apkPath: string): Promise<void> {
-        return invoke<void>('plugin:adb-manager|adb_install', {serial, apkPath});
+    /** `downgrade` adds `-d`, letting an older version replace a newer one where Android allows it. */
+    async install(serial: string, apkPath: string, downgrade = false): Promise<void> {
+        return invoke<void>('plugin:adb-manager|adb_install', {serial, apkPath, downgrade});
+    }
+
+    async listLibrary(source: string): Promise<LibraryApk[]> {
+        return invoke<LibraryApk[]>('plugin:adb-manager|apk_library_list', {source});
+    }
+
+    /** Adds an APK on this Mac to the library as `name`; refused when the name exists, unless `overwrite`. */
+    async uploadToLibrary(source: string, path: string, name: string, overwrite: boolean): Promise<void> {
+        return invoke<void>('plugin:adb-manager|apk_library_upload', {source, path, name, overwrite});
+    }
+
+    /** What the public Play listing shows now: the version and its "Updated on" date. */
+    async playListing(packageId: string): Promise<PlayListing> {
+        return invoke<PlayListing>('plugin:adb-manager|play_store_listing', {packageId});
+    }
+
+    /** The local path of a library APK, downloaded first when it lives on a server. */
+    async fetchFromLibrary(location: string): Promise<string> {
+        return invoke<string>('plugin:adb-manager|apk_library_fetch', {location});
+    }
+
+    /** The package id and version name an APK on this Mac declares. */
+    async apkManifest(path: string): Promise<{packageId: string; versionName: string | null}> {
+        return invoke('plugin:adb-manager|apk_manifest', {path});
+    }
+
+    /** Whether Tailscale is up on this Mac: `running`, `stopped`, `needs-login` or `missing`. */
+    async tailscaleState(): Promise<'running' | 'stopped' | 'needs-login' | 'missing'> {
+        return invoke('plugin:adb-manager|tailscale_state');
+    }
+
+    /** Runs `tailscale up`. */
+    async tailscaleUp(): Promise<void> {
+        return invoke<void>('plugin:adb-manager|tailscale_up');
+    }
+
+    async openLibraryFolderChooser(): Promise<string | null> {
+        return showOpenDialog({title: 'APK library folder', directory: true, multiple: false});
     }
 
     // DeviceProvider bridge methods

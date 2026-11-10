@@ -1,8 +1,16 @@
-# Smart TV QA Tool
+# QA Tool
 
-> A unified desktop app for QA engineers to manage, install, inspect, and stress-test apps across multiple Smart TV platforms — from one window.
+> A unified desktop app for QA engineers to manage, install, inspect, and stress-test apps on smart TVs and phones — from one window.
 
 Built with **Tauri 2** (Rust backend) + **Angular 17** frontend. Runs natively on macOS, Windows, and Linux.
+
+---
+
+## Demo
+
+[![Smart TV QA Management Tool — 70-second walkthrough](https://img.youtube.com/vi/uYnDg0J6vs0/maxresdefault.jpg)](https://youtu.be/uYnDg0J6vs0)
+
+▶️ **[Watch the 70-second walkthrough on YouTube](https://youtu.be/uYnDg0J6vs0)**: installing builds, build identity, app lifecycle, Samsung signing, and the architecture.
 
 ---
 
@@ -62,8 +70,8 @@ Built with **Tauri 2** (Rust backend) + **Angular 17** frontend. Runs natively o
 ### 1. Clone and install dependencies
 
 ```bash
-git clone https://github.com/boris-sionov/smart-tv-qa-tool.git
-cd smart-tv-qa-tool
+git clone https://github.com/boris-sionov/qa-tool.git
+cd qa-tool
 npm install
 ```
 
@@ -94,9 +102,9 @@ npm run build
 ```
 
 **Output locations:**
-- macOS: `src-tauri/target/release/bundle/dmg/Smart TV QA Tool_*.dmg`
-- Windows: `.../msi/Smart_TV_QA_Tool_*.msi`
-- Linux: `.../deb/smart-tv-qa-tool_*.deb`
+- macOS: `target/release/bundle/dmg/QA Tool_*.dmg`
+- Windows: `.../msi/QA Tool_*.msi`
+- Linux: `.../deb/qa-tool_*.deb`
 
 ---
 
@@ -112,7 +120,7 @@ npm run build
 2. Install **Tizen Studio** (provides `sdb` and `tizen` CLI):
    - Download from [developer.samsung.com/smarttv](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html)
 
-3. Open Smart TV QA Tool → Samsung Tizen → **Manage** → Add device
+3. Open QA Tool → Samsung Tizen → **Manage** → Add device
 
 4. For signed installs: go to **Manage** → configure your certificate (browse `~/SamsungCertificate/`)
 
@@ -122,7 +130,7 @@ npm run build
    - Settings → Device Preferences → About → Build (click 7×)
    - Enable ADB over Network
 
-2. Open Smart TV QA Tool → Android TV → **Manage** → Add device (enter TV IP)
+2. Open QA Tool → Android TV → **Manage** → Add device (enter TV IP)
 
 3. ADB binary is downloaded automatically by `npm run setup`
 
@@ -130,14 +138,14 @@ npm run build
 
 1. Enable **Developer Mode** via the [LG Developer Mode app](https://webostv.developer.lge.com/develop/getting-started/developer-mode-app) on your TV
 
-2. Open Smart TV QA Tool → LG → **Manage** → Add device
+2. Open QA Tool → LG → **Manage** → Add device
 
 ---
 
 ## Project Structure
 
 ```
-smart-tv-qa-tool/
+qa-tool/
 ├── src/
 │   └── app/
 │       ├── platform-selector/       # Startup platform chooser
@@ -178,7 +186,7 @@ smart-tv-qa-tool/
 │   └── download-sdb.ps1             # Downloads SDB binary (Windows)
 │
 ├── AGENTS.md                        # Developer / agent reference
-└── Smart-TV-QA-Tool.code-workspace  # VS Code workspace
+└── QA-Tool.code-workspace           # VS Code workspace
 ```
 
 ---

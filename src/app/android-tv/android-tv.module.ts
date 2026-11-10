@@ -10,6 +10,9 @@ import {AndroidTvAppsComponent} from './apps/android-tv-apps.component';
 import {AndroidTvInfoComponent} from './info/android-tv-info.component';
 import {AndroidTvDevicesComponent} from './devices/android-tv-devices.component';
 import {AndroidTvWizardComponent} from './wizard/android-tv-wizard.component';
+import {ApkLibraryComponent} from './library/apk-library.component';
+import {FirebaseBuildsComponent} from './library/firebase-builds.component';
+import {AdbApprovalComponent} from './approval/adb-approval.component';
 
 const routes: Routes = [
     {
@@ -31,6 +34,9 @@ const routes: Routes = [
         AndroidTvInfoComponent,
         AndroidTvDevicesComponent,
         AndroidTvWizardComponent,
+        ApkLibraryComponent,
+        FirebaseBuildsComponent,
+        AdbApprovalComponent,
     ],
     imports: [
         CommonModule,

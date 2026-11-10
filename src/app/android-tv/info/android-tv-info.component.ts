@@ -22,17 +22,20 @@ export class AndroidTvInfoComponent implements OnInit, OnDestroy {
     info: DeviceInfo[] = [];
     loading = false;
     error?: Error;
+    unauthorized = false;
     copySuccess = false;
     private sub?: Subscription;
 
-    constructor(private adb: AdbService, private state: AdbStateService) {}
+    constructor(private adb: AdbService, public state: AdbStateService) {}
 
     ngOnInit(): void {
-        this.sub = this.state.selected$.subscribe(dev => {
-            this.device = dev;
+        this.sub = this.state.connection$.subscribe(conn => {
+            this.device = conn.device;
             this.info = [];
-            this.error = undefined;
-            if (dev) this.loadInfo(dev);
+            this.unauthorized = conn.status === 'unauthorized';
+            this.error = conn.status === 'failed' ? new Error(conn.error) : undefined;
+            this.loading = conn.status === 'checking';
+            if (conn.status === 'connected') this.loadInfo(conn.device);
         });
     }
 
@@ -53,6 +56,11 @@ export class AndroidTvInfoComponent implements OnInit, OnDestroy {
         } catch (err) {
             console.error('Failed to copy:', err);
         }
+    }
+
+    retry(): void {
+        if (this.state.connection$.value.status === 'connected') this.loadInfo(this.device!);
+        else this.state.checkConnection();
     }
 
     async loadInfo(dev: SavedDevice): Promise<void> {

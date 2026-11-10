@@ -24,6 +24,10 @@
 
     <!-- Install APK Button -->
     <div class="install-btn-container">
+      <button class="btn btn-outline-light text-nowrap install-btn" (click)="installFromLibrary()" [disabled]="!serial"
+              title="Install a version from the shared APK library — downgrades allowed">
+        <i class="bi bi-collection-fill me-2"></i>Install from library
+      </button>
       <button class="btn btn-primary text-nowrap install-btn" (click)="installApk()" [disabled]="!serial">
         <i class="bi bi-folder-fill me-2"></i>Install APK
       </button>
@@ -31,8 +35,14 @@
   </div>
 
   <div class="p-3 flex-fill overflow-auto">
-    @if (packagesError) {
-      <app-error-card title="Unable to get installed apps" [error]="packagesError" (retry)="loadPackages(true)">
+    @if (connection.status === 'failed') {
+      <app-error-card [title]="'Cannot connect to ' + connection.device.name" [error]="connectionError!" (retry)="retry()">
+      </app-error-card>
+    } @else if (connection.status === 'unauthorized') {
+      <app-adb-approval [serial]="serial!" [deviceName]="connection.device.name"
+                        (approved)="state.checkConnection()"></app-adb-approval>
+    } @else if (packagesError) {
+      <app-error-card title="Unable to get installed apps" [error]="packagesError" (retry)="retry()">
       </app-error-card>
     } @else if (!serial) {
       <div class="android-empty-state">
@@ -55,9 +65,15 @@
             <div class="apps-kicker">Android TV</div>
             <h2>Installed Apps</h2>
           </div>
-          <div class="apps-count">
-            <i class="bi bi-grid-3x3-gap-fill"></i>
-            <span>{{ packages.length }}</span>
+          <div class="apps-tools">
+            <div class="apps-count">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+              <span>{{ packages.length }}</span>
+            </div>
+            <button class="app-action secondary" type="button" aria-label="Reload apps" title="Reload apps"
+                    (click)="loadPackages(true)">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
           </div>
         </div>
 

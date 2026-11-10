@@ -8,9 +8,21 @@ import {ProgressDialogComponent, ProgressStep} from '../../shared/components/pro
 import {tizenSerial, TizenDevice, TizenStateService} from '../tizen-state.service';
 import {TizenWizardComponent} from '../wizard/tizen-wizard.component';
 import {TizenRemoteDialogComponent} from '../remote-dialog/tizen-remote-dialog.component';
-import {isKnownApp, isPriorityApp} from '../../shared/known-apps';
+import {isPriorityApp} from '../../shared/known-apps';
 import {tizenEnvironmentIcon} from '../../shared/app-environment-icons';
 import {brandIcon} from '../../shared/app-brand-icons';
+import {RELEASE_PAGES} from '../../core/services/confluence.service';
+import {BuildTab, ConfluenceBuildsDialogComponent} from '../../shared/components/confluence-builds/confluence-builds-dialog.component';
+
+/**
+ * The Samsung builds on "Releases Smart TV", told apart by file name. No store build: Samsung
+ * re-signs a published app and offers no download of that package, and a retail TV will not
+ * hand an installed one back over sdb.
+ */
+const TIZEN_TABS: BuildTab[] = [
+    {label: 'PREPROD', kinds: [{label: 'PREPROD', match: /samsung-tizen-preprod-.*\.wgt$/i}]},
+    {label: 'UAT', kinds: [{label: 'UAT', match: /samsung-tizen-uat-.*\.wgt$/i}]},
+];
 import {info as logInfo, warn as logWarn} from '@tauri-apps/plugin-log';
 import {renderEnvironmentBadge, renderEnvironmentBadgeUrl, readIcon} from '../../shared/environment-badge';
 
@@ -61,19 +73,21 @@ export class TizenAppsComponent implements OnInit, OnDestroy {
         return this.selected ? tizenSerial(this.selected) : null;
     }
 
-    isAllowed(app: SdbAppInfo): boolean {
-        return isKnownApp(app.name, app.id, app.runtimeId, app.tizenId);
-    }
-
     // Sort order: FreeTV first, then the rest alphabetically
     isPriority(app: SdbAppInfo): boolean {
         return isPriorityApp(app.name, app.id, app.runtimeId, app.tizenId);
     }
 
+    /**
+     * Every app the TV reports, FreeTV first and the rest alphabetically.
+     *
+     * The list used to keep only a fixed set of brands, which hid whatever QA had just
+     * sideloaded — `13+` among them — behind a pattern nobody thought to extend. A Samsung TV
+     * lists under two dozen apps, so showing all of them costs a few rows and no guessing.
+     */
     get filteredApps(): SdbAppInfo[] | null {
         if (!this.apps) return null;
         return [...this.apps]
-            .filter(app => this.isAllowed(app))
             .sort((a, b) => {
                 const aPriority = this.isPriority(a);
                 const bPriority = this.isPriority(b);
@@ -218,9 +232,20 @@ export class TizenAppsComponent implements OnInit, OnDestroy {
 
     async installWgt(): Promise<void> {
         if (!this.serial || this.installing) return;
-
         const path = await this.sdb.openWgtChooser().catch(() => null);
-        if (!path) return;
+        if (path) await this.installWgtFile(path);
+    }
+
+    /** The newest UAT / PREPROD build from Confluence, through the same signed install. */
+    async installFromConfluence(): Promise<void> {
+        if (!this.serial || this.installing) return;
+        const build = await ConfluenceBuildsDialogComponent.pick(
+            this.modalService, 'Install from Confluence — Samsung', RELEASE_PAGES.smartTv, TIZEN_TABS);
+        if (build) await this.installWgtFile(build.path);
+    }
+
+    private async installWgtFile(path: string): Promise<void> {
+        if (!this.serial || this.installing) return;
 
         // Ensure cert profile is configured
         let certProfile = this.state.getCertProfile();
