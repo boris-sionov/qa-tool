@@ -22,7 +22,6 @@ const LG_TABS: BuildTab[] = [
     {label: 'UAT', kinds: [{label: 'UAT', match: /lg-webos-uhd-uat-.*\.ipk$/i}]},
 ];
 import {HbchannelRemoveComponent} from "./hbchannel-remove/hbchannel-remove.component";
-import {StatStorageInfoComponent} from "../shared/components/stat-storage-info/stat-storage-info.component";
 import {DetailsComponent} from "./details/details.component";
 import {InstalledComponent} from "./installed/installed.component";
 
@@ -46,7 +45,6 @@ export class AppsComponent implements OnInit, OnDestroy {
     devices$?: Observable<Device[]|null>;
     appsScope: AppsScope = AppsComponent.restoreScope();
 
-    @ViewChild('storageInfo') storageInfo?: StatStorageInfoComponent;
     @ViewChild('installedComponent') installedComponent?: InstalledComponent;
 
     private deviceSubscription?: Subscription;
@@ -469,7 +467,6 @@ export class AppsComponent implements OnInit, OnDestroy {
         const progress = ProgressDialogComponent.open(this.modalService);
         try {
             await this.appManager.remove(this.device, pkg.id);
-            this.storageInfo?.refresh();
             return true;
         } catch (e) {
             MessageDialogComponent.open(this.modalService, {
@@ -523,7 +520,6 @@ export class AppsComponent implements OnInit, OnDestroy {
             const component = progress.componentInstance as ProgressDialogComponent;
             await this.appManager.installByManifest(device, manifest,
                 (progress, statusText) => component.update(statusText, progress));
-            this.storageInfo?.refresh();
             return true;
         } catch (e: any) {
             this.handleInstallationError(item.title, e as Error);
