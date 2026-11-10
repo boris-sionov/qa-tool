@@ -1,7 +1,7 @@
 import BuildInfoJson from '../../build-info.json';
 
 export interface BuildInfo {
-    /** Semver from package.json, e.g. `1.0.0`. */
+    /** Semver from package.json, `1.BUILD.0`, e.g. `1.36.0`. */
     readonly version: string;
     /** Monotonic counter, bumped by `scripts/build-info.js --bump` on every new update. */
     readonly build: number;
@@ -15,20 +15,20 @@ export interface BuildInfo {
 export const BUILD_INFO: BuildInfo = BuildInfoJson;
 
 /**
- * Human-readable banner, e.g. `1.0.0 (build 12)`.
+ * Human-readable banner: the version without its `.0`, e.g. `1.36` — the version *is* the build
+ * number (`1.BUILD.0`, see scripts/version-for.js).
  *
- * Only CI bumps the build number, on a merge to main, so a test build from a branch carries the
- * number of the last merge although it holds work main does not. Such a build says so:
- * `1.0.0 (build 12+ · feat/foo a1b2c3d)`, with `, modified` when it had uncommitted changes.
+ * Only CI bumps it, on a merge to main, so a test build from a branch carries the version of the
+ * last merge although it holds work main does not. Such a build says so:
+ * `1.36+ · feat/foo a1b2c3d`, with `, modified` when it had uncommitted changes.
  * `HEAD` is a detached checkout, as CI's release build of a tag is, and counts as main.
  */
 export const APP_VERSION: string = versionLabel(BUILD_INFO);
 
 export function versionLabel(info: BuildInfo): string {
+    const shown = info.version.replace(/\.0$/, '');
     const offMain = !!info.branch && info.branch !== 'main' && info.branch !== 'HEAD';
-    if (!offMain && !info.dirty) {
-        return info.build > 0 ? `${info.version} (build ${info.build})` : info.version;
-    }
+    if (!offMain && !info.dirty) return shown;
     const where = [offMain ? info.branch : '', info.commit].filter(Boolean).join(' ');
-    return `${info.version} (build ${info.build}+ · ${where}${info.dirty ? ', modified' : ''})`;
+    return `${shown}+ · ${where}${info.dirty ? ', modified' : ''}`;
 }
