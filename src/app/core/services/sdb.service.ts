@@ -167,10 +167,6 @@ export class SdbService implements DeviceProvider {
     // DeviceProvider bridge
     // -----------------------------------------------------------------------
 
-    async getAppIcon(_serial: string, _appId: string): Promise<string | null> {
-        return null;
-    }
-
     async launchApp(serial: string, appId: string): Promise<void> {
         await this.launch(serial, appId);
     }

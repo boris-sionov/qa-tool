@@ -25,7 +25,6 @@ export interface DeviceProvider {
     disconnect(serial: string): Promise<void>;
     listConnectedDevices(): Promise<PlatformDevice[]>;
     listApps(serial: string): Promise<PlatformApp[]>;
-    getAppIcon(serial: string, appId: string): Promise<string | null>;
     launchApp(serial: string, appId: string): Promise<void>;
     killApp(serial: string, appId: string): Promise<void>;
     installApp(serial: string, filePath: string): Promise<void>;

@@ -205,7 +205,6 @@ interface DeviceProvider {
     disconnect(serial: string): Promise<void>;
     listConnectedDevices(): Promise<PlatformDevice[]>;
     listApps(serial: string): Promise<PlatformApp[]>;
-    getAppIcon(serial: string, appId: string): Promise<string | null>;
     launchApp(serial: string, appId: string): Promise<void>;
     killApp(serial: string, appId: string): Promise<void>;
     installApp(serial: string, filePath: string): Promise<void>;
@@ -483,11 +482,13 @@ DUID comparison is containment-based (`0 duid` can echo more than the bare id) a
   brand ordering; anything else is named from its package id (`derived_name()`) and sorted
   alphabetically after the known brands. Firmware without `cmd package` falls back to
   `pm list packages`.
-- **`getAppIcon`** is still in TypeScript (APK icon extraction) — planned migration to Rust + zip crate
 - **Icons in the app list** are bundled assets, resolved in `AndroidTvAppsComponent.setPackages()`:
   the badged environment icon for a FreeTV build (see [Environment Icons](#environment-icons)),
-  otherwise `assets/app-icons/<packageId>.png` for the ids in `EXTRACTED_ICONS`, otherwise the ATV
-  placeholder. Nothing is written to the device — an installed APK's launcher banner is baked into
+  otherwise the brand icon (`assets/brand-icons/`, the same set as Samsung — see
+  [App List Icons](#app-list-icons-our-list-not-the-tv)), otherwise the ATV placeholder. **No icon is
+  extracted from an APK:** the old `getAppIcon` pulled the APK and unzipped it with python3, and
+  the `assets/app-icons/` it fed are gone. A new app gets its icon by adding its artwork to
+  `brand-icons/` and a pattern to `app-brand-icons.ts`. Nothing is written to the device — an installed APK's launcher banner is baked into
   the APK and cannot be changed over ADB, so this is our list only, not the TV's home screen.
 
 #### Scan Devices (Manage Devices)
