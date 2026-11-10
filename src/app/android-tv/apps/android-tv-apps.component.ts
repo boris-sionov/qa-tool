@@ -13,9 +13,6 @@ import {ApkLibraryComponent, LibraryPick} from '../library/apk-library.component
 /** pm's answers when an APK cannot replace the installed app without an uninstall first. */
 const REPLACE_REFUSED = /INSTALL_FAILED_UPDATE_INCOMPATIBLE|INSTALL_FAILED_VERSION_DOWNGRADE/;
 
-// OTT apps whose icon was extracted from the APK and bundled under assets/app-icons.
-const EXTRACTED_ICONS = ['tv.freetv.androidtv', 'tv.freetv.androidtv.uat', 'il.co.stingtv.staging', 'il.co.partnertv.atv', 'com.stingtv.androidtv', 'com.stingtv.androidtv.staging', 'il.co.partnertv.atv.staging', 'tv.partner.androidtv', 'tv.partner.androidtv.staging', 'tv.yes.androidtv', 'com.yes.yestv', 'com.cellcom.cellcom_tv', 'tv.cellcom.androidtv', 'tv.cellcom.androidtv.stg', 'com.netflix.ninja', 'com.hbo.hbomax', 'com.disneyplus', 'com.hotstar.androidtv'];
-
 @Component({
     selector: 'app-android-tv-apps',
     templateUrl: './android-tv-apps.component.html',
@@ -46,7 +43,7 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
      * A FreeTV build gets the badged icon for its environment — PREPROD, UAT, PROD TEST — because
      * every FreeTV APK ships the same green icon and the list would otherwise be a row of
      * identical tiles. Other brands get the bundled artwork the Samsung list uses
-     * (`assets/brand-icons/`), then the few icons extracted from APKs, then the placeholder.
+     * (`assets/brand-icons/`); anything else gets the placeholder. Nothing is read from the APK.
      *
      * Resolved here rather than in `iconPath`, which the template calls on every row on every
      * change-detection pass.
@@ -55,8 +52,7 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
         this.packages = packages;
         this.iconPaths = new Map((packages ?? []).flatMap(pkg => {
             const asset = environmentIcon('android-tv', pkg.id, pkg.name)?.asset
-                ?? brandIcon(pkg.id, pkg.name)
-                ?? (EXTRACTED_ICONS.includes(pkg.id) ? `assets/app-icons/${pkg.id}.png` : null);
+                ?? brandIcon(pkg.id, pkg.name);
             return asset ? [[pkg.id, asset] as const] : [];
         }));
     }
@@ -137,11 +133,8 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
         try {
             component.update('Installing APK...', 50);
             await this.adb.install(this.serial, path);
-            component.update('Extracting app icon...', 75);
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for icon extraction to complete
             if (this.serial) this.state.invalidatePackages(this.serial);
             await this.loadPackages();
-            window.location.reload(); // Reload to pick up new icons
         } catch (e) {
             MessageDialogComponent.open(this.modalService, {
                 title: 'Failed to install', message: extractMessage(e, 'Failed to install'), positive: 'Close',
