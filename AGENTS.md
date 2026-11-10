@@ -476,6 +476,13 @@ DUID comparison is containment-based (`0 duid` can echo more than the bare id) a
 - **Connection:** TCP port 5555, no auth after developer mode
 - **App format:** APK
 - **Commands:** bundled ADB sidecar binary, orchestrated from Rust via `adb-manager` plugin
+- **The app list is what the TV's launcher shows**: `adb_list_packages` asks
+  `cmd package query-activities` for every package with a MAIN activity under
+  `LEANBACK_LAUNCHER` or `LAUNCHER`, so system and preinstalled apps appear too, not only the
+  dozen-odd brands `app_name()` knows. That whitelist now only supplies display names and the
+  brand ordering; anything else is named from its package id (`derived_name()`) and sorted
+  alphabetically after the known brands. Firmware without `cmd package` falls back to
+  `pm list packages`.
 - **`getAppIcon`** is still in TypeScript (APK icon extraction) — planned migration to Rust + zip crate
 - **Icons in the app list** are bundled assets, resolved in `AndroidTvAppsComponent.setPackages()`:
   the badged environment icon for a FreeTV build (see [Environment Icons](#environment-icons)),
@@ -723,6 +730,13 @@ Where the icon is applied differs per platform, because what each one lets us wr
 
 #### App List Icons (our list, not the TV)
 
+Every app list shows **every app the TV reports** — Samsung from `0 vd_applist` (under two dozen
+on a retail set), LG's Apps scope from `allPackages$`, Android TV from the launcher query. They
+used to keep only the brands `isKnownApp` matched, which silently hid whatever QA had just
+installed — `13+` among them. That whitelist is gone from `src/app/shared/known-apps.ts`, which
+now only supplies the FreeTV-first sort (`isPriorityApp`) and `appEnvironment`. LG's Developer
+scope is unchanged: it still lists sideloaded apps only.
+
 The Tizen list draws bundled artwork per app — Disney, Netflix, yes+, HOT and the rest — because
 webOS's approach does not port: a retail Samsung TV refuses `sdb pull` from
 `/opt/share/webappservice/apps_icon/`, and its `sdb shell` is the restricted `vd_*` one with no
@@ -868,6 +882,7 @@ smooth transitions.
 | Priority | Item | Notes |
 |----------|------|-------|
 | Now | Fix Samsung Tizen Info tab | Branch: `fix-samsung-info`; reads `/etc/info.ini` via `tizen_get_device_info` — check the fields returned vs displayed, the `TizenInfoEntry` parsing, and the UI mapping |
+| Now | One-click ADB setup (Android) | Check adb, **Install ADB** button, add to PATH; likely fixes Android on Windows (bundle lacks `AdbWinApi.dll`) — plan in `docs/superpowers/specs/2026-11-05-adb-setup-design.md` |
 | Now | VIDAA logs / Inspect | Ask VIDAA via the PEM to open DevTools (9226) — [questions](#vidaa-hisense--implementation-plan) |
 | Soon | LG WebOS into `DeviceProviderFactory` | Wrap `RemoteLunaService` / `RemoteCommandService` in `WebOSProvider` |
 | Soon | Screenshot from Samsung TV | `sdb shell 0 screencapture` + `sdb pull` (not on all firmware), or CDP `Page.captureScreenshot` on a debug build |
@@ -993,6 +1008,22 @@ read from its JS and exercised on our TV on 2026-10-06.**
     (OK). It then received TV_INFO and the installed-apps list, including `debug-FreeTV PreProd`.
 
 **The TV can expose Chrome DevTools, the route for logs and Inspect, but on our U9 set it is closed.**
+- **The documented switch is in DevKit, and it is not enough on our set.** VIDAA's partner docs
+  ("Enable Chrome devtools") give these steps:
+  1. With DevKit authorized by the PEM's SecureCode, open DevKit → **Advanced Features** →
+     **Open DevTools**.
+  2. Do an AC reboot (unplug from the wall).
+  3. Open an app installed through DevKit.
+  4. Browse to `http://<tv-ip>:9226`.
+
+  On our 43E70QEVS (U09.60, DevKit 3.4.5), on 2026-10-06, all of this was done: Advanced Features
+  shows **Close DevTools**, meaning it is on; the TV was unplugged; FreeTV PreProd was opened from
+  My Apps; the Mac was on the same LAN, where 36669 and 18400 answer. 9222 / 9224 / 9226 / 9229
+  were still refused. That is the docs' "some models do not open the DevTools port by default —
+  contact VIDAA" case, and it is with the PEM.
+- Advanced Features also has **Environment Setting**, which switches the TV between Production / Test
+  / On-site Test / Partner environments. Leave it on **Production Env**. The docs warn that
+  switching can leave the TV's data inconsistent.
 - Current official page: <https://partner-doc.vidaa.com/vdocs/development/devtools.html> (behind the
   partner login). Its port table:
   - **U4 and above: 9226**
