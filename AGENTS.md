@@ -156,7 +156,8 @@ releases. `acl_tests` in `samsung_tizen.rs` now parses the three lists and fails
 they disagree.
 
 Cargo package name is still `devman` and the binary `webos-dev-manager` (fork leftovers) — the
-product name `QA Tool` comes from `tauri.conf.json`.
+product name `QA Tool` comes from `tauri.conf.json`. On Linux `tauri.linux.conf.json` overrides it to
+`qa-tool`, which names the package, the bundle files and the installed binary (`/usr/bin/qa-tool`).
 
 ### Legacy Names That Hold User Data
 
@@ -172,7 +173,7 @@ migration loses that data silently on the next install:
 | `smart-tv-qa-*` | `localStorage` keys (Tizen state, LG apps scope) | the values under those keys |
 | `smartTvQaTool:ignoreVersionUntil` | `localStorage` (`update.service.ts`) | a dismissed update prompt |
 | `SmartTVQATool` | Samsung remote client name (`samsung_tizen.rs`) | the TV's pairing token; every TV would ask to allow the remote again |
-| `smart-tv-qa-tool` | Linux `provides` / `conflicts` / `replaces` / `obsoletes` (`tauri.conf.json`) | nothing — kept on purpose so the renamed `qa-tool` package replaces the old one |
+| `smart-tv-qa-tool`, `webos-dev-manager` | Linux `provides` / `conflicts` / `replaces` / `obsoletes` (`tauri.conf.json`) | nothing — kept on purpose so the `qa-tool` package replaces the older ones |
 
 Keep them as they are, like `devman` / `webos-dev-manager`.
 
@@ -784,8 +785,33 @@ open questions are in [VIDAA (Hisense) — Implementation Plan](#vidaa-hisense--
 - **Close** launches a `data:` page that calls `window.close()`. DevKit has no close command, but
   launching any URL replaces the app on screen, and a page that closes itself hands the screen back
   to the launcher. It closes whatever is on screen, because the TV runs one web app at a time.
-- **Debug / logs:** Chrome DevTools at `http://<tv-ip>:9226` per VIDAA's docs. **Closed on our set**;
-  VIDAA has to open it.
+- **Debug / logs: Inspect → Chrome DevTools (Console, Network, Elements) without the TV's port.** The
+  TV's own DevTools port (9226) is closed on our set, so `plugins/vidaa_devtools.rs` serves the app
+  instead:
+  - **Installs are always direct.** The TV's app entry points at FreeTV's own URL, so the
+    installed app opens without the Mac or DevKit. An earlier "With DevTools" install option, which
+    stored the proxy's URL on the TV, was dropped for that reason. Rows that still carry such a URL
+    show **Needs Mac**.
+  - **Inspect is per session and installs nothing.** It launches the build once through
+    `http://<this-mac>:<port>/apps/…` (DevKit launches any URL) and opens DevTools on it. The port
+    is 8765 for `uat-web.freetv.tv` (PreProd, UAT) and 8766 for `web.freetv.tv` (Prod). Opening
+    the app from the TV again runs it directly. Inspect needs the TV on this Mac's network.
+  - That listener is a **reverse proxy**: every request goes to the real host, so page, JS and
+    `/api` share one origin, as on `uat-web.freetv.tv`.
+  - The only change is to the app's `index.html`: its own origin becomes the proxy's, and
+    **Chii's `target.js`** is injected first in `<head>`. Chii is MIT, from github.com/liriliri/chii,
+    and its DevTools frontend ships as an app resource from the `chii` npm devDependency.
+    `target.js` speaks the DevTools protocol from inside the page (chobitsu). The same listener
+    relays it at `/__chii/target/<id>` ↔ `/__chii/client/<id>?target=<id>`.
+  - Once the page attaches, Inspect opens `…/__chii/front_end/chii_app.html?ws=…` in the default
+    browser. Use Chrome or Edge.
+  - **Limits:**
+    - Network lists JS requests (XHR / fetch: the API, the player's segments), not images or CSS.
+    - No breakpoints in Sources.
+    - The app runs from `http://<mac>`, so DRM and https-only features may behave differently.
+      Confirm such bugs on a normal install.
+  - Verified on our U9 set on 2026-10-06: live Console (FreeTV logs and uncaught errors with
+    stacks), Network (160 requests, including `live.livx` segments) and Elements.
 
 #### Devkit Install — App And Icon URLs
 
@@ -835,7 +861,7 @@ sudo apt-get install -y build-essential pkg-config cmake perl file libssl-dev li
 - **Install:** the `.deb` puts the sidecar at `/usr/bin/adb`, which Ubuntu's `adb` package owns, so
   `apt install` refuses. The files are identical, so `sudo dpkg -i --force-overwrite <deb>`. Removing
   the app later deletes `/usr/bin/adb`; `sudo apt install --reinstall adb` puts it back.
-- Logs: `~/.local/share/com.smarttv.qa-tool/logs/webos-dev-manager.log`.
+- Logs: `~/.local/share/com.smarttv.qa-tool/logs/qa-tool.log`.
 
 ---
 
@@ -846,6 +872,9 @@ sudo apt-get install -y build-essential pkg-config cmake perl file libssl-dev li
 - `.github/workflows/release.yml` — on published release (or manual dispatch), builds all targets
   (Windows x64 + i686 + ARM64, Linux x86_64 + ARM64, macOS universal) with
   `--features=vendored-openssl` and attaches bundles to the release.
+  Each installer is renamed `QA-Tool_<version>_<platform>` first (`windows-x64`, `windows-32bit`,
+  `windows-arm64`, `macos-intel-and-apple-silicon`, `linux-x86_64`, `linux-arm64`), since Tauri
+  names bundles by architecture alone.
 
 ---
 

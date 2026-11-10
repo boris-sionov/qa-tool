@@ -46,13 +46,16 @@
           "zlib1g (>=1.2.11)"
         ],
         "provides": [
-          "smart-tv-qa-tool"
+          "smart-tv-qa-tool",
+          "webos-dev-manager"
         ],
         "conflicts": [
-          "smart-tv-qa-tool"
+          "smart-tv-qa-tool",
+          "webos-dev-manager"
         ],
         "replaces": [
-          "smart-tv-qa-tool"
+          "smart-tv-qa-tool",
+          "webos-dev-manager"
         ]
       },
       "rpm": {
@@ -61,13 +64,16 @@
           "zlib (>=1.2.11)"
         ],
         "provides": [
-          "smart-tv-qa-tool"
+          "smart-tv-qa-tool",
+          "webos-dev-manager"
         ],
         "conflicts": [
-          "smart-tv-qa-tool"
+          "smart-tv-qa-tool",
+          "webos-dev-manager"
         ],
         "obsoletes": [
-          "smart-tv-qa-tool"
+          "smart-tv-qa-tool",
+          "webos-dev-manager"
         ]
       }
     },
@@ -87,7 +93,11 @@
       "providerShortName": null,
       "signingIdentity": null
     },
-    "resources": [],
+    "resources": {
+      "../node_modules/chii/public/front_end/": "chii/front_end/",
+      "../node_modules/chii/public/target.js": "chii/target.js",
+      "../node_modules/chii/LICENSE": "chii/LICENSE"
+    },
     "shortDescription": "QA tool for smart TV and phone apps",
     "targets": "all",
     "windows": {

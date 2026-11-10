@@ -127,7 +127,9 @@ jobs:
         if: matrix.target == 'windows-x64'
         run: |
           rustup target add i686-pc-windows-msvc
+          # PowerShell fails a step on its last command only, so a failed x64 bundle would pass.
           npm run build -- --features=vendored-openssl --target x86_64-pc-windows-msvc
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run build -- --features=vendored-openssl --target i686-pc-windows-msvc
 
       - name: Build (Windows ARM64)
@@ -148,26 +150,40 @@ jobs:
         env:
           CI: true
 
-      - name: Collect Artifacts
-        uses: tj-actions/glob@v22
-        id: glob
-        with:
-          separator: "\n"
-          read-gitignore: false
-          files: |
-            target/**/bundle/deb/*.deb
-            target/**/bundle/rpm/*.rpm
-            target/**/bundle/appimage/*.AppImage
-            target/**/bundle/msi/*.msi
-            target/**/bundle/nsis/*.exe
-            target/**/bundle/dmg/*.dmg
+      # Tauri names bundles by arch alone (x64, amd64, universal), so say the OS too.
+      - name: Name Installers By Platform
+        shell: bash
+        run: |
+          # No globstar: macOS ships bash 3.2. Bundles sit in target/release or target/<triple>/release.
+          shopt -s nullglob
+          version=$(node -p "require('./package.json').version")
+          mkdir -p release-files
+          for f in target/release/bundle/*/* target/*/release/bundle/*/*; do
+            case "$f" in *.deb|*.rpm|*.AppImage|*.msi|*.exe|*.dmg) ;; *) continue ;; esac
+            name=$(basename "$f")
+            case "$name" in
+              *universal*)                  platform=macos-intel-and-apple-silicon ;;
+              *_x64_*|*_x64-setup*)         platform=windows-x64 ;;
+              *_x86_*|*_x86-setup*)         platform=windows-32bit ;;
+              *_arm64_*.msi|*_arm64-setup*) platform=windows-arm64 ;;
+              *amd64*|*x86_64*)             platform=linux-x86_64 ;;
+              *arm64*|*aarch64*)            platform=linux-arm64 ;;
+              *) echo "No platform for $name" >&2; exit 1 ;;
+            esac
+            case "$name" in
+              *.exe) suffix=-setup.exe ;;
+              *)     suffix=.${name##*.} ;;
+            esac
+            cp "$f" "release-files/QA-Tool_${version}_${platform}${suffix}"
+          done
+          ls -l release-files
 
       - name: Upload Artifact (snapshot)
         uses: actions/upload-artifact@v4
         if: github.event_name != 'release'
         with:
           name: ${{ matrix.target }}-package
-          path: ${{ steps.glob.outputs.paths }}
+          path: release-files/*
 
       - name: Attach to Release
         uses: ncipollo/release-action@v1
@@ -178,4 +194,4 @@ jobs:
           omitNameDuringUpdate: true
           omitBodyDuringUpdate: true
           omitPrereleaseDuringUpdate: true
-          artifacts: ${{ steps.glob.outputs.paths }}
+          artifacts: "release-files/*"
