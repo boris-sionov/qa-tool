@@ -129,10 +129,11 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   // One width for every button, so Inspect / Launch / Kill / Remove line up from row to row and
   // from platform to platform whatever the label.
   .app-action {
-    @include btn-base(36px);
+    @include btn-base(40px);
     @include btn-sm;
-    flex: 0 0 100px;
-    width: 100px;
+    height: 40px;
+    flex: 0 0 116px;
+    width: 116px;
     padding: 0 11px;
     font-weight: 700;
 

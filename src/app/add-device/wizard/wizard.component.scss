@@ -521,7 +521,7 @@ $border-color: rgba(91, 159, 245, 0.2);
 }
 
 .wizard-btn {
-  @include btn-base(42px);
+  @include btn-base(44px);
   padding: 0 22px;
 
   &.primary { @include btn-primary; }

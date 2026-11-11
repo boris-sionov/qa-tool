@@ -25,11 +25,11 @@
       @if (!minimal) {
         <button class="btn btn-secondary text-nowrap me-2" (click)="openRemote()" [disabled]="!selected"
                 title="Open remote control" style="height:42px;">
-          <i class="bi bi-controller me-2"></i>Remote
+          <i class="bi bi-controller"></i>Remote
         </button>
-        <button class="btn btn-outline-light text-nowrap install-btn me-2" (click)="installFromConfluence()"
+        <button class="btn btn-primary text-nowrap install-btn" (click)="installFromConfluence()"
                 [disabled]="!serial || installing" title="Install the newest UAT or PREPROD build from Confluence">
-          <i class="bi bi-journal-arrow-down me-2"></i>From Confluence
+          <i class="bi bi-journal-arrow-down"></i>From Confluence
         </button>
       }
       <button class="btn btn-primary text-nowrap install-btn" (click)="installWgt()"
@@ -38,7 +38,7 @@
           <app-spinner size="sm" tone="inherit"></app-spinner>
           <span>Installing...</span>
         } @else {
-          <i class="bi bi-folder-fill me-2"></i>
+          <i class="bi bi-folder-fill"></i>
           <span>Install</span>
         }
       </button>

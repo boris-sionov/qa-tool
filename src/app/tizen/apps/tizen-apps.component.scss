@@ -335,7 +335,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
 }
 
 .action-button {
-  @include btn-base(42px);
+  @include btn-base(44px);
   padding: 0 14px;
 
   &.primary { @include btn-primary; }

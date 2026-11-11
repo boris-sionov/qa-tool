@@ -11,14 +11,14 @@
       <div class="install-btn-container toolbar-actions">
         <button class="btn btn-secondary text-nowrap me-2" style="height:42px;" (click)="disconnect()"
                 title="Disconnect from the TV's DevKit">
-          <i class="bi bi-plug me-2"></i>Disconnect
+          <i class="bi bi-plug"></i>Disconnect
         </button>
         <button class="btn btn-primary text-nowrap install-btn" (click)="showInstall = !showInstall" [disabled]="!!busy">
           @if (busy === 'install') {
             <app-spinner size="sm" tone="inherit"></app-spinner>
             <span>Installing...</span>
           } @else {
-            <i class="bi bi-folder-fill me-2"></i>
+            <i class="bi bi-folder-fill"></i>
             <span>Install</span>
           }
         </button>

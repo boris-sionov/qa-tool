@@ -49,7 +49,7 @@
 }
 
 .build-btn {
-  @include btn-base(34px);
+  @include btn-base(38px);
   @include btn-sm;
 
   &.primary { @include btn-primary; }

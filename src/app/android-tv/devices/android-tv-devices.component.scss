@@ -73,7 +73,7 @@ $border-color: rgba(91, 159, 245, 0.2);
 .hero-text { flex: 1; }
 
 .add-device-btn {
-  @include btn-base(42px);
+  @include btn-base(44px);
   padding: 0 22px;
 
   &:not(.scan) { @include btn-primary; }
@@ -396,11 +396,11 @@ $border-color: rgba(91, 159, 245, 0.2);
 }
 
 .device-btn {
-  @include btn-base(40px);
+  @include btn-base(44px);
 
   &.primary { @include btn-primary; flex: 1; }
   &.secondary { @include btn-success; flex: 1; }
-  &.danger { @include btn-danger; @include btn-icon(40px); }
+  &.danger { @include btn-danger; @include btn-icon(44px); }
 }
 
 
