@@ -5,41 +5,31 @@
   </div>
 
   <div class="platform-grid">
-    <button class="platform-card" (click)="openAndroid()">
+    <button class="platform-card" (click)="openAndroid()" aria-label="Android TV">
       <div class="platform-icon android-icon">
         <img src="assets/platform-logos/Android_TV-Logo.png" alt="Android TV">
       </div>
-      <div class="platform-name">Android TV</div>
-      <div class="platform-desc">Manage apps on Android TV</div>
     </button>
-    <button class="platform-card" (click)="openLg()">
+    <button class="platform-card" (click)="openLg()" aria-label="LG webOS">
       <div class="platform-icon lg-icon">
         <img src="assets/platform-logos/lg-webos-logo.svg" alt="LG WebOS">
       </div>
-      <div class="platform-name">LG WebOS</div>
-      <div class="platform-desc">Manage apps on<br>LG Smart TV</div>
     </button>
-    <button class="platform-card" (click)="openTizen()">
+    <button class="platform-card" (click)="openTizen()" aria-label="Samsung Tizen">
       <div class="platform-icon tizen-icon">
         <img src="assets/platform-logos/tizen-logo-png.png" alt="Samsung Tizen">
       </div>
-      <div class="platform-name">Samsung Tizen</div>
-      <div class="platform-desc">Manage apps on Samsung TV</div>
     </button>
-    <button class="platform-card" (click)="openVidaa()">
+    <button class="platform-card" (click)="openVidaa()" aria-label="VIDAA">
       <div class="platform-icon vidaa-icon">
         <img src="assets/platform-logos/vidaa-logo.svg" alt="VIDAA">
       </div>
-      <div class="platform-name">VIDAA (Hisense)</div>
-      <div class="platform-desc">Manage apps on Hisense TV</div>
     </button>
     @if (!minimal) {
-    <button class="platform-card" (click)="openPhone()">
+    <button class="platform-card" (click)="openPhone()" aria-label="Android Phone">
       <div class="platform-icon phone-icon">
         <i class="bi bi-phone"></i>
       </div>
-      <div class="platform-name">Android Phone</div>
-      <div class="platform-desc">Apps on a phone<br>connected by USB</div>
     </button>
     }
   </div>
