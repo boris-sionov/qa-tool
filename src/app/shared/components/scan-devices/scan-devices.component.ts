@@ -27,6 +27,8 @@ const LABELS: Record<Platform, {title: string; ready: string; notReady: string; 
     },
 };
 
+const ipKey = (ip: string): number => ip.split('.').reduce((n, part) => n * 256 + Number(part), 0);
+
 /** Scans the network and lists the TVs of one platform; closes with the one picked. */
 @Component({
     selector: 'app-scan-devices',
@@ -71,8 +73,22 @@ export class ScanDevicesComponent implements OnInit {
         }
     }
 
+    /** Developer mode on first, then the rest; each group in IP order. */
+    get groups(): {title: string; devices: LanDevice[]}[] {
+        const byIp = (a: LanDevice, b: LanDevice) => ipKey(a.ip) - ipKey(b.ip);
+        return [
+            {title: this.labels.ready, devices: this.devices.filter(d => d.ready).sort(byIp)},
+            {title: this.labels.notReady, devices: this.devices.filter(d => !d.ready).sort(byIp)},
+        ].filter(g => g.devices.length);
+    }
+
     get allReady(): boolean {
         return this.devices.every(d => d.ready);
+    }
+
+    /** `2025 · webOS 25 · 65QNED86T6A` — what is known of the TV besides its name and address. */
+    details(d: LanDevice): string {
+        return [d.year, d.os, d.model].filter(Boolean).join(' · ');
     }
 
     isSaved(d: LanDevice): boolean {

@@ -561,17 +561,24 @@ Each page lists only its own platform. One shared dialog, `ScanDevicesComponent`
 flow with the IP and name filled in.
 
 `lan_scan` (`plugins/net_scan.rs`, on `adb-manager`) probes every address in this computer's /24
-(about 3.5 s) and tells the platform from the ports that answer:
+(about 3.5 s) and tells the platform from the ports that answer. No MAC is read or shown.
 
-| Platform | Recognised by | `ready` (can connect) | Name from |
+| Platform | Recognised by | `ready` (can connect) | Name, model, year from (no dev mode needed) |
 |---|---|---|---|
-| Android TV | 5555 (ADB) | always | Google Cast `:8008/setup/eureka_info?params=name` |
-| LG webOS | 3000 **and** 3001 (SSAP) | 9922 open: Dev Mode on | Cast (`[LG] webOS TV QNED86T6A`); some sets don't answer Cast |
-| Samsung Tizen | 8001 + 8002 (remote API), or 26101 | 26101 open: Developer mode on | `:8001/api/v2/` → `name · modelName`, HTML-escaped (`55&quot;`) |
+| Android TV | 5555 (ADB) | always | Google Cast `:8008/setup/eureka_info?params=name` — name only |
+| LG webOS | 3000 **and** 3001 (SSAP), or an SSDP answer | 9922 open: Dev Mode on | SSDP `urn:lge-com:service:webos-second-screen:1` → description XML: `friendlyName` (`[LG] webOS TV ` dropped) and `modelNumber`; year from the model (`lg_year`) |
+| Samsung Tizen | 8001 + 8002 (remote API), or 26101 | 26101 open: Developer mode on | `:8001/api/v2/` → `name` (HTML-escaped), `modelName`, and the year from `model` (`24_NKL_UHD_T09`) |
 
-Ports go in pairs so a laptop with a dev server on 3000 is not taken for an LG. Checked on the
-office network on 2026-11-10: 18 TVs (7 Android TV, 6 LG, 5 Samsung). VIDAA (36669) is left out: it
-connects by DevKit code, not IP, so it has no device list.
+The OS is **by model year**, not read from the TV (`os_for`): Tizen 5.0 / 5.5 / 6.0 / 6.5 / 7.0 /
+8.0 / 9.0 for 2019–2025; webOS 4.5 / 5 / 6 / 22 … 26. The exact firmware needs dev mode (SSH / SDB).
+The dialog lists Developer mode on first, then off, each in IP order.
+
+Completeness: pass 1 is the TCP probe (400 ms) with an SSDP search running beside it; pass 2 re-probes
+every address the ARP table knows that showed no TV ports, 1.5 s, all ports at once (a TV on weak
+Wi-Fi drops the first SYN); an LG that only SSDP found is added; an LG whose multicast answer was
+lost is asked directly. An Android TV with ADB off shows only a Cast name, which a Chromecast shares,
+so it cannot be told apart and is not listed. One LG on both Ethernet and Wi-Fi is two addresses
+and is listed twice (its SSDP description comes from the wired one).
 
 - Names are read with no prompt on the TV. ADB/SDB would give more, but ask the TV to allow it.
 - Not ready = the platform's developer mode is off; the dialog says how to turn it on. A Samsung
