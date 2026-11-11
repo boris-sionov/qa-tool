@@ -3,7 +3,6 @@
 .home {
   --brand: #5B9FF5;
   --brand-glow: rgba(91, 159, 245, 0.35);
-  --on-brand: #fff;
   --line: rgba(255, 255, 255, 0.08);
   --glass: rgba(255, 255, 255, 0.04);
   display: grid;
@@ -109,8 +108,8 @@
     font-size: 15px;
     background: var(--brand);
     border-color: transparent;
-    color: var(--on-brand);
-    svg { stroke: var(--on-brand); }
+    color: #fff;
+    svg { stroke: #fff; }
     &:hover { filter: brightness(1.1); background: var(--brand); }
   }
 }

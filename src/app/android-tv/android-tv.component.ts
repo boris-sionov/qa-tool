@@ -1,4 +1,3 @@
-import {platformById} from '../shared/platforms';
 import {Component, OnInit} from '@angular/core';
 import {AdbService} from '../core/services/adb.service';
 import {AdbStateService, deviceSerial, SavedDevice} from './adb-state.service';
@@ -9,7 +8,6 @@ import {AdbStateService, deviceSerial, SavedDevice} from './adb-state.service';
     styleUrls: ['./android-tv.component.scss']
 })
 export class AndroidTvComponent implements OnInit {
-    readonly brand = platformById('android-tv').brand;
 
     devices: SavedDevice[] = [];
     selected: SavedDevice | null = null;

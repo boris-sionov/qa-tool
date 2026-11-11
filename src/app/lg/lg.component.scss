@@ -124,16 +124,16 @@ $border-color: rgba(91, 159, 245, 0.2);
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--brand, #{$primary-blue}) 15%, transparent);
-    color: var(--brand, #{$primary-blue});
+    background: rgba(91, 159, 245, 0.15);
+    color: $primary-blue;
     border-color: $border-color;
     transform: translateY(-2px);
   }
 
   &.active {
-    background: color-mix(in srgb, var(--brand, #{$primary-blue}) 25%, transparent);
-    color: var(--brand, #{$primary-blue});
-    border-color: var(--brand, #{$primary-blue});
+    background: rgba(91, 159, 245, 0.25);
+    color: $primary-blue;
+    border-color: $primary-blue;
   }
 }
 

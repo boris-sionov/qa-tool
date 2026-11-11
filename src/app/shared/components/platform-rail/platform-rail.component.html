@@ -6,8 +6,7 @@
   }
   @for (p of platforms; track p.id) {
     <button class="tile" type="button" [class.active]="p.id === active" [attr.aria-pressed]="p.id === active"
-            [attr.aria-label]="p.name" [title]="p.name" (click)="pick(p)"
-            [style.--brand]="p.brand">
+            [attr.aria-label]="p.name" [title]="p.name" (click)="pick(p)">
       <img [src]="'assets/platform-logos/' + p.logo" alt="">
     </button>
   }

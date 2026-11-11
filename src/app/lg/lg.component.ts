@@ -1,5 +1,4 @@
 import {ScannedTv} from "../shared/components/scan-devices/scan-devices.component";
-import {platformById} from '../shared/platforms';
 import {Component, ElementRef, HostListener, Injector, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Device} from '../types';
@@ -18,7 +17,6 @@ import {DevicesComponent} from "../devices/devices.component";
     styleUrls: ['./lg.component.scss']
 })
 export class LgComponent implements OnInit {
-    readonly brand = platformById('lg').brand;
 
     selectedDevice?: Device;
     appVersion: string;

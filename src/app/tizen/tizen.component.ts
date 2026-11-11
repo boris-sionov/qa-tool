@@ -1,4 +1,3 @@
-import {platformById} from '../shared/platforms';
 import {Component, OnInit} from '@angular/core';
 import {SdbService} from '../core/services/sdb.service';
 import {tizenSerial, TizenDevice, TizenStateService} from './tizen-state.service';
@@ -10,7 +9,6 @@ import {TizenRequirementsService} from './tizen-requirements.service';
     styleUrls: ['./tizen.component.scss'],
 })
 export class TizenComponent implements OnInit {
-    readonly brand = platformById('tizen').brand;
     devices: TizenDevice[] = [];
     selected: TizenDevice | null = null;
 

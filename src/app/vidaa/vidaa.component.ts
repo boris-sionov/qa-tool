@@ -1,4 +1,3 @@
-import {platformById} from '../shared/platforms';
 import {Component} from '@angular/core';
 
 @Component({
@@ -8,5 +7,4 @@ import {Component} from '@angular/core';
     styleUrls: ['../tizen/tizen.component.scss'],
 })
 export class VidaaComponent {
-    readonly brand = platformById('vidaa').brand;
 }
