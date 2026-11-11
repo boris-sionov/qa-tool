@@ -258,8 +258,12 @@ export class AdbService implements DeviceProvider {
 /** A TV `lanScan` found. `ready`: the port the tool connects through answers (ADB, LG dev mode, SDB). */
 export interface LanDevice {
     ip: string;
-    mac: string | null;
     name: string | null;
+    /** Model number. Samsung and LG only. */
+    model: string | null;
+    /** Model year and the OS that year shipped with (`Tizen 8.0`, `webOS 25`). Samsung and LG only. */
+    year: number | null;
+    os: string | null;
     platform: Platform;
     ready: boolean;
     openPorts: number[];

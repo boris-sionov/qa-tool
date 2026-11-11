@@ -33,32 +33,31 @@
       </p>
     }
 
-    <div class="scan-list">
-      @for (d of devices; track d.ip) {
-        <div class="scan-row" [class.ready]="d.ready">
-          <i class="bi bi-tv"></i>
-          <div class="scan-main">
-            <div class="scan-ip">
-              @if (d.name) { <span class="scan-name">{{ d.name }}</span> }
-              {{ d.ip }}
+    @for (g of groups; track g.title) {
+      <div class="scan-group">{{ g.title }} <span class="scan-group-count">{{ g.devices.length }}</span></div>
+      <div class="scan-list">
+        @for (d of g.devices; track d.ip) {
+          <div class="scan-row" [class.ready]="d.ready">
+            <i class="bi bi-tv"></i>
+            <div class="scan-main">
+              <div class="scan-title">{{ d.name || 'Unnamed TV' }}</div>
+              <div class="scan-ip">{{ d.ip }}</div>
+              @if (details(d)) { <div class="scan-meta">{{ details(d) }}</div> }
             </div>
-            <div class="scan-meta">{{ d.mac || 'MAC unknown' }}</div>
+            @if (!d.ready) {
+              <span class="tag warn" [title]="'To connect, ' + labels.hint">{{ labels.notReady }}</span>
+            }
+            @if (isSaved(d)) {
+              <span class="tag">Saved</span>
+            } @else {
+              <button class="filter-btn active" (click)="pick(d)">
+                <i class="bi bi-plus-lg"></i> Add
+              </button>
+            }
           </div>
-          @if (d.ready) {
-            <span class="tag ok">{{ labels.ready }}</span>
-          } @else {
-            <span class="tag warn" [title]="'To connect, ' + labels.hint">{{ labels.notReady }}</span>
-          }
-          @if (isSaved(d)) {
-            <span class="tag">Saved</span>
-          } @else {
-            <button class="filter-btn active" (click)="pick(d)">
-              <i class="bi bi-plus-lg"></i> Add
-            </button>
-          }
-        </div>
-      }
-    </div>
+        }
+      </div>
+    }
 
     @if (!scanning && devices.length && !allReady) {
       <p class="scan-hint"><i class="bi bi-info-circle"></i> {{ labels.notReady }}: {{ labels.hint }}.</p>

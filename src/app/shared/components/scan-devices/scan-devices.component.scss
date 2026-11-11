@@ -56,9 +56,21 @@
 }
 
 .scan-main { flex: 1; min-width: 0; }
-.scan-ip { color: #fff; font-weight: 600; font-family: monospace; }
-.scan-name { font-family: inherit; margin-right: 8px; }
-.scan-meta { color: #7E92B0; font-size: 12px; font-family: monospace; }
+.scan-title { color: #fff; font-weight: 600; }
+.scan-ip { color: #A8B8CC; font-size: 13px; font-family: monospace; }
+.scan-meta { color: #7E92B0; font-size: 12px; }
+
+.scan-group {
+  margin: 16px 0 8px;
+  color: #A8B8CC;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  &:first-of-type { margin-top: 0; }
+}
+.scan-group-count { margin-left: 6px; color: #7E92B0; font-weight: 600; }
 
 .tag {
   padding: 3px 10px;
