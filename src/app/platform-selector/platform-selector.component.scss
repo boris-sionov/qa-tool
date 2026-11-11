@@ -151,3 +151,29 @@
   color: #7E92B0;
   letter-spacing: 0.02em;
 }
+
+.update-notice {
+  color: #A8B8CC;
+
+  a, button {
+    margin-left: 0.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  a {
+    color: #5B9FF5;
+    text-decoration: none;
+  }
+
+  button {
+    color: #7E92B0;
+  }
+
+  a:hover, button:hover {
+    text-decoration: underline;
+  }
+}

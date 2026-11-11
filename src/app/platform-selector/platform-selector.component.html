@@ -46,5 +46,12 @@
     </button>
   </div>
 
-  <div class="selector-footer">v{{ appVersion }}</div>
+  <div class="selector-footer">
+    v{{ appVersion }}
+    <span class="update-notice" *ngIf="update" role="status">
+      · v{{ update.version.version }} is available
+      <a [href]="update.release.html_url" appExternalLink>Download</a>
+      <button type="button" (click)="dismissUpdate()">Not now</button>
+    </span>
+  </div>
 </div>

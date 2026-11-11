@@ -104,6 +104,22 @@ fetch the latest release and compare semver, but nothing calls it — wiring it 
 
 `APP_VERSION` is displayed in the platform-selector footer, the LG sidebar, and LG → More → Version.
 
+### Update Notice
+
+The platform-selector footer tells QA when a newer release exists: `v1.37.0 is available ·
+Download · Not now`. `UpdateService.availableUpdate()` asks
+`api.github.com/repos/boris-sionov/qa-tool/releases/latest` once per app start (GitHub allows 60
+unauthenticated requests an hour) and compares its tag (`v1.N.0`) with `BUILD_INFO.version` as
+semver (`updateToOffer`, specced in `update.service.spec.ts`).
+
+- **Download** opens the release page in the system browser (`appExternalLink`).
+- **Not now** stores that version in `localStorage` `smartTvQaTool:ignoreVersionUntil`; the notice
+  stays away until a later release.
+- Branch and modified builds skip the check (`isReleaseBuild`): their number is the last merge's,
+  so they would be told to "update" to what they already contain.
+- A failed fetch — offline, rate-limited, no release yet — shows nothing.
+- `releases/latest` skips drafts and pre-releases, so publishing the release is what makes it offered.
+
 ## Logs
 
 `~/Library/Logs/com.smarttv.qa-tool/QA Tool.log` (macOS), via `tauri_plugin_log`. The folder is the
