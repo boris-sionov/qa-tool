@@ -15,7 +15,7 @@ import {Component, HostBinding, Input} from '@angular/core';
     selector: 'app-spinner',
     standalone: true,
     template: `
-      <span class="mark" role="status" [attr.aria-label]="label || 'Loading'">
+      <span class="glyph" role="status" [attr.aria-label]="label || 'Loading'">
         <svg viewBox="0 0 100 100" aria-hidden="true">
           <rect class="track" x="10" y="10" width="80" height="80" rx="26"/>
           <rect class="chase outer" x="10" y="10" width="80" height="80" rx="26"/>
