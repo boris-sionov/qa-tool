@@ -346,7 +346,7 @@ mod tests {
     }
 
     /// Runs every check but the bundled sdb against this machine's Tizen Studio and prints them:
-    /// `cargo test -p devman tizen_prereq -- --ignored --nocapture`
+    /// `cargo test -p qa-tool tizen_prereq -- --ignored --nocapture`
     #[tokio::test]
     #[ignore]
     async fn checks_this_machine() {

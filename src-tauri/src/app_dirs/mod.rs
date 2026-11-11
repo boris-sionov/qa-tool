@@ -49,7 +49,7 @@ pub trait GetAppSshKeyDir {
         let path = self.get_app_ssh_key_path()?;
         if !path.exists() || !PrivateKey::read_openssh_file(&path).is_ok() {
             let keypair = Ed25519Keypair::random(&mut OsRng);
-            let key_comment = String::from(&format!("devman_{:x}", keypair.public)[0..15]);
+            let key_comment = String::from(&format!("qa-tool_{:x}", keypair.public)[0..15]);
             log::info!(
                 "Generating new SSH key `{}` and saving to {}",
                 key_comment,

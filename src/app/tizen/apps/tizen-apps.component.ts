@@ -1,3 +1,5 @@
+import {matches} from '../../shared/components/list-filter/list-filter.component';
+import {AppConfig} from '../../../environments/environment';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
@@ -32,9 +34,11 @@ import {renderEnvironmentBadge, renderEnvironmentBadgeUrl, readIcon} from '../..
     styleUrls: ['./tizen-apps.component.scss'],
 })
 export class TizenAppsComponent implements OnInit, OnDestroy {
+    readonly minimal = AppConfig.minimal;
     selected: TizenDevice | null = null;
     devices: TizenDevice[] = [];
     apps: SdbAppInfo[] | null = null;
+    search = '';
     appVersions: Map<string, string> = new Map();
     appsError?: Error;
     loadingApps = false;
@@ -76,6 +80,11 @@ export class TizenAppsComponent implements OnInit, OnDestroy {
     // Sort order: FreeTV first, then the rest alphabetically
     isPriority(app: SdbAppInfo): boolean {
         return isPriorityApp(app.name, app.id, app.runtimeId, app.tizenId);
+    }
+
+    /** The rows on screen: every app, narrowed by the filter box. */
+    get shownApps(): SdbAppInfo[] {
+        return (this.filteredApps ?? []).filter(a => matches(this.search, a.name, a.id, a.tizenId));
     }
 
     /**
@@ -184,7 +193,6 @@ export class TizenAppsComponent implements OnInit, OnDestroy {
         const inst = ref.componentInstance as TizenRemoteDialogComponent;
         inst.device = this.selected;
         inst.serial = this.serial;
-        inst.wgtApps = (this.filteredApps ?? []).filter(a => !!a.tizenId);
     }
 
     /**

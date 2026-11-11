@@ -1,3 +1,4 @@
+import {AppConfig} from '../../environments/environment';
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 
@@ -8,6 +9,7 @@ import {Router} from '@angular/router';
     styleUrls: ['../tizen/tizen.component.scss', './vidaa.component.scss'],
 })
 export class VidaaComponent {
+    readonly minimal = AppConfig.minimal;
     constructor(private router: Router) {}
 
     goBack(): void {

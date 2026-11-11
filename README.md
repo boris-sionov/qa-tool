@@ -242,7 +242,7 @@ The `.npmrc` pins exact dependency versions (`save-exact=true`) for reproducible
 
 | Component | Origin |
 |-----------|--------|
-| LG WebOS backend | Forked from [`webosbrew/dev-manager-desktop`](https://github.com/webosbrew/dev-manager-desktop) |
+| LG WebOS backend | Based on an open-source LG developer manager (Apache-2.0, see `LICENSE`) |
 | Samsung Tizen | Built from scratch using SDB + tz CLI |
 | Android TV | Ported from an internal Python/PySide6 QA tool |
 | VIDAA | VIDAA DevKit relay protocol, read from DevKit Web — see `AGENTS.md` |

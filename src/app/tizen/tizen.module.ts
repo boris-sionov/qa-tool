@@ -9,7 +9,6 @@ import {TizenAppsComponent} from './apps/tizen-apps.component';
 import {TizenDevicesComponent} from './devices/tizen-devices.component';
 import {TizenInfoComponent} from './info/tizen-info.component';
 import {TizenRemoteDialogComponent} from './remote-dialog/tizen-remote-dialog.component';
-import {TizenStressWizardComponent} from './stress-wizard/tizen-stress-wizard.component';
 import {TizenComponent} from './tizen.component';
 import {TizenWizardComponent} from './wizard/tizen-wizard.component';
 
@@ -34,7 +33,6 @@ const routes: Routes = [
         TizenDevicesComponent,
         TizenWizardComponent,
         TizenRemoteDialogComponent,
-        TizenStressWizardComponent,
     ],
     imports: [
         CommonModule,

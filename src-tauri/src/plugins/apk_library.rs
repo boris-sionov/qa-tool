@@ -288,83 +288,49 @@ fn parse_json_listing(base: &Url, body: &str) -> Option<Vec<LibraryApk>> {
     )
 }
 
-/// The Tailscale CLI, wherever this machine has it.
-fn tailscale_cli() -> Option<&'static str> {
-    [
-        "/Applications/Tailscale.app/Contents/MacOS/Tailscale",
-        "/usr/local/bin/tailscale",
-        "/opt/homebrew/bin/tailscale",
-        "/usr/bin/tailscale",
-        "C:\\Program Files\\Tailscale\\tailscale.exe",
-    ]
-    .into_iter()
-    .find(|p| std::path::Path::new(p).exists())
-}
-
-/// Whether Tailscale is up on this Mac — `freetv-server` is reached through it, so a library
-/// that does not answer is most often just Tailscale being off. `missing` when there is no CLI.
+/// Whether Tailscale is connected on this machine — `freetv-server` is reached through it, so a
+/// library that does not answer is most often just Tailscale being off. Looks for a Tailscale
+/// address (100.64.0.0/10) on a local interface. It deliberately does not run the Tailscale
+/// binary: on macOS that launches the Tailscale app.
+///
+/// Returns `down` (no Tailscale address), `dns` (connected, but `host` does not resolve — Tailscale's
+/// name service is not answering or the machine was renamed) or `up`.
 #[tauri::command]
-pub(crate) async fn tailscale_state() -> Result<String, Error> {
-    let Some(cli) = tailscale_cli() else { return Ok("missing".into()) };
-    let output = std::process::Command::new(cli)
-        .args(["status", "--json"])
-        .output()
-        .map_err(|e| Error::new(format!("Could not run Tailscale: {e}")))?;
-    let status: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap_or_default();
-    Ok(match status["BackendState"].as_str() {
-        Some("Running") => "running",
-        Some("NeedsLogin") => "needs-login",
-        _ => "stopped",
+pub(crate) async fn tailscale_state(host: String) -> Result<String, Error> {
+    let output = if cfg!(windows) {
+        std::process::Command::new("ipconfig").output()
+    } else {
+        std::process::Command::new("ifconfig").output()
     }
-    .into())
-}
-
-/// Runs plain `tailscale up` — no flags: with any flag, `up` refuses unless every non-default
-/// setting is repeated (`--accept-routes` and the like). When the CLI cannot reach Tailscale
-/// because its app is not running, starts the app and tries once more. Gives up after 25 s, which
-/// is when `up` is waiting for a browser sign-in.
-#[tauri::command]
-pub(crate) async fn tailscale_up() -> Result<(), Error> {
-    let cli = tailscale_cli().ok_or_else(|| Error::new("Tailscale is not installed"))?;
-    tauri::async_runtime::spawn_blocking(move || {
-        let mut result = run_up(cli);
-        if result.is_err() && cfg!(target_os = "macos") {
-            let _ = std::process::Command::new("open").args(["-g", "-a", "Tailscale"]).status();
-            std::thread::sleep(std::time::Duration::from_secs(3));
-            result = run_up(cli);
-        }
-        if result.is_ok() {
-            log::info!("[Tailscale] tailscale up: connected");
-        }
-        result
+    .map_err(|e| Error::new(format!("Could not list network interfaces: {e}")))?;
+    if !String::from_utf8_lossy(&output.stdout).split_whitespace().any(is_tailscale_ip) {
+        return Ok("down".into());
+    }
+    let resolves = tauri::async_runtime::spawn_blocking(move || {
+        std::net::ToSocketAddrs::to_socket_addrs(&(host.as_str(), 80)).is_ok()
     })
     .await
-    .map_err(|e| Error::new(format!("tailscale up did not finish: {e}")))?
+    .unwrap_or(true);
+    Ok(if resolves { "up" } else { "dns" }.into())
 }
 
-fn run_up(cli: &str) -> Result<(), Error> {
-    use std::process::{Command, Stdio};
-    let mut child = Command::new(cli)
-        .arg("up")
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .map_err(|e| Error::new(format!("Could not run tailscale up: {e}")))?;
-    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(25);
-    loop {
-        if let Some(status) = child.try_wait()? {
-            let output = child.wait_with_output()?;
-            if status.success() {
-                return Ok(());
-            }
-            let text = format!("{}{}", String::from_utf8_lossy(&output.stderr), String::from_utf8_lossy(&output.stdout));
-            return Err(Error::new(format!("tailscale up failed: {}", text.trim())));
-        }
-        if std::time::Instant::now() > deadline {
-            let _ = child.kill();
-            return Err(Error::new("Tailscale is waiting for you to sign in — open the Tailscale app."));
-        }
-        std::thread::sleep(std::time::Duration::from_millis(250));
+fn is_tailscale_ip(word: &str) -> bool {
+    word.parse::<std::net::Ipv4Addr>()
+        .map(|ip| ip.octets()[0] == 100 && (64..128).contains(&ip.octets()[1]))
+        .unwrap_or(false)
+}
+
+#[cfg(test)]
+mod tailscale_tests {
+    use super::is_tailscale_ip;
+
+    #[test]
+    fn matches_only_the_cgnat_range() {
+        assert!(is_tailscale_ip("100.101.5.7"));
+        assert!(is_tailscale_ip("100.64.0.1"));
+        assert!(!is_tailscale_ip("100.63.0.1"));
+        assert!(!is_tailscale_ip("100.128.0.1"));
+        assert!(!is_tailscale_ip("192.168.1.5"));
     }
 }
 
@@ -420,7 +386,7 @@ fn percent_decode(text: &str) -> String {
 mod tests {
     use super::*;
 
-    /// Run against a real APK: `APK=/path/to/app.apk cargo test -p devman reads_a_real_manifest -- --ignored`
+    /// Run against a real APK: `APK=/path/to/app.apk cargo test -p qa-tool reads_a_real_manifest -- --ignored`
     #[test]
     #[ignore]
     fn reads_a_real_manifest() {
@@ -445,17 +411,6 @@ mod tests {
         assert_eq!(apks[0].size, Some(26703206));
         assert_eq!(apks[0].modified.as_deref(), Some("12-Oct-2026 09:14"));
         assert_eq!(apks[1].name, "FreeTV 1.9.0.apk");
-    }
-
-    /// Takes Tailscale down and brings it back the way the dialog's button does:
-    /// `cargo test -p devman tailscale_up_reconnects -- --ignored`
-    #[test]
-    #[ignore]
-    fn tailscale_up_reconnects() {
-        let cli = tailscale_cli().unwrap();
-        assert!(std::process::Command::new(cli).arg("down").status().unwrap().success());
-        tauri::async_runtime::block_on(tailscale_up()).unwrap();
-        assert_eq!(tauri::async_runtime::block_on(tailscale_state()).unwrap(), "running");
     }
 
     #[test]

@@ -58,14 +58,4 @@
       </div>
     }
   </div>
-
-  <div class="remote-footer">
-    <button class="stress-btn" (click)="openStress()" [disabled]="wgtApps.length === 0"
-            [title]="wgtApps.length === 0 ? 'No WGT apps installed on this device' : ''">
-      <i class="bi bi-arrow-repeat me-2"></i>Stress Test
-      @if (wgtApps.length > 0) {
-        <span class="stress-badge">{{ wgtApps.length }}</span>
-      }
-    </button>
-  </div>
 </div>

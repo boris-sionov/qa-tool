@@ -41,7 +41,7 @@ async fn remove(path: String, recursive: bool) -> Result<(), Error> {
 
 #[tauri::command]
 async fn temp_path(extension: String) -> Result<String, Error> {
-    let temp_path = temp_dir().join(format!("webos-dev-tmp-{}{}", Uuid::new_v4(), extension));
+    let temp_path = temp_dir().join(format!("qa-tool-tmp-{}{}", Uuid::new_v4(), extension));
     temp_path
         .to_str()
         .map(|s| String::from(s))

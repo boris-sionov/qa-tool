@@ -1,5 +1,5 @@
 import {Component, Host, Input, NgZone, OnDestroy} from '@angular/core';
-import {AppsComponent, AppsScope} from '../apps.component';
+import {AppsComponent} from '../apps.component';
 import {Device, PackageInfo, PackageSource} from "../../types";
 import {Observable, Subscription} from "rxjs";
 import {AppManagerService, AppsRepoService, RepositoryItem} from "../../core/services";
@@ -24,7 +24,6 @@ export class InstalledComponent implements OnDestroy {
     htmlVersions = new Map<string, string | null>();
     packages: PackageInfo[] | null = null;
     search = '';
-    private scoped: PackageInfo[] | null = null;
     private brokenIcons = new Set<string>();
 
     private subscription?: Subscription;
@@ -49,13 +48,12 @@ export class InstalledComponent implements OnDestroy {
                 this.brokenIcons.clear();
                 this.htmlVersions.clear();
                 this.packages = pkgs;
-                this.applyScope();
                 const strings: string[] = pkgs?.map((pkg) => pkg.id) ?? [];
                 this.appsRepo.showApps(...strings).then(apps => this.repoPackages = apps);
                 // Only the apps that end up on screen — the raw list holds the TV's whole inventory.
-                const scoped = this.scoped ?? [];
-                void this.loadIcons(scoped);
-                scoped.forEach(pkg => this.resolveHtmlVersion(pkg));
+                const shown = pkgs ?? [];
+                void this.loadIcons(shown);
+                shown.forEach(pkg => this.resolveHtmlVersion(pkg));
             },
             error: (error) => {
                 console.log('installed apps', error);
@@ -70,35 +68,13 @@ export class InstalledComponent implements OnDestroy {
         return this.installedField;
     }
 
-    get scope(): AppsScope {
-        return this.parent.appsScope;
-    }
-
-    /**
-     * The scope filter runs once per list/scope change rather than per change-detection pass —
-     * the template reads `visiblePackages` constantly and this sorts the whole TV inventory.
-     */
-    private applyScope(): void {
-        const packages = this.packages;
-        if (!packages) {
-            this.scoped = null;
-            return;
-        }
-        // The 'apps' scope shows everything the TV reports, sideloaded builds first. It used to
-        // keep only a fixed set of brands, which hid whatever QA had just installed
-        // from the store — `13+` among them — behind a pattern nobody thought to extend.
-        this.scoped = this.scope !== 'apps' ? packages
-            : [...packages].sort((a, b) => this.appsScopeRank(b) - this.appsScopeRank(a)
-                || (a.title || a.id).localeCompare(b.title || b.id));
-    }
-
-    /** Apps left after the scope filter and the search box. */
+    /** Apps left after the search box. */
     get visiblePackages(): PackageInfo[] | null {
-        const scoped = this.scoped;
-        if (!scoped) return null;
+        const packages = this.packages;
+        if (!packages) return null;
         const needle = this.search.trim().toLowerCase();
-        if (!needle) return scoped;
-        return scoped.filter(pkg =>
+        if (!needle) return packages;
+        return packages.filter(pkg =>
             pkg.id.toLowerCase().includes(needle) || (pkg.title ?? '').toLowerCase().includes(needle));
     }
 
@@ -109,17 +85,6 @@ export class InstalledComponent implements OnDestroy {
     loadPackages(): void {
         this.installedError = undefined;
         this.parent.loadPackages();
-    }
-
-    setScope(scope: AppsScope): void {
-        this.search = '';
-        this.parent.setAppsScope(scope);
-    }
-
-    /** Sideloaded builds first, then FreeTV, then the rest of the tracked brands. */
-    private appsScopeRank(pkg: PackageInfo): number {
-        if (this.isDeveloperApp(pkg)) return 2;
-        return isPriorityApp(pkg.id, pkg.title) ? 1 : 0;
     }
 
     /** Only apps sideloaded in dev mode can be uninstalled or debugged from here. */

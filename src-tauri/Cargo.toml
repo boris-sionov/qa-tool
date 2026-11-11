@@ -1,22 +1,22 @@
 [package]
-name = "devman"
+name = "qa-tool"
 version = "0.2.0"
-description = "Device Manager for LG webOS"
+description = "QA Tool for smart TVs and Android devices"
 authors = ["Ningyuan Li"]
 license = "Apache-2.0"
-repository = "https://github.com/webosbrew/dev-manager-desktop"
+repository = "https://github.com/boris-sionov/qa-tool"
 edition = "2021"
 rust-version = "1.92.0"
-links = "devman"
+links = "qa-tool"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [[bin]]
-name = "webos-dev-manager"
+name = "qa-tool"
 path = "src/main.rs"
 
 [lib]
-name = "devman"
+name = "qa_tool"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

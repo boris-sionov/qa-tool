@@ -937,56 +937,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "devman"
-version = "0.2.0"
-dependencies = [
- "abs-file-macro",
- "base64 0.22.1",
- "bytes",
- "flate2",
- "futures",
- "futures-util",
- "hex",
- "http-body-util",
- "httparse",
- "httptest",
- "hyper",
- "hyper-util",
- "keyring",
- "libssh-rs",
- "libssh-rs-sys",
- "log",
- "native-dialog",
- "native-tls",
- "path-slash",
- "pathdiff",
- "port_check",
- "r2d2",
- "regex",
- "reqwest 0.12.28",
- "serde",
- "serde_json",
- "sha2",
- "ssh-key",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-http",
- "tauri-plugin-log",
- "tauri-plugin-os",
- "tauri-plugin-shell",
- "tauri-plugin-single-instance",
- "tauri-plugin-upload",
- "tokio",
- "tokio-tungstenite",
- "unix_mode",
- "uuid",
- "vt100",
- "zip",
-]
-
-[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3758,6 +3708,56 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "qa-tool"
+version = "0.2.0"
+dependencies = [
+ "abs-file-macro",
+ "base64 0.22.1",
+ "bytes",
+ "flate2",
+ "futures",
+ "futures-util",
+ "hex",
+ "http-body-util",
+ "httparse",
+ "httptest",
+ "hyper",
+ "hyper-util",
+ "keyring",
+ "libssh-rs",
+ "libssh-rs-sys",
+ "log",
+ "native-dialog",
+ "native-tls",
+ "path-slash",
+ "pathdiff",
+ "port_check",
+ "r2d2",
+ "regex",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "sha2",
+ "ssh-key",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-http",
+ "tauri-plugin-log",
+ "tauri-plugin-os",
+ "tauri-plugin-shell",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-upload",
+ "tokio",
+ "tokio-tungstenite",
+ "unix_mode",
+ "uuid",
+ "vt100",
+ "zip",
 ]
 
 [[package]]

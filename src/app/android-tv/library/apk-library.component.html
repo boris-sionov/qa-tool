@@ -31,7 +31,7 @@
         <div class="flavor-tabs" role="tablist">
           <button role="tab" [class.active]="tab === 'store'" [attr.aria-selected]="tab === 'store'" (click)="tab = 'store'">Store / PROD</button>
           <button role="tab" [class.active]="tab === 'uat'" [attr.aria-selected]="tab === 'uat'" (click)="tab = 'uat'">UAT</button>
-          <button role="tab" [class.active]="tab === 'prodDebug'" [attr.aria-selected]="tab === 'prodDebug'" (click)="tab = 'prodDebug'">PROD Debug</button>
+          <button role="tab" [class.active]="tab === 'prod'" [attr.aria-selected]="tab === 'prod'" (click)="tab = 'prod'">PROD</button>
           <button role="tab" [class.active]="tab === 'firebase'" [attr.aria-selected]="tab === 'firebase'" (click)="tab = 'firebase'">Firebase</button>
         </div>
         @if (tab === 'store') {
@@ -52,7 +52,7 @@
       </div>
     } @else if (tab !== 'store') {
       <div class="confluence-tab">
-        <app-confluence-builds [page]="androidPage" [kinds]="tab === 'uat' ? kinds.uat : kinds.prodDebug"
+        <app-confluence-builds [page]="androidPage" [kinds]="tab === 'uat' ? kinds.uat : kinds.prod"
                                (picked)="installBuild($event)"></app-confluence-builds>
       </div>
     } @else {
@@ -68,25 +68,18 @@
       } @else if (tailscale) {
         <div class="library-empty tailscale">
           <i class="bi bi-shield-lock"></i>
-          @switch (tailscale) {
-            @case ('waiting') {
-              <p><span class="spinner-border spinner-border-sm"></span> Running <code>tailscale up</code>…</p>
-            }
-            @case ('missing') {
-              <p>Tailscale is not installed</p>
-              <span class="hint">freetv-server is reached through Tailscale — install it from tailscale.com and sign in.</span>
-            }
-            @case ('needs-login') {
-              <p>Tailscale needs you to sign in</p>
-              <span class="hint">freetv-server is reached through Tailscale.</span>
-              <button class="wizard-btn primary" (click)="tailscaleUp()"><i class="bi bi-power"></i><span>Tailscale up</span></button>
-            }
-            @default {
-              <p>Tailscale is off</p>
-              <span class="hint">freetv-server is reached through Tailscale.</span>
-              <button class="wizard-btn primary" (click)="tailscaleUp()"><i class="bi bi-power"></i><span>Tailscale up</span></button>
-            }
+          @if (tailscale === 'down') {
+            <p>Tailscale is down</p>
+            <span class="hint">freetv-server is reached through Tailscale, and it is not connected on this computer.</span>
+            <span class="hint">To fix: open the Tailscale app (menu bar on Mac, system tray on Windows), sign in if it asks, and turn it on.
+              Not installed? Get it from tailscale.com.</span>
+          } @else {
+            <p>Tailscale is on, but <code>{{ host }}</code> cannot be found</p>
+            <span class="hint">Tailscale's name service is not answering for this server, or the server was renamed.</span>
+            <span class="hint">To fix: turn Tailscale off and on again, then retry. If it persists, press Change and enter the server's
+              Tailscale IP (<code>tailscale status</code> lists it) instead of its name.</span>
           }
+          <button class="wizard-btn secondary" (click)="load()"><i class="bi bi-arrow-clockwise"></i><span>Retry</span></button>
         </div>
       } @else if (unreachable) {
         <div class="library-empty">

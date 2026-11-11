@@ -1,3 +1,5 @@
+import {matches} from '../../shared/components/list-filter/list-filter.component';
+import {AppConfig} from '../../../environments/environment';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
@@ -14,6 +16,7 @@ import {DEVTOOLS_PORTS, devtoolsLauncher, devtoolsUpstream, launcherTarget, pres
     styleUrls: ['../../tizen/apps/tizen-apps.component.scss', './vidaa-apps.component.scss'],
 })
 export class VidaaAppsComponent implements OnInit, OnDestroy {
+    readonly minimal = AppConfig.minimal;
     readonly presets = VIDAA_PRESETS;
     state!: VidaaState;
 
@@ -44,6 +47,17 @@ export class VidaaAppsComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.sub?.unsubscribe();
+    }
+
+    search = '';
+
+    /** The rows on screen: every app, narrowed by the filter box. */
+    get shownApps(): VidaaApp[] {
+        return this.apps.filter(a => matches(this.search, a.AppName, a.Id));
+    }
+
+    reload(): void {
+        this.vidaa.refresh().catch(e => console.warn('[vidaa] reload', e));
     }
 
     get apps(): VidaaApp[] {

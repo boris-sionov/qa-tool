@@ -31,7 +31,7 @@
       </button>
       <button class="btn btn-primary text-nowrap install-btn" type="button" (click)="installApk()"
               title="Pick one or more .apk / .xapk files — split APKs of one app install together">
-        <i class="bi bi-folder-fill me-2"></i>Install APK / XAPK
+        <i class="bi bi-folder-fill me-2"></i>Install
       </button>
     </div>
   </div>
@@ -44,25 +44,17 @@
     } @else if (packages.length === 0) {
       <div class="android-empty-state">
         <i class="bi bi-inbox"></i>
-        <h3>None of the tested apps is installed</h3>
-        <p>This list shows only {{ appNames }}. Install one with <strong>Install APK / XAPK</strong>.</p>
+        <h3>No apps installed by you</h3>
+        <p>System apps are not listed. Install one with <strong>Install</strong>.</p>
       </div>
     } @else {
       <section class="android-apps-shell">
-        <div class="apps-header">
-          <div class="apps-heading">
-            <div class="apps-kicker">Android Phone</div>
-            <h2>Installed Apps</h2>
-          </div>
-          <div class="apps-count">
-            <i class="bi bi-grid-3x3-gap-fill"></i>
-            <span>{{ packages.length }}</span>
-          </div>
-        </div>
+        <app-list-header kicker="Android Phone" [shown]="shown.length" [total]="packages.length"
+                         [(search)]="search" (refresh)="load()"></app-list-header>
 
-        <div class="android-app-list">
-          @for (pkg of packages; track pkg.id) {
-            <article class="android-app-row">
+        <div class="app-list">
+          @for (pkg of shown; track pkg.id) {
+            <article class="app-row">
               <div class="app-identity">
                 <div class="app-icon-frame">
                   <div class="app-icon-placeholder phone-app-icon"><i class="bi" [ngClass]="icon(pkg.id)"></i></div>

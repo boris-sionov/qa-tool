@@ -6,13 +6,13 @@
           <i class="bi bi-chevron-left"></i>
         </button>
         <div class="platform-switcher" aria-label="Switch platform">
-          <button class="platform-chip" type="button" title="LG WebOS" (click)="open('lg')">
-            <span class="platform-mark lg-mark">LG</span>
-            <span>LG</span>
-          </button>
           <button class="platform-chip" type="button" title="Android TV" (click)="open('android-tv')">
             <i class="bi bi-android2"></i>
             <span>ATV</span>
+          </button>
+          <button class="platform-chip" type="button" title="LG WebOS" (click)="open('lg')">
+            <span class="platform-mark lg-mark">LG</span>
+            <span>LG</span>
           </button>
           <button class="platform-chip" type="button" title="Samsung Tizen" (click)="open('tizen')">
             <span class="platform-mark samsung-mark">S</span>
@@ -22,10 +22,12 @@
             <span class="platform-mark vidaa-mark">V</span>
             <span>VIDAA</span>
           </button>
+          @if (!minimal) {
           <button class="platform-chip" type="button" title="Android Phone" (click)="open('android-phone')">
             <i class="bi bi-phone"></i>
             <span>Phone</span>
           </button>
+          }
         </div>
       </div>
 

@@ -1,3 +1,4 @@
+import {AppConfig} from '../../environments/environment';
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {APP_VERSION} from '../core/build-info';
@@ -10,6 +11,8 @@ import {SemVer} from 'semver';
     styleUrls: ['./platform-selector.component.scss']
 })
 export class PlatformSelectorComponent implements OnInit {
+    readonly minimal = AppConfig.minimal;
+    readonly appName = AppConfig.appName;
     readonly appVersion = APP_VERSION;
     update: { release: Release, version: SemVer } | null = null;
 

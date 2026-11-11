@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Inject, Input, OnInit, Optional, Output, ViewChild} from '@angular/core';
 import {ScannedTv} from "../../../shared/components/scan-devices/scan-devices.component";
+import {Component, EventEmitter, Inject, Input, OnInit, Optional, Output, ViewChild} from '@angular/core';
 import {DeviceConnectionMode} from "../mode-select/mode-select.component";
 import {Device, NewDeviceAuthentication} from "../../../types";
 import {DeviceEditorComponent, SetupAuthInfoUnion} from "../../device-editor/device-editor.component";

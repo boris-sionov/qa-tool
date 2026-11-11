@@ -1,3 +1,5 @@
+import {ScannedTv} from "../shared/components/scan-devices/scan-devices.component";
+import {AppConfig} from '../../environments/environment';
 import {Component, ElementRef, HostListener, Injector, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Router} from '@angular/router';
@@ -10,7 +12,6 @@ import {isNonNull} from "../shared/operators";
 import {APP_VERSION} from '../core/build-info';
 import {DeviceChooserComponent} from "./device-chooser/device-chooser.component";
 import {DevicesComponent} from "../devices/devices.component";
-import {ScannedTv} from "../shared/components/scan-devices/scan-devices.component";
 
 @Component({
     selector: 'app-lg',
@@ -18,6 +19,7 @@ import {ScannedTv} from "../shared/components/scan-devices/scan-devices.componen
     styleUrls: ['./lg.component.scss']
 })
 export class LgComponent implements OnInit {
+    readonly minimal = AppConfig.minimal;
 
     selectedDevice?: Device;
     appVersion: string;
