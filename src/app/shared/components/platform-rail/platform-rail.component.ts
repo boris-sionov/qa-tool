@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output} from '@angular/core';
 import {Router} from '@angular/router';
 import {AVAILABLE_PLATFORMS, PlatformInfo} from '../../platforms';
 
@@ -12,7 +12,7 @@ import {AVAILABLE_PLATFORMS, PlatformInfo} from '../../platforms';
     templateUrl: './platform-rail.component.html',
     styleUrls: ['./platform-rail.component.scss'],
 })
-export class PlatformRailComponent {
+export class PlatformRailComponent implements OnChanges, OnDestroy {
     readonly platforms = AVAILABLE_PLATFORMS;
     @Input() active = '';
     /** Smaller tiles and a button back to the home page, for the platform pages. */
@@ -21,6 +21,16 @@ export class PlatformRailComponent {
     @Output() picked = new EventEmitter<PlatformInfo>();
 
     constructor(private router: Router) {}
+
+    /** A platform's pages (the compact rail) colour the whole document, dialogs included. */
+    ngOnChanges(): void {
+        const brand = this.platforms.find(p => p.id === this.active)?.brand;
+        if (this.compact && brand) document.documentElement.style.setProperty('--brand', brand);
+    }
+
+    ngOnDestroy(): void {
+        if (this.compact) document.documentElement.style.removeProperty('--brand');
+    }
 
     pick(p: PlatformInfo): void {
         this.picked.emit(p);

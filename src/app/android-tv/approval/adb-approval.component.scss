@@ -9,14 +9,14 @@
   padding: 28px 24px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(91, 159, 245, 0.25);
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 25%, transparent);
   color: #A8B8CC;
 }
 
 .approval-icon {
   position: relative;
   font-size: 44px;
-  color: #5B9FF5;
+  color: var(--brand, #5B9FF5);
   line-height: 1;
 }
 
@@ -47,7 +47,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #5B9FF5;
+  color: var(--brand, #5B9FF5);
   font-size: 13px;
   font-weight: 600;
 }
@@ -67,23 +67,23 @@
   gap: 8px;
   padding: 8px 16px;
   border-radius: 10px;
-  border: 1px solid rgba(91, 159, 245, 0.4);
-  background: rgba(91, 159, 245, 0.12);
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 40%, transparent);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
   color: #FFFFFF;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
 
-  &:hover:not([disabled]) { background: rgba(91, 159, 245, 0.22); }
+  &:hover:not([disabled]) { background: color-mix(in srgb, var(--brand, #5B9FF5) 22%, transparent); }
   &[disabled] { opacity: 0.6; cursor: default; }
 }
 
 .spinner-mini {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(91, 159, 245, 0.3);
-  border-top-color: #5B9FF5;
+  border: 2px solid color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
+  border-top-color: var(--brand, #5B9FF5);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

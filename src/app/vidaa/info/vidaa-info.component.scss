@@ -1,5 +1,5 @@
 $text-secondary: #A8B8CC;
-$border-color: rgba(91, 159, 245, 0.2);
+$border-color: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 
 :host {
   display: block;
@@ -23,7 +23,7 @@ $border-color: rgba(91, 159, 245, 0.2);
 
   i {
     font-size: 42px;
-    color: #5B9FF5;
+    color: var(--brand, #5B9FF5);
   }
 
   h4 {

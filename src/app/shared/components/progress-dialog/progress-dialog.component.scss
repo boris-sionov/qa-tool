@@ -1,14 +1,14 @@
 // Design tokens
 $bg-dark: #0F172B;
 $bg-light: #1a2744;
-$primary-blue: #5B9FF5;
-$accent-purple: #8B7FF5;
+$primary-blue: var(--brand, #5B9FF5);
+$accent-purple: color-mix(in srgb, var(--brand, #5B9FF5) 60%, #8B7FF5);
 $success-green: #4ADE80;
 $danger-red: #FF6B6B;
 $text-primary: #FFFFFF;
 $text-secondary: #A8B8CC;
 $text-muted: rgba(168, 184, 204, 0.4);
-$border-color: rgba(91, 159, 245, 0.2);
+$border-color: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 
 .progress-dialog {
   background: linear-gradient(135deg, $bg-light 0%, $bg-dark 100%);
@@ -26,18 +26,18 @@ $border-color: rgba(91, 159, 245, 0.2);
   width: 56px;
   height: 56px;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(91, 159, 245, 0.15) 0%, rgba(139, 127, 245, 0.08) 100%);
-  border: 1px solid rgba(91, 159, 245, 0.3);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent) 0%, rgba(139, 127, 245, 0.08) 100%);
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 16px rgba(91, 159, 245, 0.15);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent);
 }
 
 .spinner {
   width: 28px;
   height: 28px;
-  border: 3px solid rgba(91, 159, 245, 0.2);
+  border: 3px solid color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
   border-top-color: $primary-blue;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -124,7 +124,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(91, 159, 245, 0.3);
+  border: 2px solid color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
   border-top-color: $primary-blue;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
@@ -159,16 +159,16 @@ $border-color: rgba(91, 159, 245, 0.2);
   .modern-progress {
     .progress {
       height: 8px !important;
-      background: rgba(91, 159, 245, 0.1) !important;
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 10%, transparent) !important;
       border-radius: 6px !important;
       overflow: hidden !important;
-      border: 1px solid rgba(91, 159, 245, 0.15) !important;
+      border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent) !important;
     }
 
     .progress-bar {
       background: linear-gradient(90deg, $primary-blue 0%, $accent-purple 100%) !important;
       border-radius: 6px !important;
-      box-shadow: 0 0 8px rgba(91, 159, 245, 0.4) !important;
+      box-shadow: 0 0 8px color-mix(in srgb, var(--brand, #5B9FF5) 40%, transparent) !important;
 
       &.progress-bar-striped {
         background-image: linear-gradient(

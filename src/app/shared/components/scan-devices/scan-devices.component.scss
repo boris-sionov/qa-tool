@@ -17,16 +17,16 @@
   gap: 6px;
   padding: 7px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(91, 159, 245, 0.35);
-  background: rgba(91, 159, 245, 0.08);
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 35%, transparent);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 8%, transparent);
   color: #A8B8CC;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover:not(:disabled) { color: #fff; border-color: #5B9FF5; }
-  &.active { background: #5B9FF5; border-color: #5B9FF5; color: #fff; }
+  &:hover:not(:disabled) { color: #fff; border-color: var(--brand, #5B9FF5); }
+  &.active { background: var(--brand, #5B9FF5); border-color: var(--brand, #5B9FF5); color: #fff; }
   &:disabled { opacity: 0.5; cursor: default; }
 }
 

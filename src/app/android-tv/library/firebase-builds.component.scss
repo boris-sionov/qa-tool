@@ -24,7 +24,7 @@
     font-size: 12px;
     font-weight: 600;
 
-    &.active { background: rgba(91, 159, 245, 0.18); color: #FFFFFF; }
+    &.active { background: color-mix(in srgb, var(--brand, #5B9FF5) 18%, transparent); color: #FFFFFF; }
   }
 }
 

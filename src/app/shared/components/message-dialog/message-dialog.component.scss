@@ -1,15 +1,15 @@
 // Design tokens
 $bg-dark: #0F172B;
 $bg-light: #1a2744;
-$primary-blue: #5B9FF5;
-$accent-purple: #8B7FF5;
+$primary-blue: var(--brand, #5B9FF5);
+$accent-purple: color-mix(in srgb, var(--brand, #5B9FF5) 60%, #8B7FF5);
 $accent-green: #4CAF50;
 $accent-red: #FF6B6B;
 $accent-orange: #FF9800;
 $text-primary: #FFFFFF;
 $text-secondary: #A8B8CC;
 $text-muted: #7E92B0;
-$border-color: rgba(91, 159, 245, 0.2);
+$border-color: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 
 :host {
   button:not(:disabled),
@@ -39,7 +39,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   gap: 12px;
   padding: 16px 20px 12px 20px;
   border-bottom: 1px solid $border-color;
-  background: rgba(91, 159, 245, 0.04);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 4%, transparent);
 }
 
 .header-icon {
@@ -51,7 +51,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 6px 16px rgba(91, 159, 245, 0.3);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
 
   i.bi {
     font-size: 18px;
@@ -90,7 +90,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(91, 159, 245, 0.3);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
     border-radius: 4px;
   }
 
@@ -118,7 +118,7 @@ $border-color: rgba(91, 159, 245, 0.2);
     }
 
     code {
-      background: rgba(91, 159, 245, 0.15);
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent);
       color: $primary-blue;
       padding: 2px 6px;
       border-radius: 4px;
@@ -193,7 +193,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(91, 159, 245, 0.3);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
     border-radius: 3px;
   }
 }
@@ -234,11 +234,11 @@ $border-color: rgba(91, 159, 245, 0.2);
   &.positive-primary {
     background: linear-gradient(135deg, $primary-blue 0%, $accent-purple 100%);
     color: white;
-    box-shadow: 0 4px 14px rgba(91, 159, 245, 0.25);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--brand, #5B9FF5) 25%, transparent);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(91, 159, 245, 0.4);
+      box-shadow: 0 6px 20px color-mix(in srgb, var(--brand, #5B9FF5) 40%, transparent);
     }
   }
 
@@ -261,21 +261,21 @@ $border-color: rgba(91, 159, 245, 0.2);
     border-color: rgba(255, 255, 255, 0.1);
 
     &:hover:not(:disabled) {
-      background: rgba(91, 159, 245, 0.12);
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
       color: $primary-blue;
-      border-color: rgba(91, 159, 245, 0.3);
+      border-color: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
       transform: translateY(-2px);
     }
   }
 
   // Alternative button
   &.alternative {
-    background: rgba(91, 159, 245, 0.12);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
     color: $primary-blue;
-    border-color: rgba(91, 159, 245, 0.3);
+    border-color: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
 
     &:hover:not(:disabled) {
-      background: rgba(91, 159, 245, 0.2);
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
       border-color: $primary-blue;
       transform: translateY(-2px);
     }

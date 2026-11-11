@@ -1,14 +1,14 @@
 // Design tokens
 $bg-dark: #0F172B;
 $bg-light: #1a2744;
-$primary-blue: #5B9FF5;
-$accent-purple: #8B7FF5;
+$primary-blue: var(--brand, #5B9FF5);
+$accent-purple: color-mix(in srgb, var(--brand, #5B9FF5) 60%, #8B7FF5);
 $accent-green: #4CAF50;
 $accent-red: #FF6B6B;
 $text-primary: #FFFFFF;
 $text-secondary: #A8B8CC;
 $text-muted: #7E92B0;
-$border-color: rgba(91, 159, 245, 0.2);
+$border-color: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 
 // Hand cursor
 :host {
@@ -41,7 +41,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   justify-content: space-between;
   padding: 22px 28px;
   border-bottom: 1px solid $border-color;
-  background: rgba(91, 159, 245, 0.04);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 4%, transparent);
 }
 
 .header-text {
@@ -82,7 +82,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   &.active {
     background: linear-gradient(135deg, $primary-blue 0%, $accent-purple 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(91, 159, 245, 0.4);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand, #5B9FF5) 40%, transparent);
   }
 
   &.complete {
@@ -145,7 +145,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(91, 159, 245, 0.3);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
     border-radius: 4px;
   }
 }
@@ -170,7 +170,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   align-items: center;
   justify-content: center;
   margin: 0 auto 16px auto;
-  box-shadow: 0 8px 24px rgba(91, 159, 245, 0.3);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
 
   i.bi {
     font-size: 36px;
@@ -203,14 +203,14 @@ $border-color: rgba(91, 159, 245, 0.2);
   gap: 16px;
   padding: 18px 20px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(91, 159, 245, 0.15);
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent);
   border-radius: 14px;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
 
   &:hover {
-    background: linear-gradient(135deg, rgba(91, 159, 245, 0.08) 0%, rgba(91, 159, 245, 0.04) 100%);
-    border-color: rgba(91, 159, 245, 0.3);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--brand, #5B9FF5) 8%, transparent) 0%, color-mix(in srgb, var(--brand, #5B9FF5) 4%, transparent) 100%);
+    border-color: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
     transform: translateX(4px);
   }
 }
@@ -227,7 +227,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   font-size: 15px;
   font-weight: 700;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(91, 159, 245, 0.3);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
 }
 
 .instruction-text {
@@ -265,7 +265,7 @@ $border-color: rgba(91, 159, 245, 0.2);
     }
 
     code {
-      background: rgba(91, 159, 245, 0.15);
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent);
       color: $primary-blue;
       padding: 2px 6px;
       border-radius: 4px;
@@ -299,7 +299,7 @@ $border-color: rgba(91, 159, 245, 0.2);
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 6px 16px rgba(91, 159, 245, 0.3);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
 
   i.bi {
     font-size: 26px;
@@ -349,14 +349,14 @@ $border-color: rgba(91, 159, 245, 0.2);
 
     &:hover {
       background: rgba(15, 23, 43, 0.7) !important;
-      border-color: rgba(91, 159, 245, 0.4) !important;
+      border-color: color-mix(in srgb, var(--brand, #5B9FF5) 40%, transparent) !important;
     }
 
     &:focus {
       outline: none !important;
       background: rgba(15, 23, 43, 0.7) !important;
       border-color: $primary-blue !important;
-      box-shadow: 0 0 0 3px rgba(91, 159, 245, 0.15) !important;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent) !important;
     }
   }
 
@@ -410,7 +410,7 @@ $border-color: rgba(91, 159, 245, 0.2);
       border-radius: 0 10px 10px 0 !important;
       border: 1.5px solid $border-color !important;
       border-left: none !important;
-      background: rgba(91, 159, 245, 0.12) !important;
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent) !important;
       color: $primary-blue !important;
       font-size: 13px !important;
       font-weight: 600 !important;
@@ -421,7 +421,7 @@ $border-color: rgba(91, 159, 245, 0.2);
       transition: all 0.25s ease !important;
 
       &:hover {
-        background: rgba(91, 159, 245, 0.2) !important;
+        background: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent) !important;
         border-color: $primary-blue !important;
       }
     }
@@ -461,8 +461,8 @@ $border-color: rgba(91, 159, 245, 0.2);
   transition: all 0.25s ease;
 
   &:hover {
-    background: rgba(91, 159, 245, 0.05);
-    border-color: rgba(91, 159, 245, 0.3);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 5%, transparent);
+    border-color: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
   }
 }
 
@@ -541,11 +541,11 @@ $border-color: rgba(91, 159, 245, 0.2);
   &.primary {
     background: linear-gradient(135deg, $primary-blue 0%, $accent-purple 100%);
     color: white;
-    box-shadow: 0 4px 14px rgba(91, 159, 245, 0.25);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--brand, #5B9FF5) 25%, transparent);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(91, 159, 245, 0.4);
+      box-shadow: 0 6px 20px color-mix(in srgb, var(--brand, #5B9FF5) 40%, transparent);
     }
 
     &:disabled {
@@ -560,9 +560,9 @@ $border-color: rgba(91, 159, 245, 0.2);
     border-color: rgba(255, 255, 255, 0.1);
 
     &:hover {
-      background: rgba(91, 159, 245, 0.12);
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
       color: $primary-blue;
-      border-color: rgba(91, 159, 245, 0.3);
+      border-color: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
       transform: translateY(-2px);
     }
   }

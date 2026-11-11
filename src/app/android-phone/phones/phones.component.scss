@@ -16,13 +16,13 @@
 }
 
 .device-btn.mirror {
-  background: rgba(91, 159, 245, 0.1);
-  color: #5B9FF5;
-  border-color: rgba(91, 159, 245, 0.3);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 10%, transparent);
+  color: var(--brand, #5B9FF5);
+  border-color: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
 
   &:hover:not(:disabled) {
-    background: rgba(91, 159, 245, 0.2);
-    border-color: #5B9FF5;
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
+    border-color: var(--brand, #5B9FF5);
     transform: translateY(-2px);
   }
 }

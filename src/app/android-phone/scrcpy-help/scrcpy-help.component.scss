@@ -1,6 +1,6 @@
 $bg-dark: #0F172B;
 $bg-light: #1a2744;
-$primary-blue: #5B9FF5;
+$primary-blue: var(--brand, #5B9FF5);
 $text-primary: #FFFFFF;
 $text-secondary: #A8B8CC;
 
@@ -29,8 +29,8 @@ $text-secondary: #A8B8CC;
   justify-content: center;
   font-size: 24px;
   color: $primary-blue;
-  background: rgba(91, 159, 245, 0.12);
-  border: 1px solid rgba(91, 159, 245, 0.3);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
 }
 
 .help-title {
@@ -49,8 +49,8 @@ $text-secondary: #A8B8CC;
 .fix-card {
   padding: 14px 16px;
   border-radius: 12px;
-  background: rgba(91, 159, 245, 0.06);
-  border: 1px solid rgba(91, 159, 245, 0.2);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 }
 
 .fix-title {
@@ -152,8 +152,8 @@ $text-secondary: #A8B8CC;
   }
 
   &:hover {
-    background: rgba(91, 159, 245, 0.12);
-    border-color: rgba(91, 159, 245, 0.4);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
+    border-color: color-mix(in srgb, var(--brand, #5B9FF5) 40%, transparent);
     color: $text-primary;
   }
 }
@@ -164,6 +164,6 @@ $text-secondary: #A8B8CC;
   color: $text-primary;
 
   &:hover {
-    box-shadow: 0 6px 18px rgba(91, 159, 245, 0.35);
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--brand, #5B9FF5) 35%, transparent);
   }
 }

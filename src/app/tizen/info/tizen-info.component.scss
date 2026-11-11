@@ -46,7 +46,7 @@
 
   .summary-icon {
     font-size: 22px;
-    color: #5B9FF5;
+    color: var(--brand, #5B9FF5);
     flex-shrink: 0;
     width: 28px;
     text-align: center;
@@ -89,8 +89,8 @@
 .spinner-modern {
   width: 44px;
   height: 44px;
-  border: 3px solid rgba(91, 159, 245, 0.2);
-  border-top-color: #5B9FF5;
+  border: 3px solid color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
+  border-top-color: var(--brand, #5B9FF5);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-bottom: 20px;

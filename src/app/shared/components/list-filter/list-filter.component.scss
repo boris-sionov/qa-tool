@@ -5,12 +5,12 @@
   height: 36px;
   margin: 0;
   padding: 0 10px;
-  border: 1px solid rgba(91, 159, 245, 0.18);
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 18%, transparent);
   border-radius: 8px;
   background: rgba(7, 13, 28, 0.48);
 
   i {
-    color: #5B9FF5;
+    color: var(--brand, #5B9FF5);
     font-size: 13px;
   }
 

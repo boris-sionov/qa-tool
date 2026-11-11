@@ -13,7 +13,7 @@
   border: 0;
   background: none;
   padding: 0;
-  color: #5B9FF5;
+  color: var(--brand, #5B9FF5);
   font-size: 13px;
   font-weight: 600;
 
@@ -70,7 +70,7 @@
   color: #A8B8CC;
   font-size: 14px;
 
-  > i.bi { font-size: 28px; color: #5B9FF5; }
+  > i.bi { font-size: 28px; color: var(--brand, #5B9FF5); }
   p { margin: 0; display: flex; align-items: center; gap: 8px; color: #FFFFFF; font-weight: 600; }
   .hint { max-width: 420px; text-align: center; font-size: 13px; }
   code { color: #A8B8CC; }
@@ -113,7 +113,7 @@
   color: #FFFFFF;
   transition: border-color 0.2s ease;
 
-  &:hover { border-color: rgba(91, 159, 245, 0.35); }
+  &:hover { border-color: color-mix(in srgb, var(--brand, #5B9FF5) 35%, transparent); }
 
   .install-btn { padding: 8px 14px; }
 }
@@ -136,7 +136,7 @@
     transition: all 0.2s ease;
 
     &.active {
-      background: rgba(91, 159, 245, 0.18);
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 18%, transparent);
       color: #FFFFFF;
     }
   }

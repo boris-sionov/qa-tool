@@ -21,8 +21,8 @@
     color: #7E92B0;
     font-size: 14px;
     gap: 12px;
-    background: rgba(91, 159, 245, 0.07);
-    border: 1px solid rgba(91, 159, 245, 0.18);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 7%, transparent);
+    border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 18%, transparent);
   }
 
   &.success {
@@ -76,7 +76,7 @@
   height: 44px;
   padding: 0 14px;
   border-radius: 10px;
-  border: 1.5px solid rgba(91, 159, 245, 0.2);
+  border: 1.5px solid color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
   background: rgba(15, 23, 43, 0.5);
   color: #FFFFFF;
   font-size: 14px;
@@ -86,8 +86,8 @@
 
   &:focus {
     outline: none;
-    border-color: #5B9FF5;
-    box-shadow: 0 0 0 3px rgba(91, 159, 245, 0.15);
+    border-color: var(--brand, #5B9FF5);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent);
   }
 
   option { background: #0F172B; color: #FFFFFF; }
@@ -96,7 +96,7 @@
 .cert-instructions {
   padding: 16px;
   border-radius: 10px;
-  border: 1px solid rgba(91, 159, 245, 0.15);
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent);
   background: rgba(15, 23, 43, 0.4);
 }
 
@@ -122,7 +122,7 @@
   code {
     padding: 1px 6px;
     border-radius: 4px;
-    background: rgba(91, 159, 245, 0.12);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
     color: #7EC8FF;
     font-size: 12px;
   }
@@ -192,7 +192,7 @@
 .input-icon {
   position: absolute;
   left: 14px;
-  color: #5B9FF5;
+  color: var(--brand, #5B9FF5);
   font-size: 15px;
   pointer-events: none;
 }
@@ -202,7 +202,7 @@
   height: 44px;
   padding: 0 16px 0 40px;
   border-radius: 10px;
-  border: 1.5px solid rgba(91, 159, 245, 0.2);
+  border: 1.5px solid color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
   background: rgba(15, 23, 43, 0.5);
   color: #FFFFFF;
   font-size: 14px;
@@ -213,14 +213,14 @@
 
   &:hover {
     background: rgba(15, 23, 43, 0.7);
-    border-color: rgba(91, 159, 245, 0.4);
+    border-color: color-mix(in srgb, var(--brand, #5B9FF5) 40%, transparent);
   }
 
   &:focus {
     outline: none;
     background: rgba(15, 23, 43, 0.7);
-    border-color: #5B9FF5;
-    box-shadow: 0 0 0 3px rgba(91, 159, 245, 0.15);
+    border-color: var(--brand, #5B9FF5);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent);
   }
 }
 

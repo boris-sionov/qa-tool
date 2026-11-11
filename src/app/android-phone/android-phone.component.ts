@@ -1,4 +1,3 @@
-import {platformById} from '../shared/platforms';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
@@ -16,7 +15,6 @@ import {PhoneApprovalComponent} from './approval/phone-approval.component';
     styleUrls: ['../android-tv/android-tv.component.scss'],
 })
 export class AndroidPhoneComponent implements OnInit, OnDestroy {
-    readonly brand = platformById('android-phone').brand;
     /** The approval popup, and the phone it is for. */
     private approval?: {serial: string, ref: NgbModalRef};
     /** Phones whose approval popup QA closed; it is not opened again until they are re-plugged. */
