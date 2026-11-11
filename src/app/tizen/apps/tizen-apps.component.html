@@ -27,21 +27,8 @@
                 title="Open remote control" style="height:42px;">
           <i class="bi bi-controller"></i>Remote
         </button>
-        <button class="btn btn-primary text-nowrap install-btn" (click)="installFromConfluence()"
-                [disabled]="!serial || installing" title="Install the newest UAT or PREPROD build from Confluence">
-          <i class="bi bi-journal-arrow-down"></i>From Confluence
-        </button>
       }
-      <button class="btn btn-primary text-nowrap install-btn" (click)="installWgt()"
-              [disabled]="!serial || installing">
-        @if (installing) {
-          <app-spinner size="sm" tone="inherit"></app-spinner>
-          <span>Installing...</span>
-        } @else {
-          <i class="bi bi-folder-fill"></i>
-          <span>Install</span>
-        }
-      </button>
+      <app-install-menu [sources]="installSources" [disabled]="!serial" [busy]="installing" (choose)="install($event)"></app-install-menu>
     </div>
   </div>
 
@@ -58,7 +45,7 @@
     </div>
   }
 
-  <div class="p-3 flex-fill overflow-auto">
+  <div class="p-4 flex-fill overflow-auto">
     @if (!serial) {
       <div class="tizen-empty-state">
         <i class="bi bi-hdd-network"></i>

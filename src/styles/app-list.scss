@@ -12,15 +12,15 @@ $panel-strong: rgba(18, 30, 55, 0.88);
 .app-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
 
   .app-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 18px;
-    min-height: 82px;
-    padding: 12px;
+    min-height: 96px;
+    padding: 18px 22px;
     border: 1px solid $border-color;
     border-radius: 8px;
     background: linear-gradient(135deg, $panel-strong 0%, $panel 100%);
@@ -123,7 +123,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 10px;
   }
 
   // One width for every button, so Inspect / Launch / Kill / Remove line up from row to row and
@@ -190,11 +190,11 @@ $panel-strong: rgba(18, 30, 55, 0.88);
 // in a scroll area with 16px padding, so it reaches out over that padding to cover the rows.
 app-list-header {
   position: sticky;
-  top: -16px; // sticky offsets count from inside the scroll area's padding
+  top: -24px; // sticky offsets count from inside the scroll area's padding
   z-index: 10;
   display: block;
-  margin: -16px -16px 0;
-  padding: 16px 16px 12px;
+  margin: -24px -24px 0;
+  padding: 24px 24px 18px;
   background: rgba(15, 23, 43, 0.94);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(91, 159, 245, 0.12);

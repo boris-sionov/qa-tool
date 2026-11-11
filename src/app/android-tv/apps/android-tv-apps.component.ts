@@ -11,6 +11,7 @@ import {extractMessage} from '../../core/utils/error.utils';
 import {environmentIcon} from '../../shared/app-environment-icons';
 import {brandIcon} from '../../shared/app-brand-icons';
 import {ApkLibraryComponent, LibraryPick} from '../library/apk-library.component';
+import {InstallSource} from '../../shared/components/install-menu/install-menu.component';
 
 /** pm's answers when an APK cannot replace the installed app without an uninstall first. */
 const REPLACE_REFUSED = /INSTALL_FAILED_UPDATE_INCOMPATIBLE|INSTALL_FAILED_VERSION_DOWNGRADE/;
@@ -22,6 +23,7 @@ const REPLACE_REFUSED = /INSTALL_FAILED_UPDATE_INCOMPATIBLE|INSTALL_FAILED_VERSI
 })
 export class AndroidTvAppsComponent implements OnInit, OnDestroy {
     readonly minimal = AppConfig.minimal;
+    readonly installSources: InstallSource[] = [{id: 'file', label: 'From file', icon: 'bi-folder2-open'}, ...(AppConfig.minimal ? [] : [{id: 'library', label: 'From library', icon: 'bi-collection', hint: 'A version from the shared APK library — downgrades allowed'}])];
 
     packages: AdbPackageInfo[] | null = null;
     search = '';
@@ -130,6 +132,10 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
         } finally {
             this.loading = false;
         }
+    }
+
+    install(source: string): void {
+        void (source === 'library' ? this.installFromLibrary() : this.installApk());
     }
 
     async installApk(): Promise<void> {

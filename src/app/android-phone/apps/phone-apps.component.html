@@ -29,14 +29,11 @@
               title="Save the phone's logcat to a file">
         <i class="bi bi-file-earmark-text"></i>Pull logs
       </button>
-      <button class="btn btn-primary text-nowrap install-btn" type="button" (click)="installApk()"
-              title="Pick one or more .apk / .xapk files — split APKs of one app install together">
-        <i class="bi bi-folder-fill"></i>Install
-      </button>
+      <app-install-menu [sources]="installSources" (choose)="installApk()"></app-install-menu>
     </div>
   </div>
 
-  <div class="p-3 flex-fill overflow-auto">
+  <div class="p-4 flex-fill overflow-auto">
     @if (error) {
       <app-error-card title="Unable to get installed apps" [error]="error" (retry)="load()"></app-error-card>
     } @else if (packages === null) {

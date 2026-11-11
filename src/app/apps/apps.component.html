@@ -24,18 +24,10 @@
 
     <!-- Install Button -->
     <div class="install-btn-container">
-      @if (!minimal) {
-        <button class="btn btn-primary text-nowrap install-btn" (click)="installFromConfluence()"
-                title="Install the newest UAT or PREPROD build from Confluence">
-          <i class="bi bi-journal-arrow-down"></i>From Confluence
-        </button>
-      }
-      <button class="btn btn-primary text-nowrap install-btn" (click)="openInstallChooser()">
-        <i class="bi bi-folder-fill"></i>Install
-      </button>
+      <app-install-menu [sources]="installSources" (choose)="install($event)"></app-install-menu>
     </div>
   </div>
-  <div class="p-3 flex-fill overflow-auto apps-scroll">
+  <div class="p-4 flex-fill overflow-auto apps-scroll">
     @if (!device) {
       <div class="lg-empty-state">
         <i class="bi bi-hdd-network"></i>

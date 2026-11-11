@@ -28,3 +28,10 @@
 
 .btn-link,
 .btn-ghost { @include btn-ghost; text-decoration: none; }
+
+// The row of actions in every apps page's toolbar.
+.install-btn-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

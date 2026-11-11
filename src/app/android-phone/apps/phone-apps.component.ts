@@ -9,6 +9,7 @@ import {mirrorPhone} from '../scrcpy-help/scrcpy-help.component';
 import {MessageDialogComponent} from '../../shared/components/message-dialog/message-dialog.component';
 import {ProgressDialogComponent} from '../../shared/components/progress-dialog/progress-dialog.component';
 import {extractMessage} from '../../core/utils/error.utils';
+import {InstallSource} from '../../shared/components/install-menu/install-menu.component';
 
 /** pm's answers when an APK cannot replace the installed app without an uninstall first. */
 const REPLACE_REFUSED = /INSTALL_FAILED_UPDATE_INCOMPATIBLE|INSTALL_FAILED_VERSION_DOWNGRADE/;
@@ -32,6 +33,7 @@ function fileName(path: string): string {
     styleUrls: ['../../android-tv/apps/android-tv-apps.component.scss', './phone-apps.component.scss'],
 })
 export class PhoneAppsComponent implements OnInit, OnDestroy {
+    readonly installSources: InstallSource[] = [{id: 'apk', label: 'Install', icon: 'bi-download', hint: 'Pick one or more .apk / .xapk files — split APKs of one app install together'}];
 
     /** The phone whose apps are listed, or '' while there is none ready. */
     serial = '';

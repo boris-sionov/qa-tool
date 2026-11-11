@@ -260,7 +260,7 @@ One set, `src/styles/_btn.scss` (mixins `btn-base`, `btn-primary`, `btn-secondar
 `btn-danger-solid`, `btn-warning`, `btn-success`, `btn-ghost`, `btn-sm`). Bootstrap's `.btn-*` classes
 are restyled with them in `styles/buttons.scss`; the app-list row buttons (`.app-action`: Inspect
 secondary, Launch primary, Kill warning, Remove danger) and every local family (`.wizard-btn`,
-`.device-btn`, `.add-device-btn`, `.dialog-btn`, `.editor-btn`, …) include them too. A new button
+`.device-btn`, `.add-device-btn`, `.dialog-btn`, `.editor-btn`, …) include them too. Every platform's apps page has the **one Install button** (`<app-install-menu>`, `shared/components/install-menu/`): with several sources (file, APK library, Confluence) it opens a menu of them, with one it installs directly. A new button
 uses a mixin (`@use '…/styles/btn' as *;`), not its own colours.
 
 ### Spinners

@@ -1,0 +1,31 @@
+<ng-template #label>
+  @if (busy) {
+    <app-spinner size="sm" tone="inherit"></app-spinner>
+    <span>Installing…</span>
+  } @else {
+    <i class="bi bi-download"></i>
+    <span>Install</span>
+  }
+</ng-template>
+
+@if (sources.length === 1) {
+  <button type="button" class="btn btn-primary text-nowrap" [disabled]="disabled || busy"
+          [title]="sources[0].hint ?? ''" (click)="choose.emit(sources[0].id)">
+    <ng-container *ngTemplateOutlet="label"></ng-container>
+  </button>
+} @else if (sources.length > 1) {
+  <div ngbDropdown placement="bottom-end" class="d-inline-block">
+    <button type="button" class="btn btn-primary text-nowrap dropdown-toggle" ngbDropdownToggle
+            [disabled]="disabled || busy">
+      <ng-container *ngTemplateOutlet="label"></ng-container>
+    </button>
+    <div ngbDropdownMenu class="install-menu">
+      @for (s of sources; track s.id) {
+        <button type="button" ngbDropdownItem (click)="choose.emit(s.id)" [title]="s.hint ?? ''">
+          <i class="bi" [ngClass]="s.icon"></i>
+          <span>{{ s.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+}

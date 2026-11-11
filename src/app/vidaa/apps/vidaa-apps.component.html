@@ -13,20 +13,12 @@
                 title="Disconnect from the TV's DevKit">
           <i class="bi bi-plug"></i>Disconnect
         </button>
-        <button class="btn btn-primary text-nowrap install-btn" (click)="showInstall = !showInstall" [disabled]="!!busy">
-          @if (busy === 'install') {
-            <app-spinner size="sm" tone="inherit"></app-spinner>
-            <span>Installing...</span>
-          } @else {
-            <i class="bi bi-folder-fill"></i>
-            <span>Install</span>
-          }
-        </button>
+        <app-install-menu [sources]="installSources" [disabled]="!!busy" [busy]="busy === 'install'" (choose)="showInstall = !showInstall"></app-install-menu>
       </div>
     }
   </div>
 
-  <div class="p-3 flex-fill overflow-auto">
+  <div class="p-4 flex-fill overflow-auto">
     @if (connecting || (state.connected && !state.appsLoaded)) {
       <app-loading-card></app-loading-card>
     } @else if (!state.connected) {
