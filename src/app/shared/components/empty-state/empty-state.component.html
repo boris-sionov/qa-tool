@@ -1,0 +1,6 @@
+<div class="tile"><i class="bi" [ngClass]="icon"></i></div>
+<h3>{{ title }}</h3>
+@if (text) { <p>{{ text }}</p> }
+@if (actionLabel) {
+  <a class="btn btn-primary" [routerLink]="actionLink"><i class="bi" [ngClass]="actionIcon"></i>{{ actionLabel }}</a>
+}

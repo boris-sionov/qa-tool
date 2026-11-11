@@ -9,6 +9,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {MessageTraceComponent} from './components/message-dialog/message-trace/message-trace.component';
 import {ErrorCardComponent} from './components/error-card/error-card.component';
 import {ExternalLinkDirective} from "./directives";
+import {EmptyStateComponent} from './components/empty-state/empty-state.component';
 import {InstallMenuComponent} from './components/install-menu/install-menu.component';
 import {SpinnerComponent} from './components/spinner/spinner.component';
 import {LoadingCardComponent} from './components/loading-card/loading-card.component';
@@ -38,10 +39,11 @@ import {AppListHeaderComponent} from './components/app-list-header/app-list-head
         AppListHeaderComponent,
     ],
     imports: [CommonModule, FormsModule, NgbModule,
-        ExternalLinkDirective, SpinnerComponent, InstallMenuComponent],
+        ExternalLinkDirective, SpinnerComponent, InstallMenuComponent, EmptyStateComponent],
     exports: [
         SpinnerComponent,
         InstallMenuComponent,
+        EmptyStateComponent,
         PageNotFoundComponent,
         TrustUriPipe,
         FilesizePipe,

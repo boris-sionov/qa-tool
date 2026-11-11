@@ -263,6 +263,13 @@ secondary, Launch primary, Kill warning, Remove danger) and every local family (
 `.device-btn`, `.add-device-btn`, `.dialog-btn`, `.editor-btn`, …) include them too. Every platform's apps page has the **one Install button** (`<app-install-menu>`, `shared/components/install-menu/`): with several sources (file, APK library, Confluence) it opens a menu of them, with one it installs directly. A new button
 uses a mixin (`@use '…/styles/btn' as *;`), not its own colours.
 
+### Empty States
+
+A page with nothing to show — no device, not connected, no devices saved — uses
+`<app-empty-state>` (`shared/components/empty-state/`): an icon tile, a title, one line of help and,
+if there is a next step, a button (`actionLabel` + `actionLink`, relative to the page). Do not write
+a page-local "no device" block.
+
 ### Spinners
 
 One component, `<app-spinner>` (`shared/components/spinner/`): the rounded square of the platform

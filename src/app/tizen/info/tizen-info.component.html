@@ -24,13 +24,7 @@
 
   <div class="info-content">
     @if (!device) {
-      <div class="empty-state">
-        <div class="empty-icon">
-          <i class="bi bi-tv"></i>
-        </div>
-        <h4>No Device Selected</h4>
-        <p>Select a device from the dropdown to view its information.</p>
-      </div>
+      <app-empty-state icon="bi-tv" title="No device selected" text="Pick a device in the list above, or add one." actionLabel="Add a device" [actionLink]="['../devices']"></app-empty-state>
     } @else if (loading) {
       <app-spinner size="lg" [center]="true"></app-spinner>
     } @else if (error) {

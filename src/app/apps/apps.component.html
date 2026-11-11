@@ -29,11 +29,7 @@
   </div>
   <div class="p-4 flex-fill overflow-auto apps-scroll">
     @if (!device) {
-      <div class="lg-empty-state">
-        <i class="bi bi-hdd-network"></i>
-        <h3>No device detected</h3>
-        <p>Go to <strong>Manage</strong> and add an LG device to get started.</p>
-      </div>
+      <app-empty-state icon="bi-hdd-network" title="No device detected" text="Add an LG TV to start installing and managing apps." actionLabel="Add a device" [actionLink]="['../devices']"></app-empty-state>
     } @else {
       <app-installed #installedComponent [device]="device" [installed$]="packages$"></app-installed>
     }

@@ -92,3 +92,9 @@
     </div>
   </div>
 </ng-container>
+
+@if (!device) {
+  <app-empty-state class="w-100" icon="bi-folder2-open" title="No device selected"
+                   text="Add an LG TV to browse its files." actionLabel="Add a device"
+                   [actionLink]="['../devices']"></app-empty-state>
+}
