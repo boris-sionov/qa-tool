@@ -257,11 +257,13 @@ list the home page can read cheaply.
 ### Spinners
 
 One component, `<app-spinner>` (`shared/components/spinner/`): the rounded square of the platform
-logos with a light chasing round its edge, a second one inside turning the other way and a pulsing core. `size` `sm` (inline in text or a button), `md` (cards, dialog headers), `lg` (page level);
-`center` puts it in the middle of the app window, over the page and never blocking a click, with the label under it; `tone="inherit"` takes the text
-colour, for buttons. `<app-loading-card>` is `lg` + `center`. Do not add another spinner — the
-Bootstrap `spinner-border`, `.spinner-mini`, `.spinner-modern` and per-component copies are gone.
-Standalone components must import `SpinnerComponent`; modules get it through `SharedModule`.
+logos with one light running round its edge, always clockwise. `size` `sm` (inline in text or a
+button), `md` (cards, dialog headers), `lg`; `center` puts it in the middle of the app window, over
+the page and never blocking a click; `caption` adds the word under it without taking over the window
+(for the middle of a dialog); `tone="inherit"` takes the text colour, for buttons. **The word is
+always "Loading"** — there is no label input; what is loading is clear from where the spinner is.
+`<app-loading-card>` is `lg` + `center`. Do not add another spinner. Standalone components must
+import `SpinnerComponent`; modules get it through `SharedModule`.
 
 ### Route Structure
 

@@ -11,7 +11,7 @@
     <app-adb-approval [serial]="device.ip + ':' + device.port" [deviceName]="device.name"
                       (approved)="state.checkConnection()"></app-adb-approval>
   } @else if (loading) {
-    <app-spinner size="lg" [center]="true" label="Loading device information..."></app-spinner>
+    <app-spinner size="lg" [center]="true"></app-spinner>
   } @else if (error) {
     <div class="error-state">
       <div class="error-icon">
