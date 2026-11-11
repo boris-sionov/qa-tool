@@ -254,6 +254,15 @@ saved devices of Android TV and Samsung (`getSavedDevices()`); LG, VIDAA and And
 list the home page can read cheaply. The pick is remembered in `localStorage`
 `qa-tool-home-platform`.
 
+### Spinners
+
+One component, `<app-spinner>` (`shared/components/spinner/`): a ring with a gliding arc and a soft
+glow. `size` `sm` (inline in text or a button), `md` (cards, dialog headers), `lg` (page level);
+`center` fills the container and puts the label under the ring; `tone="inherit"` takes the text
+colour, for buttons. `<app-loading-card>` is `lg` + `center`. Do not add another spinner — the
+Bootstrap `spinner-border`, `.spinner-mini`, `.spinner-modern` and per-component copies are gone.
+Standalone components must import `SpinnerComponent`; modules get it through `SharedModule`.
+
 ### Route Structure
 
 ```

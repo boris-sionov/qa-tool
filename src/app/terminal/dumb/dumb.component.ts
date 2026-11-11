@@ -5,12 +5,13 @@ import {Buffer} from "buffer";
 import {ITerminalComponent} from "../terminal.component";
 import {ExternalLinkDirective} from "../../shared/directives";
 import {AutosizeModule} from "ngx-autosize";
+import {SpinnerComponent} from '../../shared/components/spinner/spinner.component';
 
 @Component({
     selector: 'app-terminal-dumb',
     templateUrl: './dumb.component.html',
     styleUrls: ['./dumb.component.scss'],
-    imports: [
+    imports: [SpinnerComponent, 
         ExternalLinkDirective,
         AutosizeModule
     ],

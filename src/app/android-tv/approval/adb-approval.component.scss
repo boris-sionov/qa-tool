@@ -79,13 +79,3 @@
   &[disabled] { opacity: 0.6; cursor: default; }
 }
 
-.spinner-mini {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(91, 159, 245, 0.3);
-  border-top-color: #5B9FF5;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }

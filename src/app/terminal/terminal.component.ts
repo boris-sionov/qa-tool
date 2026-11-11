@@ -25,6 +25,7 @@ import {AsyncPipe} from "@angular/common";
 import {SizeCalculatorComponent} from "../shared/components/term-size-calculator/size-calculator.component";
 import {DumbComponent} from "./dumb/dumb.component";
 import {PtyComponent} from "./pty/pty.component";
+import {SpinnerComponent} from '../shared/components/spinner/spinner.component';
 
 
 @Component({
@@ -33,7 +34,7 @@ import {PtyComponent} from "./pty/pty.component";
     styleUrls: ['./terminal.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [
+    imports: [SpinnerComponent, 
         NgbNavContent,
         NgbNav,
         NgbNavItem,

@@ -3,7 +3,7 @@
     @if (hasFailed) {
       <div class="icon-failed">✕</div>
     } @else {
-      <div class="spinner"></div>
+      <app-spinner size="md"></app-spinner>
     }
   </div>
   <div class="progress-content">
@@ -22,7 +22,7 @@
             <span class="step-icon">
               @switch (stepStatus(step)) {
                 @case ('done')   { <span class="icon-done">✓</span> }
-                @case ('active') { <span class="step-spinner"></span> }
+                @case ('active') { <app-spinner size="sm"></app-spinner> }
                 @case ('failed') { <span class="icon-fail">✕</span> }
                 @default         { <span class="icon-pending">○</span> }
               }

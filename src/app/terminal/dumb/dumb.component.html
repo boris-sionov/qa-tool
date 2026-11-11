@@ -22,9 +22,7 @@
               [placeholder]="working ? 'Please wait for the command to finish' : 'Input command here'"
               (keydown.enter)="$event.preventDefault(); send(input.value); input.value=''" #input></textarea>
     @if (working) {
-      <div class="spinner-border spinner-border-sm align-self-center" role="status">
-        <span class="visually-hidden">Executing...</span>
-      </div>
+      <app-spinner size="sm" class="align-self-center"></app-spinner>
     }
   </div>
 </div>

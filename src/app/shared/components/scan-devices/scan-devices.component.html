@@ -12,7 +12,7 @@
     <div class="scan-toolbar">
       <span class="scan-count">
         @if (scanning) {
-          <span class="spinner-border spinner-border-sm"></span> Scanning the network…
+          <app-spinner size="sm"></app-spinner> Scanning the network…
         } @else {
           {{ devices.length }} {{ devices.length === 1 ? 'TV' : 'TVs' }} found
         }

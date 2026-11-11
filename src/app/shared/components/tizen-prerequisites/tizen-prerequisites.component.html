@@ -4,7 +4,7 @@
          [class.ok]="!running && !error && failed === 0"
          [class.fail]="!running && (error || failed > 0)">
       @if (running) {
-        <span class="spinner"></span>
+        <app-spinner size="md"></app-spinner>
       } @else if (error || failed > 0) {
         <i class="bi bi-exclamation-triangle-fill"></i>
       } @else {

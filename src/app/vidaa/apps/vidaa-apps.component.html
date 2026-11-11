@@ -15,7 +15,7 @@
         </button>
         <button class="btn btn-primary text-nowrap install-btn" (click)="showInstall = !showInstall" [disabled]="!!busy">
           @if (busy === 'install') {
-            <span class="spinner-mini me-2"></span>
+            <app-spinner size="sm" tone="inherit"></app-spinner>
             <span>Installing...</span>
           } @else {
             <i class="bi bi-folder-fill me-2"></i>
@@ -50,7 +50,7 @@
                  [disabled]="connecting" autofocus>
           <button class="action-button primary" type="submit" [disabled]="code.length !== 6 || connecting">
             @if (connecting) {
-              <span class="spinner-mini"></span><span>Connecting…</span>
+              <app-spinner size="sm" tone="inherit"></app-spinner><span>Connecting…</span>
             } @else {
               <i class="bi bi-link-45deg"></i><span>Connect</span>
             }
@@ -139,7 +139,7 @@
                     <button class="app-action secondary" type="button" aria-label="Inspect" (click)="inspect(app)" [disabled]="!!busy"
                             title="Opens the app once through this Mac and Chrome DevTools (Console, Network) on it. Nothing is installed; needs the TV on this Mac's network.">
                       @if (busy === 'inspect:' + app.Id) {
-                        <span class="spinner-mini"></span>
+                        <app-spinner size="sm" tone="inherit"></app-spinner>
                       } @else {
                         <i class="bi bi-search"></i>
                       }
@@ -148,7 +148,7 @@
                   }
                   <button class="app-action primary" type="button" aria-label="Launch" (click)="launch(app)" [disabled]="!!busy">
                     @if (busy === app.Id) {
-                      <span class="spinner-mini"></span>
+                      <app-spinner size="sm" tone="inherit"></app-spinner>
                     } @else {
                       <i class="bi bi-play-fill"></i>
                     }
@@ -157,7 +157,7 @@
                   <button class="app-action warning" type="button" aria-label="Kill" (click)="close(app)" [disabled]="!!busy"
                           title="Closes the app on screen and returns the TV to its home screen">
                     @if (busy === 'close:' + app.Id) {
-                      <span class="spinner-mini"></span>
+                      <app-spinner size="sm" tone="inherit"></app-spinner>
                     } @else {
                       <i class="bi bi-stop-fill"></i>
                     }

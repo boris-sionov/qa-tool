@@ -3,6 +3,7 @@ import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AdbService, LanDevice} from '../../../core/services/adb.service';
 import {Platform} from '../../../core/models/device-provider.interface';
 import {extractMessage} from '../../../core/utils/error.utils';
+import {SpinnerComponent} from '../spinner/spinner.component';
 
 /** What the user picked: the caller opens its own add flow with these filled in. */
 export interface ScannedTv {
@@ -33,6 +34,7 @@ const ipKey = (ip: string): number => ip.split('.').reduce((n, part) => n * 256 
 @Component({
     selector: 'app-scan-devices',
     standalone: true,
+    imports: [SpinnerComponent],
     templateUrl: './scan-devices.component.html',
     styleUrls: ['./scan-devices.component.scss'],
 })

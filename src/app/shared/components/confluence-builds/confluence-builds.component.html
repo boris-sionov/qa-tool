@@ -10,14 +10,14 @@
       <input class="token-input" type="password" name="token" [(ngModel)]="token" autocomplete="off"
              placeholder="Personal Access Token" aria-label="Confluence Personal Access Token">
       <button class="build-btn primary" type="submit" [disabled]="!token.trim() || savingToken">
-        @if (savingToken) { <span class="spinner-border spinner-border-sm"></span> }
+        @if (savingToken) { <app-spinner size="sm" tone="inherit"></app-spinner> }
         <span>Save</span>
       </button>
     </div>
     @if (error) { <div class="build-error"><i class="bi bi-exclamation-triangle"></i> {{ error }}</div> }
   </form>
 } @else if (loading) {
-  <div class="build-state"><span class="spinner-border spinner-border-sm"></span> Reading {{ page }}…</div>
+  <div class="build-state"><app-spinner size="sm"></app-spinner> Reading {{ page }}…</div>
 } @else {
   @if (error) { <div class="build-error"><i class="bi bi-exclamation-triangle"></i> {{ error }}</div> }
   @if (rows) {
@@ -28,7 +28,7 @@
           @if (row.kind.debug) { <span class="debug-tag">Debug</span> }
           <span class="build-meta ms-auto">{{ day(row.release) }}</span>
           <button class="build-btn primary" (click)="install(row)" [disabled]="!!downloading">
-            @if (downloading === row) { <span class="spinner-border spinner-border-sm"></span><span>Downloading…</span> }
+            @if (downloading === row) { <app-spinner size="sm" tone="inherit"></app-spinner><span>Downloading…</span> }
             @else { <i class="bi bi-download"></i><span>Install</span> }
           </button>
         </div>

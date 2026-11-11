@@ -7,7 +7,7 @@
     </p>
     <div class="token-row">
       @if (signingIn) {
-        <span class="build-meta"><span class="spinner-border spinner-border-sm"></span> Finish the sign-in in your browser…</span>
+        <span class="build-meta"><app-spinner size="sm"></app-spinner> Finish the sign-in in your browser…</span>
         <button class="build-btn secondary ms-auto" (click)="cancelSignIn()">Cancel</button>
       } @else {
         <button class="build-btn primary" (click)="signIn()"><i class="bi bi-box-arrow-in-right"></i><span>Sign in with Google</span></button>
@@ -26,7 +26,7 @@
   }
   @if (error) { <div class="build-error"><i class="bi bi-exclamation-triangle"></i> {{ error }}</div> }
   @if (loading) {
-    <div class="build-state"><span class="spinner-border spinner-border-sm"></span> Reading Firebase…</div>
+    <div class="build-state"><app-spinner size="sm"></app-spinner> Reading Firebase…</div>
   } @else if (account && !app && !error) {
     <div class="build-state">This account sees no Android app in Firebase.</div>
   } @else if (releases) {
@@ -38,7 +38,7 @@
           <span class="build-notes">{{ summary(release) }}</span>
           <span class="build-meta ms-auto">{{ release.created | date:'d MMM y, HH:mm' }}</span>
           <button class="build-btn primary" (click)="install(release)" [disabled]="!!downloading">
-            @if (downloading === release) { <span class="spinner-border spinner-border-sm"></span><span>Downloading…</span> }
+            @if (downloading === release) { <app-spinner size="sm" tone="inherit"></app-spinner><span>Downloading…</span> }
             @else { <i class="bi bi-download"></i><span>Install</span> }
           </button>
         </div>

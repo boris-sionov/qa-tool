@@ -35,7 +35,7 @@
       <button class="btn btn-primary text-nowrap install-btn" (click)="installWgt()"
               [disabled]="!serial || installing">
         @if (installing) {
-          <span class="spinner-mini me-2"></span>
+          <app-spinner size="sm" tone="inherit"></app-spinner>
           <span>Installing...</span>
         } @else {
           <i class="bi bi-folder-fill me-2"></i>
@@ -107,7 +107,7 @@
                   <button class="app-action secondary" type="button" aria-label="Inspect"
                           (click)="inspectApp(app)" [disabled]="!!inspecting">
                     @if (inspecting === app.id) {
-                      <span class="spinner-mini"></span>
+                      <app-spinner size="sm" tone="inherit"></app-spinner>
                     } @else {
                       <i class="bi bi-search"></i>
                     }
@@ -121,7 +121,7 @@
                 <button class="app-action warning" type="button" aria-label="Kill" (click)="killApp(app)"
                         [disabled]="killing === app.id">
                   @if (killing === app.id) {
-                    <span class="spinner-mini"></span>
+                    <app-spinner size="sm" tone="inherit"></app-spinner>
                   } @else {
                     <i class="bi bi-stop-fill"></i>
                   }

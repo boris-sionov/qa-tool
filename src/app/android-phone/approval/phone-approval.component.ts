@@ -1,5 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbActiveModal, NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {SpinnerComponent} from '../../shared/components/spinner/spinner.component';
 
 /** When to suggest that the prompt may have gone away. */
 const HINT_AFTER_MS = 30000;
@@ -15,6 +16,7 @@ const HINT_AFTER_MS = 30000;
 @Component({
     selector: 'app-phone-approval',
     standalone: true,
+    imports: [SpinnerComponent],
     templateUrl: './phone-approval.component.html',
     styleUrls: ['../../android-tv/approval/adb-approval.component.scss', './phone-approval.component.scss'],
 })
