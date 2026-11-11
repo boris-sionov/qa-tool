@@ -1,8 +1,7 @@
 import {ScannedTv} from "../shared/components/scan-devices/scan-devices.component";
-import {AppConfig} from '../../environments/environment';
+import {platformById} from '../shared/platforms';
 import {Component, ElementRef, HostListener, Injector, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Router} from '@angular/router';
 import {Device} from '../types';
 import {DeviceManagerService} from '../core/services';
 import {WizardComponent} from "../add-device/wizard/wizard.component";
@@ -19,7 +18,7 @@ import {DevicesComponent} from "../devices/devices.component";
     styleUrls: ['./lg.component.scss']
 })
 export class LgComponent implements OnInit {
-    readonly minimal = AppConfig.minimal;
+    readonly brand = platformById('lg').brand;
 
     selectedDevice?: Device;
     appVersion: string;
@@ -30,36 +29,11 @@ export class LgComponent implements OnInit {
     constructor(
         public deviceManager: DeviceManagerService,
         private modalService: NgbModal,
-        private router: Router,
     ) {
         deviceManager.devices$.pipe(filter(isNonNull)).subscribe((devices) => {
             this.selectedDevice = devices.find((device) => device.default) || devices[0];
         });
         this.appVersion = APP_VERSION;
-    }
-
-    goBack(): void {
-        this.router.navigate(['/']);
-    }
-
-    openLg(): void {
-        this.router.navigate(['/lg']);
-    }
-
-    openAndroid(): void {
-        this.router.navigate(['/android-tv']);
-    }
-
-    openTizen(): void {
-        this.router.navigate(['/tizen']);
-    }
-
-    openVidaa(): void {
-        this.router.navigate(['/vidaa']);
-    }
-
-    openPhone(): void {
-        this.router.navigate(['/android-phone']);
     }
 
     markDefault(device: Device): void {

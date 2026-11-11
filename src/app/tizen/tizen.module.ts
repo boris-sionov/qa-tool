@@ -3,6 +3,7 @@ import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
 import {NgbDropdownModule, NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformRailComponent} from '../shared/components/platform-rail/platform-rail.component';
 
 import {SharedModule} from '../shared/shared.module';
 import {TizenAppsComponent} from './apps/tizen-apps.component';
@@ -35,6 +36,7 @@ const routes: Routes = [
         TizenRemoteDialogComponent,
     ],
     imports: [
+        PlatformRailComponent,
         CommonModule,
         FormsModule,
         SharedModule,

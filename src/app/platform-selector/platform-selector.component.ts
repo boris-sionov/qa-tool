@@ -6,6 +6,7 @@ import {Release, UpdateService} from '../core/services/update.service';
 import {SemVer} from 'semver';
 import {AdbStateService} from '../android-tv/adb-state.service';
 import {TizenStateService} from '../tizen/tizen-state.service';
+import {AVAILABLE_PLATFORMS, PlatformId, PlatformInfo} from '../shared/platforms';
 
 type Icon = 'apps' | 'info' | 'tv' | 'plug' | 'usb';
 
@@ -16,16 +17,8 @@ interface Action {
     path: string;
 }
 
-interface Platform {
-    id: string;
-    name: string;
-    logo: string;
-    /** Brand colour behind the logo and on the active marker. */
-    brand: string;
-    glow: string;
-    /** Text on the brand-coloured button; dark where the brand is light. */
-    ink?: string;
-    route: string;
+/** What the stage offers for a platform; its name, logo and colours come from `PLATFORMS`. */
+interface Stage {
     /** The big button: opens the apps page. */
     primary: {label: string; icon: Icon};
     actions: Action[];
@@ -33,46 +26,26 @@ interface Platform {
     note?: string;
 }
 
-const PLATFORMS: Platform[] = [
-    {
-        id: 'android-tv', name: 'Android TV', logo: 'android-tv.webp', brand: '#34A8FF', glow: 'rgba(52,168,255,.38)',
-        route: '/android-tv', primary: {label: 'Open apps', icon: 'apps'},
-        actions: [
-            {label: 'Manage devices', hint: 'Scan, add or remove a TV', icon: 'tv', path: 'devices'},
-            {label: 'Device info', hint: 'Model, build, storage', icon: 'info', path: 'info'},
-        ],
-    },
-    {
-        id: 'lg', name: 'LG webOS', logo: 'lg-webos.webp', brand: '#FF2F6D', glow: 'rgba(255,47,109,.34)',
-        route: '/lg', primary: {label: 'Open apps', icon: 'apps'},
-        actions: [
-            {label: 'Manage devices', hint: 'Scan, add or remove a TV', icon: 'tv', path: 'devices'},
-            {label: 'Device info', hint: 'webOS, model, year', icon: 'info', path: 'info'},
-        ],
-    },
-    {
-        id: 'tizen', name: 'Samsung Tizen', logo: 'tizen.webp', brand: '#1CA7FF', glow: 'rgba(28,167,255,.38)',
-        route: '/tizen', primary: {label: 'Open apps', icon: 'apps'},
-        actions: [
-            {label: 'Manage devices', hint: 'Scan, add or remove a TV', icon: 'tv', path: 'devices'},
-            {label: 'Device info', hint: 'Tizen, model, year', icon: 'info', path: 'info'},
-        ],
-    },
-    {
-        id: 'vidaa', name: 'VIDAA', logo: 'vidaa.webp', brand: '#C04CFF', glow: 'rgba(192,76,255,.40)',
-        route: '/vidaa', primary: {label: 'Connect to a TV', icon: 'plug'},
+const manage: Action = {label: 'Manage devices', hint: 'Scan, add or remove a TV', icon: 'tv', path: 'devices'};
+const open = {label: 'Open apps', icon: 'apps' as Icon};
+
+const STAGES: Record<PlatformId, Stage> = {
+    'android-tv': {primary: open, actions: [manage, {label: 'Device info', hint: 'Model, build, storage', icon: 'info', path: 'info'}]},
+    lg: {primary: open, actions: [manage, {label: 'Device info', hint: 'webOS, model, year', icon: 'info', path: 'info'}]},
+    tizen: {primary: open, actions: [manage, {label: 'Device info', hint: 'Tizen, model, year', icon: 'info', path: 'info'}]},
+    vidaa: {
+        primary: {label: 'Connect to a TV', icon: 'plug'},
         actions: [{label: 'Device info', hint: 'TV info and DevKit log', icon: 'info', path: 'info'}],
         note: 'VIDAA connects per session with the 6-character code DevKit shows, so there is no saved device list.',
     },
-    {
-        id: 'android-phone', name: 'Android Phone', logo: 'android-phone.webp', brand: '#8BF04C', glow: 'rgba(139,240,76,.30)', ink: '#0B1120',
-        route: '/android-phone', primary: {label: 'Open apps', icon: 'apps'},
+    'android-phone': {
+        primary: open,
         actions: [
             {label: 'Phones', hint: 'Phones connected by USB', icon: 'usb', path: 'devices'},
             {label: 'Phone info', hint: 'Model, Android, battery', icon: 'info', path: 'info'},
         ],
     },
-];
+};
 
 const SELECTED_KEY = 'qa-tool-home-platform';
 
@@ -85,14 +58,13 @@ export class PlatformSelectorComponent implements OnInit {
     readonly appName = AppConfig.appName;
     readonly appVersion = APP_VERSION;
     /** Android Phone is left out of QA Tool Lite. */
-    readonly platforms = PLATFORMS.filter(p => !(AppConfig.minimal && p.id === 'android-phone'));
-    current: Platform = this.platforms[0];
+    current: PlatformInfo = AVAILABLE_PLATFORMS[0];
     update: { release: Release, version: SemVer } | null = null;
 
     constructor(private router: Router, private updates: UpdateService,
                 private adb: AdbStateService, private tizen: TizenStateService) {
         const saved = this.readSelected();
-        this.current = this.platforms.find(p => p.id === saved) ?? this.platforms[0];
+        this.current = AVAILABLE_PLATFORMS.find(p => p.id === saved) ?? AVAILABLE_PLATFORMS[0];
         this.loadDevices();
     }
 
@@ -100,7 +72,11 @@ export class PlatformSelectorComponent implements OnInit {
         this.updates.availableUpdate().then(u => this.update = u);
     }
 
-    select(p: Platform): void {
+    get stage(): Stage {
+        return STAGES[this.current.id];
+    }
+
+    select(p: PlatformInfo): void {
         this.current = p;
         this.loadDevices();
         try { localStorage.setItem(SELECTED_KEY, p.id); } catch { /* the choice is only a convenience */ }
@@ -117,8 +93,8 @@ export class PlatformSelectorComponent implements OnInit {
         }
     }
 
-    open(path = ''): void {
-        this.router.navigate([this.current.route, ...(path ? [path] : [])]);
+    open(path: string): void {
+        this.router.navigate([this.current.route, path]);
     }
 
     dismissUpdate(): void {

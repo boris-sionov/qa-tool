@@ -241,15 +241,19 @@ migration loses that data silently on the next install:
 
 Keep them as they are.
 
-### Home Page
+### Home Page And Platform Rail
 
-`platform-selector/`: a rail of the five platform logos (`assets/platform-logos/*.webp`, 512 px,
-transparent) and a stage for the one picked — big logo with a glow in its brand colour, **Open apps**
-(VIDAA: *Connect to a TV*), **Manage devices** and **Device info**. Android TV and Samsung also list
-their saved devices (`getSavedDevices()`); LG, VIDAA and Android Phone have no list the home page
-can read cheaply. The picked platform is remembered in `localStorage` `qa-tool-home-platform`.
-Lite drops Android Phone. Brand colours live in `PLATFORMS` in the component, passed to the
-stylesheet as `--brand` / `--brand-glow` / `--on-brand`.
+`shared/platforms.ts` lists the five platforms (name, logo, brand colour); Lite drops Android Phone.
+`PlatformRailComponent` is the column of their logos (`assets/platform-logos/*.webp`, 512 px,
+transparent), used by the home page and beside every platform shell (Android TV, LG, Samsung,
+VIDAA, Android Phone). A shell passes `active` and `compact`, which adds a button back to home;
+each shell also sets `--brand` on its layout, and the active tab uses it.
+
+The home page (`platform-selector/`) shows the picked platform on a stage: big logo with a glow in
+its brand colour, **Open apps** (VIDAA: *Connect to a TV*), **Manage devices**, **Device info**, and the
+saved devices of Android TV and Samsung (`getSavedDevices()`); LG, VIDAA and Android Phone have no
+list the home page can read cheaply. The pick is remembered in `localStorage`
+`qa-tool-home-platform`.
 
 ### Route Structure
 

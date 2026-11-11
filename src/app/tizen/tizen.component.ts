@@ -1,6 +1,5 @@
-import {AppConfig} from '../../environments/environment';
+import {platformById} from '../shared/platforms';
 import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
 import {SdbService} from '../core/services/sdb.service';
 import {tizenSerial, TizenDevice, TizenStateService} from './tizen-state.service';
 import {TizenRequirementsService} from './tizen-requirements.service';
@@ -11,14 +10,13 @@ import {TizenRequirementsService} from './tizen-requirements.service';
     styleUrls: ['./tizen.component.scss'],
 })
 export class TizenComponent implements OnInit {
-    readonly minimal = AppConfig.minimal;
+    readonly brand = platformById('tizen').brand;
     devices: TizenDevice[] = [];
     selected: TizenDevice | null = null;
 
     constructor(
         public state: TizenStateService,
         private sdb: SdbService,
-        private router: Router,
         private requirements: TizenRequirementsService,
     ) {}
 
@@ -37,28 +35,4 @@ export class TizenComponent implements OnInit {
         }
     }
 
-
-    goBack(): void {
-        this.router.navigate(['/']);
-    }
-
-    openLg(): void {
-        this.router.navigate(['/lg']);
-    }
-
-    openAndroid(): void {
-        this.router.navigate(['/android-tv']);
-    }
-
-    openTizen(): void {
-        this.router.navigate(['/tizen']);
-    }
-
-    openVidaa(): void {
-        this.router.navigate(['/vidaa']);
-    }
-
-    openPhone(): void {
-        this.router.navigate(['/android-phone']);
-    }
 }

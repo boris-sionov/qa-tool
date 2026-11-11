@@ -1,6 +1,5 @@
-import {AppConfig} from '../../environments/environment';
+import {platformById} from '../shared/platforms';
 import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
 import {AdbService} from '../core/services/adb.service';
 import {AdbStateService, deviceSerial, SavedDevice} from './adb-state.service';
 
@@ -10,7 +9,7 @@ import {AdbStateService, deviceSerial, SavedDevice} from './adb-state.service';
     styleUrls: ['./android-tv.component.scss']
 })
 export class AndroidTvComponent implements OnInit {
-    readonly minimal = AppConfig.minimal;
+    readonly brand = platformById('android-tv').brand;
 
     devices: SavedDevice[] = [];
     selected: SavedDevice | null = null;
@@ -18,7 +17,6 @@ export class AndroidTvComponent implements OnInit {
     constructor(
         public state: AdbStateService,
         private adb: AdbService,
-        private router: Router,
     ) {}
 
     ngOnInit(): void {
@@ -44,27 +42,4 @@ export class AndroidTvComponent implements OnInit {
         }
     }
 
-    goBack(): void {
-        this.router.navigate(['/']);
-    }
-
-    openLg(): void {
-        this.router.navigate(['/lg']);
-    }
-
-    openAndroid(): void {
-        this.router.navigate(['/android-tv']);
-    }
-
-    openTizen(): void {
-        this.router.navigate(['/tizen']);
-    }
-
-    openVidaa(): void {
-        this.router.navigate(['/vidaa']);
-    }
-
-    openPhone(): void {
-        this.router.navigate(['/android-phone']);
-    }
 }
