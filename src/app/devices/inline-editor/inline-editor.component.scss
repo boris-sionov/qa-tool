@@ -1,12 +1,12 @@
 $bg-dark: #0F172B;
-$primary-blue: #5B9FF5;
-$accent-purple: #8B7FF5;
+$primary-blue: var(--brand, #5B9FF5);
+$accent-purple: color-mix(in srgb, var(--brand, #5B9FF5) 60%, #8B7FF5);
 $accent-red: #FF6B6B;
 $accent-green: #4CAF50;
 $text-primary: #FFFFFF;
 $text-secondary: #A8B8CC;
 $text-muted: #7E92B0;
-$border-color: rgba(91, 159, 245, 0.2);
+$border-color: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 
 .editor-wrapper {
   padding: 20px;
@@ -46,11 +46,11 @@ $border-color: rgba(91, 159, 245, 0.2);
   &.primary {
     background: linear-gradient(135deg, $primary-blue 0%, $accent-purple 100%);
     color: white;
-    box-shadow: 0 4px 14px rgba(91, 159, 245, 0.25);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--brand, #5B9FF5) 25%, transparent);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(91, 159, 245, 0.4);
+      box-shadow: 0 6px 20px color-mix(in srgb, var(--brand, #5B9FF5) 40%, transparent);
     }
 
     &:disabled {
@@ -65,9 +65,9 @@ $border-color: rgba(91, 159, 245, 0.2);
     border-color: rgba(255, 255, 255, 0.1);
 
     &:hover {
-      background: rgba(91, 159, 245, 0.1);
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 10%, transparent);
       color: $primary-blue;
-      border-color: rgba(91, 159, 245, 0.3);
+      border-color: color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
     }
   }
 

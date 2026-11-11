@@ -247,7 +247,9 @@ Keep them as they are.
 `PlatformRailComponent` is the column of their logos (`assets/platform-logos/*.webp`, 512 px,
 transparent), used by the home page and beside every platform shell (Android TV, LG, Samsung,
 VIDAA, Android Phone). A shell passes `active` and `compact`, which adds a button back to home;
-each shell also sets `--brand` on its layout, and the active tab uses it.
+each shell also sets `--brand` on its layout. The page styles read it: their `$primary-blue` is
+`var(--brand, #5B9FF5)` and `$accent-purple` is a mix of it, so tabs, buttons, icons and borders take
+the platform's colour (blue outside a shell). Dialogs live outside the layout and stay blue.
 
 The home page (`platform-selector/`) shows the picked platform on a stage: big logo with a glow in
 its brand colour, **Open apps** (VIDAA: *Connect to a TV*), **Manage devices**, **Device info**, and the

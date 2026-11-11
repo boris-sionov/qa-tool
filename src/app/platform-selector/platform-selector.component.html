@@ -1,4 +1,4 @@
-<div class="home" [style.--brand]="current.brand" [style.--brand-glow]="current.glow" [style.--on-brand]="current.ink ?? '#fff'">
+<div class="home" [style.--brand]="current.brand" [style.--brand-glow]="current.glow">
   <app-platform-rail [active]="current.id" [navigate]="false" (picked)="select($event)"></app-platform-rail>
 
   <main class="stage">

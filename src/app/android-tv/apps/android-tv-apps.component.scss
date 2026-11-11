@@ -1,7 +1,7 @@
 // Design tokens
-$primary-blue: #5B9FF5;
+$primary-blue: var(--brand, #5B9FF5);
 $text-secondary: #A8B8CC;
-$border-color: rgba(91, 159, 245, 0.2);
+$border-color: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 $panel: rgba(15, 23, 43, 0.72);
 $panel-strong: rgba(18, 30, 55, 0.88);
 
@@ -32,7 +32,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   height: 42px;
   min-width: 220px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(91, 159, 245, 0.12) 0%, rgba(91, 159, 245, 0.08) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent) 0%, color-mix(in srgb, var(--brand, #5B9FF5) 8%, transparent) 100%);
   border: 1.5px solid $border-color;
   color: #FFFFFF;
   font-size: 13px;
@@ -61,21 +61,21 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   }
 
   &:hover {
-    background: linear-gradient(135deg, rgba(91, 159, 245, 0.2) 0%, rgba(91, 159, 245, 0.14) 100%);
-    border-color: rgba(91, 159, 245, 0.5);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent) 0%, color-mix(in srgb, var(--brand, #5B9FF5) 14%, transparent) 100%);
+    border-color: color-mix(in srgb, var(--brand, #5B9FF5) 50%, transparent);
   }
 
   &:focus,
   &:focus-visible {
     outline: none;
     border-color: $primary-blue;
-    box-shadow: 0 0 0 3px rgba(91, 159, 245, 0.15);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent);
   }
 
   // When dropdown is open
   &[aria-expanded="true"] {
     border-color: $primary-blue;
-    background: linear-gradient(135deg, rgba(91, 159, 245, 0.2) 0%, rgba(91, 159, 245, 0.14) 100%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent) 0%, color-mix(in srgb, var(--brand, #5B9FF5) 14%, transparent) 100%);
 
     .chevron {
       transform: rotate(180deg);
@@ -91,12 +91,12 @@ $panel-strong: rgba(18, 30, 55, 0.88);
 // Dropdown Menu
 .device-dropdown-menu {
   background: linear-gradient(180deg, #1a2744 0%, #0F172B 100%) !important;
-  border: 1px solid rgba(91, 159, 245, 0.3) !important;
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent) !important;
   border-radius: 12px !important;
   padding: 6px !important;
   margin-top: 6px !important;
   min-width: 220px !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(91, 159, 245, 0.1) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 4px 8px color-mix(in srgb, var(--brand, #5B9FF5) 10%, transparent) !important;
   backdrop-filter: blur(12px);
   z-index: 1050 !important;
 }
@@ -145,13 +145,13 @@ $panel-strong: rgba(18, 30, 55, 0.88);
 
   &:hover,
   &:focus {
-    background: rgba(91, 159, 245, 0.18) !important;
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 18%, transparent) !important;
     color: #FFFFFF !important;
     outline: none !important;
   }
 
   &.active {
-    background: rgba(91, 159, 245, 0.25) !important;
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 25%, transparent) !important;
     color: $primary-blue !important;
   }
 }
@@ -284,7 +284,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   border: 1px solid $border-color;
   border-radius: 8px;
   color: #EAF2FF;
-  background: rgba(91, 159, 245, 0.1);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 10%, transparent);
   font-size: 13px;
   font-weight: 700;
 

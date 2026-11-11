@@ -1,7 +1,7 @@
 // Layered over tizen-apps.component.scss — only what VIDAA adds.
-$primary-blue: #5B9FF5;
+$primary-blue: var(--brand, #5B9FF5);
 $text-secondary: #A8B8CC;
-$border-color: rgba(91, 159, 245, 0.2);
+$border-color: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 $vidaa: #00A3A1;
 
 .vidaa-device {

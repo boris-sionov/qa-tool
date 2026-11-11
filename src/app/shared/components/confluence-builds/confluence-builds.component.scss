@@ -16,7 +16,7 @@
   color: #FFFFFF;
   transition: border-color 0.2s ease;
 
-  &:hover { border-color: rgba(91, 159, 245, 0.35); }
+  &:hover { border-color: color-mix(in srgb, var(--brand, #5B9FF5) 35%, transparent); }
 
   &.missing {
     opacity: 0.55;
@@ -96,7 +96,7 @@
   border: 0;
   background: none;
   padding: 0;
-  color: #5B9FF5;
+  color: var(--brand, #5B9FF5);
   font-size: 12px;
   font-weight: 600;
 
@@ -106,8 +106,8 @@
 .token-card {
   padding: 18px;
   border-radius: 12px;
-  border: 1.5px dashed rgba(91, 159, 245, 0.3);
-  background: rgba(91, 159, 245, 0.05);
+  border: 1.5px dashed color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 5%, transparent);
 }
 
 .token-title {
@@ -117,7 +117,7 @@
   color: #FFFFFF;
   font-weight: 700;
 
-  i.bi { color: #5B9FF5; }
+  i.bi { color: var(--brand, #5B9FF5); }
 }
 
 .token-hint {
@@ -127,7 +127,7 @@
   line-height: 1.5;
 
   strong { color: #DCEBFF; }
-  a { color: #5B9FF5; font-weight: 600; }
+  a { color: var(--brand, #5B9FF5); font-weight: 600; }
 }
 
 .token-row {
@@ -141,14 +141,14 @@
   height: 40px;
   padding: 0 14px;
   border-radius: 10px;
-  border: 1.5px solid rgba(91, 159, 245, 0.25);
+  border: 1.5px solid color-mix(in srgb, var(--brand, #5B9FF5) 25%, transparent);
   background: rgba(15, 23, 43, 0.6);
   color: #FFFFFF;
   font-size: 14px;
 
   &:focus {
     outline: none;
-    border-color: #5B9FF5;
-    box-shadow: 0 0 0 3px rgba(91, 159, 245, 0.15);
+    border-color: var(--brand, #5B9FF5);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand, #5B9FF5) 15%, transparent);
   }
 }

@@ -1,9 +1,9 @@
 // The one look of every app list (Android TV, LG, Samsung, VIDAA, Android Phone): the rows and
 // their Inspect / Launch / Kill / Remove buttons. Global on purpose — a copy per component is how
 // the lists drifted apart. Scoped under `.app-list` so the class names stay free elsewhere.
-$primary-blue: #5B9FF5;
+$primary-blue: var(--brand, #5B9FF5);
 $text-secondary: #A8B8CC;
-$border-color: rgba(91, 159, 245, 0.2);
+$border-color: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 $panel: rgba(15, 23, 43, 0.72);
 $panel-strong: rgba(18, 30, 55, 0.88);
 
@@ -39,7 +39,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
     align-items: center;
     justify-content: center;
     flex: 0 0 58px;
-    border: 1px solid rgba(91, 159, 245, 0.18);
+    border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 18%, transparent);
     border-radius: 8px;
     color: $primary-blue;
     background: rgba(7, 13, 28, 0.48);
@@ -57,7 +57,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
     width: 48px;
     height: 48px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #5B9FF5 0%, #8B7FF5 100%);
+    background: linear-gradient(135deg, #5B9FF5 0%, color-mix(in srgb, var(--brand, #5B9FF5) 60%, #8B7FF5) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -65,7 +65,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
     font-weight: 700;
     color: white;
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 12px rgba(91, 159, 245, 0.3);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent);
   }
 
   .app-copy {
@@ -98,10 +98,10 @@ $panel-strong: rgba(18, 30, 55, 0.88);
     align-items: center;
     height: 24px;
     padding: 0 8px;
-    border: 1px solid rgba(91, 159, 245, 0.24);
+    border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 24%, transparent);
     border-radius: 8px;
     color: #DCEBFF;
-    background: rgba(91, 159, 245, 0.12);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
     font-size: 12px;
     font-weight: 700;
     white-space: nowrap;
@@ -155,17 +155,17 @@ $panel-strong: rgba(18, 30, 55, 0.88);
     &:hover,
     &:focus-visible {
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(91, 159, 245, 0.18);
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--brand, #5B9FF5) 18%, transparent);
     }
 
     &.secondary {
       color: #EAF2FF;
-      background: rgba(91, 159, 245, 0.1);
+      background: color-mix(in srgb, var(--brand, #5B9FF5) 10%, transparent);
       border-color: $border-color;
 
       &:hover,
       &:focus-visible {
-        background: rgba(91, 159, 245, 0.2);
+        background: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
       }
     }
 
@@ -263,5 +263,5 @@ app-list-header {
   padding: 16px 16px 12px;
   background: rgba(15, 23, 43, 0.94);
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(91, 159, 245, 0.12);
+  border-bottom: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
 }

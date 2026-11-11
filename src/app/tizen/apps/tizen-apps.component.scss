@@ -47,9 +47,9 @@
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-$primary-blue: #5B9FF5;
+$primary-blue: var(--brand, #5B9FF5);
 $text-secondary: #A8B8CC;
-$border-color: rgba(91, 159, 245, 0.2);
+$border-color: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent);
 $panel: rgba(15, 23, 43, 0.72);
 $panel-strong: rgba(18, 30, 55, 0.88);
 
@@ -113,7 +113,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   border: 1.5px solid $border-color;
   border-radius: 10px;
   color: #FFFFFF;
-  background: linear-gradient(135deg, rgba(91, 159, 245, 0.12) 0%, rgba(91, 159, 245, 0.08) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent) 0%, color-mix(in srgb, var(--brand, #5B9FF5) 8%, transparent) 100%);
 
   &::after {
     display: none !important;
@@ -123,8 +123,8 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   &:focus-visible,
   &[aria-expanded="true"] {
     outline: none;
-    border-color: rgba(91, 159, 245, 0.5);
-    background: linear-gradient(135deg, rgba(91, 159, 245, 0.2) 0%, rgba(91, 159, 245, 0.14) 100%);
+    border-color: color-mix(in srgb, var(--brand, #5B9FF5) 50%, transparent);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent) 0%, color-mix(in srgb, var(--brand, #5B9FF5) 14%, transparent) 100%);
   }
 }
 
@@ -152,7 +152,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
 .device-dropdown-menu {
   min-width: 220px !important;
   padding: 6px !important;
-  border: 1px solid rgba(91, 159, 245, 0.3) !important;
+  border: 1px solid color-mix(in srgb, var(--brand, #5B9FF5) 30%, transparent) !important;
   border-radius: 12px !important;
   background: linear-gradient(180deg, #1a2744 0%, #0F172B 100%) !important;
 }
@@ -180,7 +180,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   &:hover,
   &:focus,
   &.active {
-    background: rgba(91, 159, 245, 0.2) !important;
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 20%, transparent) !important;
   }
 }
 
@@ -235,7 +235,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   border: 1px solid $border-color;
   border-radius: 8px;
   color: #EAF2FF;
-  background: rgba(91, 159, 245, 0.1);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 10%, transparent);
   font-size: 13px;
   font-weight: 700;
 }
@@ -278,7 +278,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   flex-shrink: 0;
   border-radius: 8px;
   color: $primary-blue;
-  background: rgba(91, 159, 245, 0.12);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 12%, transparent);
   font-size: 26px;
 
   &.danger {
@@ -381,7 +381,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   &:focus-visible {
     outline: none;
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(91, 159, 245, 0.22);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--brand, #5B9FF5) 22%, transparent);
   }
 }
 
@@ -447,8 +447,8 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   &:hover:not(:disabled),
   &:focus-visible {
     outline: none;
-    border-color: rgba(91, 159, 245, 0.55);
-    background: rgba(91, 159, 245, 0.16);
+    border-color: color-mix(in srgb, var(--brand, #5B9FF5) 55%, transparent);
+    background: color-mix(in srgb, var(--brand, #5B9FF5) 16%, transparent);
   }
 }
 

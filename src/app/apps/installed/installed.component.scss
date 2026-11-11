@@ -1,7 +1,7 @@
-$primary-blue: #5B9FF5;
+$primary-blue: var(--brand, #5B9FF5);
 $panel: rgba(15, 23, 43, 0.72);
 $panel-strong: rgba(18, 30, 55, 0.88);
-$border: rgba(91, 159, 245, 0.18);
+$border: color-mix(in srgb, var(--brand, #5B9FF5) 18%, transparent);
 $text-muted: #A8B8CC;
 
 :host {
@@ -105,7 +105,7 @@ $text-muted: #A8B8CC;
   border: 1px solid $border;
   border-radius: 8px;
   color: #EAF2FF;
-  background: rgba(91, 159, 245, 0.1);
+  background: color-mix(in srgb, var(--brand, #5B9FF5) 10%, transparent);
   font-size: 13px;
   font-weight: 700;
 
