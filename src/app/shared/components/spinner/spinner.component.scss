@@ -11,7 +11,7 @@
 :host(.inherit) { --spin: currentColor; color: inherit; }
 :host(.sm) { --glyph: 1.15em; }
 :host(.md) { --glyph: 40px; }
-:host(.lg) { --glyph: 112px; }
+:host(.lg) { --glyph: 132px; }
 
 // A page is loading: the middle of the app window, over the page, never in the way of a click.
 :host(.center) {
