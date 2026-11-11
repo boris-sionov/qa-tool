@@ -247,18 +247,18 @@ Keep them as they are.
 one accent colour (`#5B9FF5`) — platforms are told apart by their logos, not by colour.
 `PlatformRailComponent` is the column of their logos (`assets/platform-logos/*.webp`, 512 px,
 transparent), used by the home page and beside every platform shell (Android TV, LG, Samsung,
-VIDAA, Android Phone). A shell passes `active` and `compact`, which adds a button back to home.
+VIDAA, Android Phone). A Home tile heads the rail (it opens `/`); a shell passes `active` and `compact` (smaller tiles).
 
-The home page (`platform-selector/`) shows the picked platform on a stage: big logo with a glow, **Open apps** (VIDAA: *Connect to a TV*), **Manage devices**, **Device info**, and the
+The home page (`platform-selector/`) opens on an overview — what the tool does, in four lines, and the
+five logos to start from — and shows the picked platform on a stage: big logo with a glow, **Open apps** (VIDAA: *Connect to a TV*), **Manage devices**, **Device info**, and the
 saved devices of Android TV and Samsung (`getSavedDevices()`); LG, VIDAA and Android Phone have no
-list the home page can read cheaply. The pick is remembered in `localStorage`
-`qa-tool-home-platform`.
+list the home page can read cheaply.
 
 ### Spinners
 
-One component, `<app-spinner>` (`shared/components/spinner/`): a ring with a gliding arc and a soft
-glow. `size` `sm` (inline in text or a button), `md` (cards, dialog headers), `lg` (page level);
-`center` fills the container and puts the label under the ring; `tone="inherit"` takes the text
+One component, `<app-spinner>` (`shared/components/spinner/`): the rounded square of the platform
+logos with a light chasing round its edge, a second one inside turning the other way and a pulsing core. `size` `sm` (inline in text or a button), `md` (cards, dialog headers), `lg` (page level);
+`center` puts it in the middle of the app window, over the page and never blocking a click, with the label under it; `tone="inherit"` takes the text
 colour, for buttons. `<app-loading-card>` is `lg` + `center`. Do not add another spinner — the
 Bootstrap `spinner-border`, `.spinner-mini`, `.spinner-modern` and per-component copies are gone.
 Standalone components must import `SpinnerComponent`; modules get it through `SharedModule`.

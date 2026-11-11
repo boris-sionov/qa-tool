@@ -47,8 +47,6 @@ const STAGES: Record<PlatformId, Stage> = {
     },
 };
 
-const SELECTED_KEY = 'qa-tool-home-platform';
-
 @Component({
     selector: 'app-platform-selector',
     templateUrl: './platform-selector.component.html',
@@ -58,14 +56,13 @@ export class PlatformSelectorComponent implements OnInit {
     readonly appName = AppConfig.appName;
     readonly appVersion = APP_VERSION;
     /** Android Phone is left out of QA Tool Lite. */
-    current: PlatformInfo = AVAILABLE_PLATFORMS[0];
+    /** The platform shown on the stage; none means the overview. */
+    current: PlatformInfo | null = null;
+    readonly platforms = AVAILABLE_PLATFORMS;
     update: { release: Release, version: SemVer } | null = null;
 
     constructor(private router: Router, private updates: UpdateService,
                 private adb: AdbStateService, private tizen: TizenStateService) {
-        const saved = this.readSelected();
-        this.current = AVAILABLE_PLATFORMS.find(p => p.id === saved) ?? AVAILABLE_PLATFORMS[0];
-        this.loadDevices();
     }
 
     ngOnInit(): void {
@@ -73,20 +70,19 @@ export class PlatformSelectorComponent implements OnInit {
     }
 
     get stage(): Stage {
-        return STAGES[this.current.id];
+        return STAGES[this.current!.id];
     }
 
-    select(p: PlatformInfo): void {
+    select(p: PlatformInfo | null): void {
         this.current = p;
         this.loadDevices();
-        try { localStorage.setItem(SELECTED_KEY, p.id); } catch { /* the choice is only a convenience */ }
     }
 
     /** Saved devices of the current platform. Only Android TV and Samsung keep a list the home page can read. */
     devices: {name: string; ip: string}[] | null = null;
 
     private loadDevices(): void {
-        switch (this.current.id) {
+        switch (this.current?.id) {
             case 'android-tv': this.devices = this.adb.getSavedDevices(); break;
             case 'tizen': this.devices = this.tizen.getSavedDevices(); break;
             default: this.devices = null;
@@ -94,15 +90,11 @@ export class PlatformSelectorComponent implements OnInit {
     }
 
     open(path: string): void {
-        this.router.navigate([this.current.route, path]);
+        this.router.navigate([this.current!.route, path]);
     }
 
     dismissUpdate(): void {
         if (this.update) this.updates.ignoreUntil = this.update.version;
         this.update = null;
-    }
-
-    private readSelected(): string | null {
-        try { return localStorage.getItem(SELECTED_KEY); } catch { return null; }
     }
 }
