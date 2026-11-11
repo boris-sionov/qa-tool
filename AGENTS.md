@@ -131,7 +131,7 @@ Lite**. Two switches, both set by that script and by CI:
   devices, logs and app data. On Linux the package and binary are `qa-tool-lite`.
 
 What Lite hides: Android TV *Install from library*, Samsung and LG *From Confluence*, the Samsung
-*Remote*, the VIDAA FreeTV preset picker, and **Android Phone** entirely (chips, home card, route).
+*Remote*, the VIDAA FreeTV preset picker, and **Android Phone** entirely (chips, home tile, route).
 LG lists developer apps only in every build, so no TV ever shows the SSAP pairing prompt. The Rust
 commands stay compiled in; only the UI is gated.
 
@@ -240,6 +240,16 @@ migration loses that data silently on the next install:
 | `smart-tv-qa-tool`, `webos-dev-manager` | Linux `provides` / `conflicts` / `replaces` / `obsoletes` (`tauri.conf.json`) | nothing — kept on purpose so the `qa-tool` package replaces the older ones |
 
 Keep them as they are.
+
+### Home Page
+
+`platform-selector/`: a rail of the five platform logos (`assets/platform-logos/*.webp`, 512 px,
+transparent) and a stage for the one picked — big logo with a glow in its brand colour, **Open apps**
+(VIDAA: *Connect to a TV*), **Manage devices** and **Device info**. Android TV and Samsung also list
+their saved devices (`getSavedDevices()`); LG, VIDAA and Android Phone have no list the home page
+can read cheaply. The picked platform is remembered in `localStorage` `qa-tool-home-platform`.
+Lite drops Android Phone. Brand colours live in `PLATFORMS` in the component, passed to the
+stylesheet as `--brand` / `--brand-glow` / `--on-brand`.
 
 ### Route Structure
 

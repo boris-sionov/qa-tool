@@ -1,45 +1,62 @@
-<div class="selector-page">
-  <div class="selector-header">
-    <h1 class="selector-title">{{ appName }}</h1>
-    <p class="selector-subtitle">Select a platform to manage</p>
-  </div>
-
-  <div class="platform-grid">
-    <button class="platform-card" (click)="openAndroid()" aria-label="Android TV">
-      <div class="platform-icon android-icon">
-        <img src="assets/platform-logos/Android_TV-Logo.png" alt="Android TV">
-      </div>
-    </button>
-    <button class="platform-card" (click)="openLg()" aria-label="LG webOS">
-      <div class="platform-icon lg-icon">
-        <img src="assets/platform-logos/lg-webos-logo.svg" alt="LG WebOS">
-      </div>
-    </button>
-    <button class="platform-card" (click)="openTizen()" aria-label="Samsung Tizen">
-      <div class="platform-icon tizen-icon">
-        <img src="assets/platform-logos/tizen-logo-png.png" alt="Samsung Tizen">
-      </div>
-    </button>
-    <button class="platform-card" (click)="openVidaa()" aria-label="VIDAA">
-      <div class="platform-icon vidaa-icon">
-        <img src="assets/platform-logos/vidaa-logo.svg" alt="VIDAA">
-      </div>
-    </button>
-    @if (!minimal) {
-    <button class="platform-card" (click)="openPhone()" aria-label="Android Phone">
-      <div class="platform-icon phone-icon">
-        <i class="bi bi-phone"></i>
-      </div>
-    </button>
+<div class="home" [style.--brand]="current.brand" [style.--brand-glow]="current.glow" [style.--on-brand]="current.ink ?? '#fff'">
+  <nav class="rail" aria-label="Platforms">
+    @for (p of platforms; track p.id) {
+      <button class="tile" type="button" [class.active]="p === current" [attr.aria-pressed]="p === current"
+              [attr.aria-label]="p.name" (click)="select(p)">
+        <img [src]="'assets/platform-logos/' + p.logo" alt="">
+      </button>
     }
-  </div>
+  </nav>
 
-  <div class="selector-footer">
-    v{{ appVersion }}
-    <span class="update-notice" *ngIf="update" role="status">
-      · v{{ update.version.version }} is available
-      <a [href]="update.release.html_url" appExternalLink>Download</a>
-      <button type="button" (click)="dismissUpdate()">Not now</button>
-    </span>
-  </div>
+  <main class="stage">
+    <div class="aura"></div>
+
+    <section class="panel" [attr.aria-label]="current.name">
+      <div class="hero">
+        <img [src]="'assets/platform-logos/' + current.logo" [alt]="current.name">
+      </div>
+
+      <div class="info">
+        <div class="actions">
+          <button class="action primary" type="button" (click)="open('apps')">
+            @switch (current.primary.icon) {
+              @case ('plug') { <svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6M7 8h10v3a5 5 0 0 1-10 0zM12 16v6"/></svg> }
+              @default { <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg> }
+            }
+            {{ current.primary.label }}
+          </button>
+          @for (a of current.actions; track a.path) {
+            <button class="action" type="button" (click)="open(a.path)">
+              @switch (a.icon) {
+                @case ('tv') { <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2.5"/><path d="M8 21h8"/></svg> }
+                @case ('usb') { <svg viewBox="0 0 24 24"><circle cx="7" cy="14" r="2.5"/><path d="M9.5 14H20M13 14V6l-2 2M16 14v4"/><rect x="14.5" y="18" width="3" height="3" rx=".5"/></svg> }
+                @default { <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg> }
+              }
+              <span>{{ a.label }}<small>{{ a.hint }}</small></span>
+            </button>
+          }
+        </div>
+
+        @if (devices?.length) {
+          <div class="recent">
+            <h4>Saved devices</h4>
+            @for (d of devices; track d.ip) {
+              <div class="dev"><b>{{ d.name }}</b><code>{{ d.ip }}</code></div>
+            }
+          </div>
+        } @else if (current.note) {
+          <p class="note">{{ current.note }}</p>
+        }
+      </div>
+    </section>
+
+    <div class="footer">
+      {{ appName }} v{{ appVersion }}
+      <span class="update-notice" *ngIf="update" role="status">
+        · v{{ update.version.version }} is available
+        <a [href]="update.release.html_url" appExternalLink>Download</a>
+        <button type="button" (click)="dismissUpdate()">Not now</button>
+      </span>
+    </div>
+  </main>
 </div>
