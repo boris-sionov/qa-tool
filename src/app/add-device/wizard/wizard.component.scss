@@ -1,3 +1,4 @@
+@use '../../../styles/btn' as *;
 // Design tokens
 $bg-dark: #0F172B;
 $bg-light: #1a2744;
@@ -520,50 +521,10 @@ $border-color: rgba(91, 159, 245, 0.2);
 }
 
 .wizard-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 11px 22px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1.5px solid transparent;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-family: 'Segoe UI', 'San Francisco', -apple-system, sans-serif;
-  white-space: nowrap;
+  @include btn-base(42px);
+  padding: 0 22px;
 
-  i.bi {
-    font-size: 14px;
-  }
-
-  &.primary {
-    background: linear-gradient(135deg, $primary-blue 0%, $accent-purple 100%);
-    color: white;
-    box-shadow: 0 4px 14px rgba(91, 159, 245, 0.25);
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(91, 159, 245, 0.4);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-
-  &.secondary {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-secondary;
-    border-color: rgba(255, 255, 255, 0.1);
-
-    &:hover {
-      background: rgba(91, 159, 245, 0.12);
-      color: $primary-blue;
-      border-color: rgba(91, 159, 245, 0.3);
-      transform: translateY(-2px);
-    }
-  }
+  &.primary { @include btn-primary; }
+  &.secondary { @include btn-secondary; }
 }
+

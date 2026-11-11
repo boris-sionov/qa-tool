@@ -1,0 +1,30 @@
+// Bootstrap's button classes, restyled with the shared set (see _btn.scss). Markup keeps saying
+// `btn btn-primary`; this is where it gets its look.
+@use 'btn' as *;
+
+.btn {
+  @include btn-base;
+
+  &.btn-sm { @include btn-sm; }
+  &.btn-lg { @include btn-lg; }
+}
+
+.btn-primary { @include btn-primary; }
+
+.btn-secondary,
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-light,
+.btn-light { @include btn-secondary; }
+
+.btn-danger,
+.btn-outline-danger { @include btn-danger; }
+
+.btn-warning,
+.btn-outline-warning { @include btn-warning; }
+
+.btn-success,
+.btn-outline-success { @include btn-success; }
+
+.btn-link,
+.btn-ghost { @include btn-ghost; text-decoration: none; }

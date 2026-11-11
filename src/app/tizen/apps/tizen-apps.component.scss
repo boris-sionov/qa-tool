@@ -1,3 +1,4 @@
+@use '../../../styles/btn' as *;
 // ── Cert banner ───────────────────────────────────────────────────────────────
 .cert-banner {
   display: flex;
@@ -334,56 +335,16 @@ $panel-strong: rgba(18, 30, 55, 0.88);
 }
 
 .action-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 42px;
+  @include btn-base(42px);
   padding: 0 14px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  color: #FFFFFF;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
 
-  &.primary {
-    background: #0D6EFD;
-    border-color: #2E86FF;
-  }
-
-  &.danger {
-    background: rgba(220, 53, 69, 0.88);
-    border-color: rgba(255, 123, 136, 0.36);
-  }
-
-  &.cert-btn {
-    background: rgba(255, 190, 50, 0.15);
-    border-color: rgba(255, 190, 50, 0.35);
-    color: #FFBE32;
-    margin-left: auto;
-    flex-shrink: 0;
-  }
-
-  &.small {
-    height: 34px;
-    padding: 0 10px;
-    font-size: 12px;
-  }
-
-  &.copied {
-    background: rgba(76, 175, 80, 0.2);
-    border-color: rgba(76, 175, 80, 0.4);
-    color: #66BB6A;
-  }
-
-  &:hover:not(:disabled),
-  &:focus-visible {
-    outline: none;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(91, 159, 245, 0.22);
-  }
+  &.primary { @include btn-primary; }
+  &.danger { @include btn-danger; }
+  &.cert-btn { @include btn-warning; }
+  &.small { @include btn-sm; }
+  &.copied { @include btn-success; }
 }
+
 
 .duid-row {
   display: flex;

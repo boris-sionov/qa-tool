@@ -1,3 +1,4 @@
+@use '../../../styles/btn' as *;
 $bg-dark: #0F172B;
 $primary-blue: #5B9FF5;
 $accent-purple: #8B7FF5;
@@ -30,56 +31,10 @@ $border-color: rgba(91, 159, 245, 0.2);
 }
 
 .editor-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 18px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1.5px solid transparent;
-  cursor: pointer;
-  transition: all 0.25s ease;
+  @include btn-base(38px);
 
-  i.bi { font-size: 13px; }
-
-  &.primary {
-    background: linear-gradient(135deg, $primary-blue 0%, $accent-purple 100%);
-    color: white;
-    box-shadow: 0 4px 14px rgba(91, 159, 245, 0.25);
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(91, 159, 245, 0.4);
-    }
-
-    &:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-  }
-
-  &.secondary {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-secondary;
-    border-color: rgba(255, 255, 255, 0.1);
-
-    &:hover {
-      background: rgba(91, 159, 245, 0.1);
-      color: $primary-blue;
-      border-color: rgba(91, 159, 245, 0.3);
-    }
-  }
-
-  &.danger {
-    background: rgba(255, 107, 107, 0.1);
-    color: $accent-red;
-    border-color: rgba(255, 107, 107, 0.2);
-
-    &:hover {
-      background: rgba(255, 107, 107, 0.2);
-      border-color: rgba(255, 107, 107, 0.4);
-      transform: translateY(-1px);
-    }
-  }
+  &.primary { @include btn-primary; }
+  &.secondary { @include btn-secondary; }
+  &.danger { @include btn-danger; }
 }
+

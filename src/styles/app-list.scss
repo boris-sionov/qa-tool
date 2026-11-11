@@ -1,6 +1,8 @@
 // The one look of every app list (Android TV, LG, Samsung, VIDAA, Android Phone): the rows and
 // their Inspect / Launch / Kill / Remove buttons. Global on purpose — a copy per component is how
 // the lists drifted apart. Scoped under `.app-list` so the class names stay free elsewhere.
+@use 'btn' as *;
+
 $primary-blue: #5B9FF5;
 $text-secondary: #A8B8CC;
 $border-color: rgba(91, 159, 245, 0.2);
@@ -127,86 +129,17 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   // One width for every button, so Inspect / Launch / Kill / Remove line up from row to row and
   // from platform to platform whatever the label.
   .app-action {
+    @include btn-base(36px);
+    @include btn-sm;
     flex: 0 0 100px;
     width: 100px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    height: 36px;
     padding: 0 11px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    font-size: 12px;
     font-weight: 700;
-    line-height: 1;
-    white-space: nowrap;
-    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease, transform 0.18s ease;
 
-    i {
-      font-size: 14px;
-    }
-
-    &:focus,
-    &:focus-visible {
-      outline: none;
-    }
-
-    &:hover,
-    &:focus-visible {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(91, 159, 245, 0.18);
-    }
-
-    &.secondary {
-      color: #EAF2FF;
-      background: rgba(91, 159, 245, 0.1);
-      border-color: $border-color;
-
-      &:hover,
-      &:focus-visible {
-        background: rgba(91, 159, 245, 0.2);
-      }
-    }
-
-    &.primary {
-      color: #FFFFFF;
-      background: #0D6EFD;
-      border-color: #2E86FF;
-
-      &:hover,
-      &:focus-visible {
-        background: #2E86FF;
-        border-color: #66A8FF;
-        box-shadow: 0 10px 24px rgba(13, 110, 253, 0.32);
-      }
-    }
-
-    &.warning {
-      color: #261A00;
-      background: #FFC107;
-      border-color: #FFD75E;
-
-      &:hover,
-      &:focus-visible {
-        background: #FFD24D;
-        border-color: #FFE08A;
-        box-shadow: 0 10px 24px rgba(255, 193, 7, 0.28);
-      }
-    }
-
-    &.danger {
-      color: #FFFFFF;
-      background: rgba(220, 53, 69, 0.88);
-      border-color: rgba(255, 123, 136, 0.36);
-
-      &:hover,
-      &:focus-visible {
-        background: #DC3545;
-        border-color: rgba(255, 160, 170, 0.58);
-        box-shadow: 0 10px 24px rgba(220, 53, 69, 0.3);
-      }
-    }
+    &.secondary { @include btn-secondary; }
+    &.primary { @include btn-primary; }
+    &.warning { @include btn-warning; }
+    &.danger { @include btn-danger; }
   }
 }
 

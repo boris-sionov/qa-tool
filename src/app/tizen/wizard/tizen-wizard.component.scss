@@ -1,3 +1,4 @@
+@use '../../../styles/btn' as *;
 @import "../../add-device/wizard/wizard.component";
 
 // ── Certificate setup step ────────────────────────────────────────────────────
@@ -135,13 +136,8 @@
   flex-wrap: wrap;
 }
 
-.wizard-btn.small {
-  padding: 7px 14px;
-  font-size: 12px;
-  border-radius: 8px;
+.wizard-btn.small { @include btn-sm; }
 
-  i.bi { font-size: 13px; }
-}
 
 .cert-file-path {
   font-family: 'SF Mono', 'Consolas', monospace;

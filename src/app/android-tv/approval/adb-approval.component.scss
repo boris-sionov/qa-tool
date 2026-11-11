@@ -1,3 +1,4 @@
+@use '../../../styles/btn' as *;
 .approval {
   display: flex;
   flex-direction: column;
@@ -62,20 +63,8 @@
 }
 
 .approval-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 10px;
-  border: 1px solid rgba(91, 159, 245, 0.4);
-  background: rgba(91, 159, 245, 0.12);
-  color: #FFFFFF;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover:not([disabled]) { background: rgba(91, 159, 245, 0.22); }
-  &[disabled] { opacity: 0.6; cursor: default; }
+  @include btn-base(36px);
+  @include btn-secondary;
 }
+
 

@@ -1,3 +1,4 @@
+@use '../../../../styles/btn' as *;
 @import "../../../add-device/wizard/wizard.component";
 
 .ms-auto { margin-left: auto; }
@@ -12,23 +13,13 @@
 .scan-count { color: #A8B8CC; font-size: 13px; }
 
 .filter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(91, 159, 245, 0.35);
-  background: rgba(91, 159, 245, 0.08);
-  color: #A8B8CC;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  @include btn-base(34px);
+  @include btn-sm;
+  @include btn-secondary;
 
-  &:hover:not(:disabled) { color: #fff; border-color: #5B9FF5; }
-  &.active { background: #5B9FF5; border-color: #5B9FF5; color: #fff; }
-  &:disabled { opacity: 0.5; cursor: default; }
+  &.active { @include btn-primary; }
 }
+
 
 .scan-error {
   padding: 10px 14px;

@@ -254,6 +254,15 @@ five logos to start from — and shows the picked platform on a stage: big logo 
 saved devices of Android TV and Samsung (`getSavedDevices()`); LG, VIDAA and Android Phone have no
 list the home page can read cheaply.
 
+### Buttons
+
+One set, `src/styles/_btn.scss` (mixins `btn-base`, `btn-primary`, `btn-secondary`, `btn-danger`,
+`btn-danger-solid`, `btn-warning`, `btn-success`, `btn-ghost`, `btn-sm`). Bootstrap's `.btn-*` classes
+are restyled with them in `styles/buttons.scss`; the app-list row buttons (`.app-action`: Inspect
+secondary, Launch primary, Kill warning, Remove danger) and every local family (`.wizard-btn`,
+`.device-btn`, `.add-device-btn`, `.dialog-btn`, `.editor-btn`, …) include them too. A new button
+uses a mixin (`@use '…/styles/btn' as *;`), not its own colours.
+
 ### Spinners
 
 One component, `<app-spinner>` (`shared/components/spinner/`): the rounded square of the platform

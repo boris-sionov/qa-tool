@@ -1,3 +1,4 @@
+@use '../../../styles/btn' as *;
 .phone-card.clickable {
   cursor: pointer;
 }
@@ -15,21 +16,4 @@
   margin: 0 auto;
 }
 
-.device-btn.mirror {
-  background: rgba(91, 159, 245, 0.1);
-  color: #5B9FF5;
-  border-color: rgba(91, 159, 245, 0.3);
-
-  &:hover:not(:disabled) {
-    background: rgba(91, 159, 245, 0.2);
-    border-color: #5B9FF5;
-    transform: translateY(-2px);
-  }
-}
-
-.device-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
+.device-btn.mirror { @include btn-secondary; }
