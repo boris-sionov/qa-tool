@@ -47,7 +47,7 @@
 
   <div class="p-4 flex-fill overflow-auto">
     @if (!serial) {
-      <app-empty-state icon="bi-hdd-network" title="No device detected" text="Add a Samsung TV to start installing and managing apps." actionLabel="Add a device" [actionLink]="['../devices']"></app-empty-state>
+      <app-empty-state [link]="['../devices']"></app-empty-state>
     } @else if (appsError) {
       <app-error-card title="Unable to get installed apps" [error]="appsError" (retry)="loadApps(true)">
       </app-error-card>

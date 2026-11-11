@@ -24,7 +24,7 @@
 
   <div class="info-content">
     @if (!device) {
-      <app-empty-state icon="bi-tv" title="No device selected" text="Pick a device in the list above, or add one." actionLabel="Add a device" [actionLink]="['../devices']"></app-empty-state>
+      <app-empty-state [link]="['../devices']"></app-empty-state>
     } @else if (loading) {
       <app-spinner size="lg" [center]="true"></app-spinner>
     } @else if (error) {

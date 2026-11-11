@@ -1,24 +1,19 @@
-import {NgClass} from '@angular/common';
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {RouterLink} from '@angular/router';
 
 /**
- * What a page shows when there is nothing to show yet — no device, not connected, no devices saved:
- * the icon tile, a title, one line of help and, if there is a next step, a button for it.
+ * What every page shows when there is no device: the same tile, the same "No device detected" and
+ * the same "Add new device" button wherever it appears. The button either goes to a route (`link`,
+ * relative to the page — the Manage page) or tells the page to open its own add flow (`add`).
  */
 @Component({
     selector: 'app-empty-state',
     standalone: true,
-    imports: [NgClass, RouterLink],
+    imports: [RouterLink],
     templateUrl: './empty-state.component.html',
     styleUrls: ['./empty-state.component.scss'],
 })
 export class EmptyStateComponent {
-    @Input() icon = 'bi-hdd-network';
-    @Input({required: true}) title = '';
-    @Input() text = '';
-    @Input() actionLabel = '';
-    @Input() actionIcon = 'bi-plus-lg';
-    /** Router link of the button, relative to the page showing this. */
-    @Input() actionLink: string | unknown[] = [];
+    @Input() link: string | unknown[] | null = null;
+    @Output() add = new EventEmitter<void>();
 }

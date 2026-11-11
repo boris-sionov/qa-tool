@@ -39,7 +39,7 @@
       <app-error-card title="Unable to get installed apps" [error]="packagesError" (retry)="retry()">
       </app-error-card>
     } @else if (!serial) {
-      <app-empty-state icon="bi-hdd-network" title="No device detected" text="Add an Android TV device to start installing and managing apps." actionLabel="Add a device" [actionLink]="['../devices']"></app-empty-state>
+      <app-empty-state [link]="['../devices']"></app-empty-state>
     } @else if (loading || packages === null) {
       <app-loading-card></app-loading-card>
     } @else if (packages.length === 0) {

@@ -1,6 +1,6 @@
 <div class="info-page">
   @if (!device) {
-    <app-empty-state icon="bi-tv" title="No device detected" text="Add an Android TV device to see its model, build and storage." actionLabel="Add a device" [actionLink]="['../devices']"></app-empty-state>
+    <app-empty-state [link]="['../devices']"></app-empty-state>
   } @else if (unauthorized) {
     <app-adb-approval [serial]="device.ip + ':' + device.port" [deviceName]="device.name"
                       (approved)="state.checkConnection()"></app-adb-approval>

@@ -34,7 +34,7 @@
     @if (!devices) {
       <app-loading-card></app-loading-card>
     } @else if (devices.length === 0) {
-      <app-empty-state icon="bi-inbox" title="No devices yet" text="Use Add Device above to add your first webOS TV."></app-empty-state>
+      <app-empty-state (add)="addDevice()"></app-empty-state>
     } @else {
       <div class="devices-grid">
         @for (device of devices; track device.name) {

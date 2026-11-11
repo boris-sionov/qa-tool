@@ -2,8 +2,7 @@
   @let devices = (deviceManager.devices$ | async);
   @if (devices && devices.length === 0) {
     <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
-      <app-empty-state icon="bi-terminal" title="No device selected" text="Add an LG TV to open a terminal on it."
-                       actionLabel="Add a device" [actionLink]="['../devices']"></app-empty-state>
+      <app-empty-state [link]="['../devices']"></app-empty-state>
     </div>
   }
   <div class="w-100 h-100 position-absolute d-flex flex-column" [class.opacity-0]="shells.length === 0">

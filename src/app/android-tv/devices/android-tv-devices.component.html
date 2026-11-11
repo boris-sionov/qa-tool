@@ -30,7 +30,7 @@
     </h5>
 
     @if (devices.length === 0) {
-      <app-empty-state icon="bi-inbox" title="No devices yet" text="Use Add New Device above to add your first Android TV."></app-empty-state>
+      <app-empty-state (add)="openAddWizard()"></app-empty-state>
     } @else {
       <div class="devices-grid">
         @for (dev of devices; track dev.ip) {

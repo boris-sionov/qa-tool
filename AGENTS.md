@@ -265,10 +265,11 @@ uses a mixin (`@use '…/styles/btn' as *;`), not its own colours.
 
 ### Empty States
 
-A page with nothing to show — no device, not connected, no devices saved — uses
-`<app-empty-state>` (`shared/components/empty-state/`): an icon tile, a title, one line of help and,
-if there is a next step, a button (`actionLabel` + `actionLink`, relative to the page). Do not write
-a page-local "no device" block.
+Every page with no device shows the same thing, wherever it is: `<app-empty-state>`
+(`shared/components/empty-state/`) — the tile, "No device detected" and an **Add new device** button,
+nothing else. The button goes to a route (`[link]`, relative to the page; VIDAA's goes to Apps, where
+the connect form is) or tells the page to open its own add flow (`(add)`, on the Manage pages). Do not
+write a page-local "no device" block or vary the wording.
 
 ### Spinners
 

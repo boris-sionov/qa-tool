@@ -1,6 +1,7 @@
-<div class="tile"><i class="bi" [ngClass]="icon"></i></div>
-<h3>{{ title }}</h3>
-@if (text) { <p>{{ text }}</p> }
-@if (actionLabel) {
-  <a class="btn btn-primary" [routerLink]="actionLink"><i class="bi" [ngClass]="actionIcon"></i>{{ actionLabel }}</a>
+<div class="tile"><i class="bi bi-tv"></i></div>
+<h3>No device detected</h3>
+@if (link) {
+  <a class="btn btn-primary" [routerLink]="link"><i class="bi bi-plus-lg"></i>Add new device</a>
+} @else {
+  <button type="button" class="btn btn-primary" (click)="add.emit()"><i class="bi bi-plus-lg"></i>Add new device</button>
 }
