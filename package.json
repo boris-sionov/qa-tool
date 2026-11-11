@@ -20,6 +20,8 @@
     "start": "tauri dev",
     "prebuild": "node scripts/build-info.js",
     "build": "tauri build",
+    "build:minimal": "node scripts/run-minimal.js build",
+    "start:minimal": "node scripts/run-minimal.js dev",
     "ng": "node scripts/ng-wrapper.js",
     "icon": "node scripts/icon-generator.js",
     "setup": "bash scripts/download-adb.sh && bash scripts/download-sdb.sh",

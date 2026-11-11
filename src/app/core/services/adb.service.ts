@@ -200,14 +200,12 @@ export class AdbService implements DeviceProvider {
         return invoke('plugin:adb-manager|apk_manifest', {path});
     }
 
-    /** Whether Tailscale is up on this Mac: `running`, `stopped`, `needs-login` or `missing`. */
-    async tailscaleState(): Promise<'running' | 'stopped' | 'needs-login' | 'missing'> {
-        return invoke('plugin:adb-manager|tailscale_state');
-    }
-
-    /** Runs `tailscale up`. */
-    async tailscaleUp(): Promise<void> {
-        return invoke<void>('plugin:adb-manager|tailscale_up');
+    /**
+     * Whether Tailscale is connected on this computer and `host` resolves: `down`, `dns` (connected,
+     * but the name does not resolve) or `up`. Never starts the Tailscale app.
+     */
+    async tailscaleState(host: string): Promise<'down' | 'dns' | 'up'> {
+        return invoke('plugin:adb-manager|tailscale_state', {host});
     }
 
     /** The Android TVs, LG and Samsung TVs on this computer's /24 network. */

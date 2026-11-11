@@ -236,7 +236,7 @@ async fn get_temp<R: Runtime>(
     let extension = source
         .extension()
         .map_or(String::new(), |s| format!(".{}", s.to_string_lossy()));
-    let temp_path = temp_dir().join(format!("webos-dev-tmp-{}{}", Uuid::new_v4(), extension));
+    let temp_path = temp_dir().join(format!("qa-tool-tmp-{}{}", Uuid::new_v4(), extension));
     let target = FilePath::from(&temp_path);
     get(app, device, path, target.clone(), on_progress).await?;
     Ok(target)

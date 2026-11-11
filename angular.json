@@ -99,6 +99,27 @@
                   "with": "src/environments/environment.dev.ts"
                 }
               ]
+            },
+            "minimal": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1mb",
+                  "maximumError": "2mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "8kb",
+                  "maximumError": "15kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.minimal.ts"
+                }
+              ],
+              "outputHashing": "all"
             }
           },
           "defaultConfiguration": "production"
@@ -111,6 +132,9 @@
           "configurations": {
             "production": {
               "buildTarget": "ui:build:production"
+            },
+            "minimal": {
+              "buildTarget": "ui:build:minimal"
             },
             "development": {
               "buildTarget": "ui:build:development"

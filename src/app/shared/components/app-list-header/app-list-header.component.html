@@ -1,0 +1,18 @@
+<div class="apps-header">
+  <div class="apps-heading">
+    <div class="apps-kicker">{{ kicker }}</div>
+    <h2>Installed Apps</h2>
+  </div>
+  <div class="apps-tools">
+    <ng-content></ng-content>
+    <app-list-filter [value]="search" (valueChange)="searchChange.emit($event)"></app-list-filter>
+    <div class="apps-count" [title]="total + ' apps on this device'">
+      <i class="bi bi-grid-3x3-gap-fill"></i>
+      <span>{{ shown }}@if (shown !== total) {/{{ total }}}</span>
+    </div>
+    <button class="reload" type="button" aria-label="Reload apps" title="Reload apps"
+            [disabled]="refreshing" (click)="refresh.emit()">
+      <i class="bi bi-arrow-clockwise"></i>
+    </button>
+  </div>
+</div>

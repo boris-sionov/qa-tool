@@ -22,14 +22,16 @@
     </div>
 
     <div class="install-btn-container toolbar-actions">
-      <button class="btn btn-secondary text-nowrap me-2" (click)="openRemote()" [disabled]="!selected"
-              title="Open remote control" style="height:42px;">
-        <i class="bi bi-controller me-2"></i>Remote
-      </button>
-      <button class="btn btn-outline-light text-nowrap install-btn me-2" (click)="installFromConfluence()"
-              [disabled]="!serial || installing" title="Install the newest UAT or PREPROD build from Confluence">
-        <i class="bi bi-journal-arrow-down me-2"></i>From Confluence
-      </button>
+      @if (!minimal) {
+        <button class="btn btn-secondary text-nowrap me-2" (click)="openRemote()" [disabled]="!selected"
+                title="Open remote control" style="height:42px;">
+          <i class="bi bi-controller me-2"></i>Remote
+        </button>
+        <button class="btn btn-outline-light text-nowrap install-btn me-2" (click)="installFromConfluence()"
+                [disabled]="!serial || installing" title="Install the newest UAT or PREPROD build from Confluence">
+          <i class="bi bi-journal-arrow-down me-2"></i>From Confluence
+        </button>
+      }
       <button class="btn btn-primary text-nowrap install-btn" (click)="installWgt()"
               [disabled]="!serial || installing">
         @if (installing) {
@@ -37,7 +39,7 @@
           <span>Installing...</span>
         } @else {
           <i class="bi bi-folder-fill me-2"></i>
-          <span>Install WGT</span>
+          <span>Install</span>
         }
       </button>
     </div>
@@ -76,20 +78,12 @@
       </div>
     } @else {
       <section class="tizen-shell">
-        <div class="tizen-header">
-          <div>
-            <div class="tizen-kicker">Samsung Tizen</div>
-            <h2>Installed Apps</h2>
-          </div>
-          <button class="icon-button" type="button" aria-label="Refresh apps" ngbTooltip="Refresh apps"
-                  (click)="loadApps(true)" [disabled]="loadingApps">
-            <i class="bi bi-arrow-clockwise"></i>
-          </button>
-        </div>
+        <app-list-header kicker="Samsung Tizen" [shown]="shownApps.length" [total]="filteredApps!.length" [refreshing]="loadingApps"
+                         [(search)]="search" (refresh)="loadApps(true)"></app-list-header>
 
-        <div class="tizen-app-list">
-          @for (app of filteredApps!; track app.id) {
-            <article class="tizen-app-row">
+        <div class="app-list">
+          @for (app of shownApps; track app.id) {
+            <article class="app-row">
               <div class="app-identity">
                 <div class="app-icon-frame">
                   @if (iconFor(app); as icon) {

@@ -28,7 +28,7 @@ npm run ng -- test --browsers=TauriDesktop                            # unit tes
 npm run ng -- test --browsers=TauriDesktop --include='**/foo.spec.ts' # single spec file
 
 # Rust tests
-cargo test -p devman
+cargo test -p qa-tool
 ```
 
 Karma does not use Chrome — `scripts/karma-tauri-launcher.js` registers `TauriDesktop` and
@@ -104,6 +104,28 @@ fetch the latest release and compare semver, but nothing calls it — wiring it 
 
 `APP_VERSION` is displayed in the platform-selector footer, the LG sidebar, and LG → More → Version.
 
+## QA Tool Lite (the minimal build)
+
+`npm run build:minimal` / `npm run start:minimal` (`scripts/run-minimal.js`) build and run **QA Tool
+Lite**. Two switches, both set by that script and by CI:
+- `QA_TOOL_MINIMAL=1` — `scripts/ng-wrapper.js` uses the Angular `minimal` configuration
+  (`environment.minimal.ts`, `AppConfig.minimal = true`, `appName = 'QA Tool Lite'`);
+- `TAURI_CONFIG` — `scripts/minimal-config.js` gives the app its name, window title and its own
+  `identifier` (`com.smarttv.qa-tool.lite`), so it installs next to QA Tool and keeps its own saved
+  devices, logs and app data. On Linux the package and binary are `qa-tool-lite`.
+
+What Lite hides: Android TV *Install from library*, Samsung and LG *From Confluence*, the Samsung
+*Remote*, the VIDAA FreeTV preset picker, and **Android Phone** entirely (chips, home card, route).
+LG lists developer apps only in every build, so no TV ever shows the SSAP pairing prompt. The Rust
+commands stay compiled in; only the UI is gated.
+
+`release.yml` builds both variants for every target (`variant: full | minimal` in the matrix).
+Lite installers are named `QA-Tool-Lite_<version>_<platform>`; for a manual run they are the
+`<target>-minimal-package` artifacts.
+
+**Before testing from source, make sure port 4281 is free** (`lsof -i :4281`): a leftover `ng serve`
+from an earlier run keeps serving its old variant, and the new run silently shows that instead.
+
 ## Logs
 
 `~/Library/Logs/com.smarttv.qa-tool/QA Tool.log` (macOS), via `tauri_plugin_log`. The folder is the
@@ -129,8 +151,7 @@ it empty for local builds.
 ### Two Parallel Architectures (Important)
 
 The codebase is mid-migration. **Android TV and Tizen** use the new `DeviceProvider` abstraction.
-**LG WebOS** still uses the original SSH-based architecture from the upstream
-`webosbrew/dev-manager-desktop` fork and is NOT wired into `DeviceProviderFactory`.
+**LG WebOS** still uses the original SSH-based architecture it started with and is NOT wired into `DeviceProviderFactory`.
 
 ```
 Angular UI
@@ -182,7 +203,7 @@ Miss 2 or 3 and it compiles, ships, and fails only when called — invisible beh
 releases. `acl_tests` in `samsung_tizen.rs` now parses the three lists and fails the build when
 they disagree.
 
-Cargo package name is still `devman` and the binary `webos-dev-manager` (fork leftovers) — the
+The Cargo package and the binary are both `qa-tool` (library `qa_tool`) — the
 product name `QA Tool` comes from `tauri.conf.json`. On Linux `tauri.linux.conf.json` overrides it to
 `qa-tool`, which names the package, the bundle files and the installed binary (`/usr/bin/qa-tool`).
 
@@ -202,7 +223,7 @@ migration loses that data silently on the next install:
 | `SmartTVQATool` | Samsung remote client name (`samsung_tizen.rs`) | the TV's pairing token; every TV would ask to allow the remote again |
 | `smart-tv-qa-tool`, `webos-dev-manager` | Linux `provides` / `conflicts` / `replaces` / `obsoletes` (`tauri.conf.json`) | nothing — kept on purpose so the `qa-tool` package replaces the older ones |
 
-Keep them as they are, like `devman` / `webos-dev-manager`.
+Keep them as they are.
 
 ### Route Structure
 
@@ -218,6 +239,20 @@ Keep them as they are, like `devman` / `webos-dev-manager`.
 
 Each platform module owns its own `devices/`, `apps/`, and `info/` sub-routes — except VIDAA,
 which has only `apps/` and `info/` (the connection code is per session, so there is no device list).
+
+### App Lists Look The Same On Every Platform
+
+Android TV, LG, Samsung, VIDAA and Android Phone share one shape:
+- header: `<app-list-header>` (`shared/components/app-list-header/`) — kicker, *Installed Apps*, the
+  filter box (`<app-list-filter>` + `matches()`), the app count (`shown/total` while filtering) and
+  Reload;
+- toolbar: one **Install** button (platform extras such as Mirror / Pull logs / Disconnect sit beside it);
+- row: **Inspect** (not Android) · **Launch** · **Kill** · **Remove**. VIDAA's Kill is its self-closing
+  page, as before. There is no stress test anywhere any more.
+
+The filter only narrows what is drawn (`shown` / `shownApps`); anything that works on the whole list,
+like Tizen's version fetch, still reads the full one. Platform order everywhere (chips and home
+cards): Android TV, LG, Samsung, VIDAA, Android Phone.
 
 ### DeviceProvider Interface
 
@@ -288,8 +323,8 @@ reproduce without revoking anything on the TV, run a second adb server with a th
 to keep state across reinstalls.
 
 LG WebOS devices live in `~/.webos/ose/novacom-devices.json` (macOS/Linux) or `%APPDATA%\.webos\ose\`
-(Windows) — a legacy path from the webosbrew fork. `DeviceManager` clears this file once on first
-run (`.initialized` marker) to drop stale entries from the fork.
+(Windows) — a legacy path. `DeviceManager` clears this file once on first
+run (`.initialized` marker) to drop stale entries.
 
 ### Unified Logging
 
@@ -447,7 +482,7 @@ Windows installs to `C:\tizen-studio`, which is now one of the `studio_candidate
 
 `tizen version` starts a JVM (~4 s), so the dialog shows a spinner; each tool call is capped at
 30 s. To see the result for this machine without the UI:
-`cargo test -p devman tizen_prereq -- --ignored --nocapture` (set `TIZEN_CERT_PROFILE` to check a
+`cargo test -p qa-tool tizen_prereq -- --ignored --nocapture` (set `TIZEN_CERT_PROFILE` to check a
 saved profile).
 
 #### Certificate ↔ TV Matching (the other cause of `[118, -12]`)
@@ -546,7 +581,7 @@ connects by DevKit code, not IP, so it has no device list.
   injection token, next to `cancellable`.
 - A TV in standby answers nothing. /24 only. Guest or office Wi-Fi with client isolation shows
   nothing; macOS may ask for Local Network permission the first time.
-- On the real network: `cargo test -p devman live_scan -- --ignored --nocapture`.
+- On the real network: `cargo test -p qa-tool live_scan -- --ignored --nocapture`.
 
 #### APK Library (Install from library)
 
@@ -568,16 +603,18 @@ plain nginx/Apache/`python3 -m http.server` listings, which cannot take uploads.
 
 **Four tabs.** Store / PROD is the freetv-server library — every Google-signed store build of
 `tv.freetv.androidtv`, the live one marked; Add version refuses any other package. UAT (and its
-debug build) and PROD Debug come from Confluence (see [Confluence Release Pages](#confluence-release-pages)); Firebase lists Firebase App Distribution releases (see [Firebase App Distribution](#firebase-app-distribution)). Each store row is the version's leading number (`1.1.50-(26010150)` reads `1.1.50`), its date
+debug build) and PROD (and its debug build) come from Confluence (see [Confluence Release Pages](#confluence-release-pages)); Firebase lists Firebase App Distribution releases (see [Firebase App Distribution](#firebase-app-distribution)). Each store row is the version's leading number (`1.1.50-(26010150)` reads `1.1.50`), its date
 and an Install button. The date is the file's mtime on the server — an upload stamps today, so
 for back-filled builds set it to the Play Console date with `touch -d`, as was done for the
 1.1.x–1.10.3 store builds.
 
-**Tailscale.** A server library that does not answer is checked against `tailscale status
---json`; when Tailscale is not `Running` the dialog says so and its button runs plain
-`tailscale up` (`tailscale_up`). Plain, because `up` with any flag — even `--timeout` — refuses
-unless every non-default setting is repeated (this Mac has `--accept-routes`). It waits up to
-25 s, which is when `up` is stuck on a browser sign-in.
+**Tailscale.** A server library that does not answer is checked for a Tailscale address
+(100.64.0.0/10) on a local interface (`tailscale_state`, via `ifconfig` / `ipconfig`); when there
+is none the dialog says Tailscale is down and how to turn it on. With Tailscale up it also resolves the
+server's host: a name that does not resolve (Tailscale's MagicDNS answering NXDOMAIN, seen 2026-11-11 while
+the IP still answered) gets its own message — toggle Tailscale, or Change to the server's Tailscale IP. The tool never runs the
+Tailscale binary and never starts its app — on macOS running `Tailscale.app/Contents/MacOS/Tailscale`
+opens the GUI, which is the bug the old `tailscale status` / `tailscale up` button caused.
 
 **Uploads are named from the manifest**, `<package>-<versionName>.apk`, so CI artifacts called
 `app-release.apk` do not collide and the list sorts by version. A store build and a CI build of
@@ -656,7 +693,7 @@ kind*, not the top row — 1.28.2 on Releases Smart TV has Samsung but no LG bui
 
 | Where | Kinds (file name) |
 |---|---|
-| Android TV → library → UAT / PROD Debug | `nodebugTesting-FreeTVUat`, `debug(Testing\|Developer)-FreeTVUat`; `debug(Testing\|Developer)-FreeTVProd`. PROD itself is the store library. `.aab` skipped |
+| Android TV → library → UAT / PROD | `nodebugTesting-FreeTVUat`, `debug(Testing\|Developer)-FreeTVUat`; `release-FreeTVProd`, `debug(Testing\|Developer)-FreeTVProd`. Store / PROD is the Google-signed store library. `.aab` skipped |
 | Samsung → From Confluence, tabs PREPROD / UAT | `samsung-tizen-preprod-*.wgt`, `samsung-tizen-uat-*.wgt` → the signed install |
 | LG → From Confluence, tabs PREPROD / UAT | `lg-webos-uhd-preprod-*.ipk`, `lg-webos-uhd-uat-*.ipk` (UHD only; HD builds are ignored) → `installByPath` |
 
@@ -680,7 +717,7 @@ commands with Android TV; what differs lives in `plugins/adb_phone.rs` (on `adb-
 | Command | Does |
 |---|---|
 | `adb_list_usb_devices` | `adb devices -l`, only entries with a `usb:` field (TVs over TCP have none); `model:` with `_` → space. The page polls it every 2 s, so a phone appears when it is plugged in |
-| `adb_list_packages_matching` | installed packages matching patterns (exact id, or a prefix ending in `*`) with `versionName` from `dumpsys package` |
+| `adb_list_packages_matching` | installed packages matching patterns (exact id, or a prefix ending in `*`) — no patterns means every user-installed package — with `versionName` from `dumpsys package` |
 | `adb_launch_launcher` | `monkey -p <id> -c android.intent.category.LAUNCHER 1`. Android TV's `am start -a MAIN -p <id>` does not resolve on a phone without the LAUNCHER category |
 | `adb_install_multiple` | one app's APKs together: `install-multiple -r -d` (one path: `install -r -d`). A `Failure [` line on stdout counts as an error even with exit code 0 |
 | `adb_install_xapk` | unzips an XAPK (APKPure-style: base + split APKs, `manifest.json`, optional `Android/obb/…`) to a temp dir, installs the APKs together, pushes OBB files to the same path under `/sdcard`; returns `package_name` |
@@ -700,9 +737,10 @@ declares (`apk_manifest`), so the split APKs of one app go in together; each XAP
 install. Apps install one after another; a refused replace (other key, release downgrade) asks to
 uninstall first, per app, and one failure does not stop the rest — a summary lists each.
 
-**The app list is a fixed filter**, `PHONE_APPS` in `phone.service.ts`: FreeTV
+**The app list is every app the user installed** (`pm list packages -3`, system apps left out),
+narrowed by the filter box. `PHONE_APPS` in `phone.service.ts` only gives FreeTV
 (`tv.freetv.mobile.android*`, so `.uat` and any other environment suffix too) and Mizrahi Tefahot's
-account app (`com.MizrahiTefahot.nh`). Everything else on the phone is hidden.
+account app (`com.MizrahiTefahot.nh`) a name and icon; any other app is named by its package id.
 
 **scrcpy is not bundled.** It is found on PATH and in the places a GUI app's PATH misses
 (`/opt/homebrew/bin`, `/usr/local/bin`, WinGet's `%LOCALAPPDATA%\Microsoft\WinGet\Links`), and
@@ -1409,8 +1447,7 @@ All platform operations use `invoke('plugin:adb-manager|<command>', {...})`. The
 ## Code Origins
 
 ### LG WebOS
-**Forked from:** [`webosbrew/dev-manager-desktop`](https://github.com/webosbrew/dev-manager-desktop)
-- Open-source Tauri + Angular LG developer manager
+**Based on:** an open-source Tauri + Angular LG developer manager (Apache-2.0, see `LICENSE`)
 - We kept: SSH connection pooling, Luna service layer, device manager, SFTP, shell/PTY infrastructure
 - We added: FreeTV/Smart TV branding, stress test, Inspect shortcut, custom dark theme, unified platform selector
 

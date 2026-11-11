@@ -1,3 +1,4 @@
+import {AppConfig} from '../../environments/environment';
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {AdbService} from '../core/services/adb.service';
@@ -9,6 +10,7 @@ import {AdbStateService, deviceSerial, SavedDevice} from './adb-state.service';
     styleUrls: ['./android-tv.component.scss']
 })
 export class AndroidTvComponent implements OnInit {
+    readonly minimal = AppConfig.minimal;
 
     devices: SavedDevice[] = [];
     selected: SavedDevice | null = null;

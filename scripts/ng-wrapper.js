@@ -17,6 +17,10 @@ switch (process.argv[2]) {
     }
   // noinspection FallThroughInSwitchStatementJS
   case 'build':
+    // Minimal build: the Angular `minimal` configuration. Set by `npm run build:minimal` and by CI.
+    if (process.env.QA_TOOL_MINIMAL === '1' && !process.argv.slice(3).find(isConfigurationArgument)) {
+      process.argv.push('--configuration=minimal');
+    }
     if (process.env.TAURI_DEBUG === "true" && !process.argv.slice(3).find(isConfigurationArgument)) {
       process.argv.push('--configuration=development');
     }

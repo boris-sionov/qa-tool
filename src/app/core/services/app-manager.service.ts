@@ -615,7 +615,7 @@ export class AppManagerService {
     private async tempDownloadIpk(device: Device, location: string | URL, progress?: InstallProgressHandler): Promise<string> {
         // Stage in the developer home, not /tmp: newer webOS builds ship /tmp as
         // d--x--x--x root:root, so the `prisoner` user cannot create files there.
-        const targetPath = `/media/developer/temp/devman_dl_${Date.now()}.ipk`
+        const targetPath = `/media/developer/temp/qa-tool_dl_${Date.now()}.ipk`
         let localPath: string;
         let deleteLocal = false;
         switch (typeof location) {

@@ -20,8 +20,9 @@ export interface PhoneApp {
 }
 
 /**
- * The only apps the phone page lists. Every FreeTV build is `tv.freetv.mobile.android` plus an
- * environment suffix (`.uat`); Mizrahi Tefahot is its "account management" app.
+ * Display names and icons of the apps QA tests. The list itself is every app the user installed;
+ * these only give FreeTV (`tv.freetv.mobile.android` plus an environment suffix such as `.uat`) and
+ * Mizrahi Tefahot's account app a proper name and icon.
  */
 export const PHONE_APPS: PhoneApp[] = [
     {pattern: 'tv.freetv.mobile.android*', name: 'FreeTV', icon: 'bi-tv'},
@@ -51,7 +52,7 @@ export class PhoneService {
 
     async listApps(serial: string): Promise<AdbPackageInfo[]> {
         const packages = await invoke<AdbPackageInfo[]>('plugin:adb-manager|adb_list_packages_matching',
-            {serial, patterns: PHONE_APPS.map(a => a.pattern)});
+            {serial, patterns: []});
         return packages
             .map(p => ({...p, name: phoneAppName(p.id)}))
             .sort((a, b) => a.name.localeCompare(b.name));

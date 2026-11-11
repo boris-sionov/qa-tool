@@ -1,3 +1,4 @@
+import {AppConfig} from '../../environments/environment';
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 import {APP_VERSION} from '../core/build-info';
@@ -8,6 +9,8 @@ import {APP_VERSION} from '../core/build-info';
     styleUrls: ['./platform-selector.component.scss']
 })
 export class PlatformSelectorComponent {
+    readonly minimal = AppConfig.minimal;
+    readonly appName = AppConfig.appName;
     readonly appVersion = APP_VERSION;
 
     constructor(private router: Router) {}

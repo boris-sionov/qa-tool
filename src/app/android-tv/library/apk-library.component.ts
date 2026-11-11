@@ -9,21 +9,22 @@ import {BuildKind, RELEASE_PAGES} from '../../core/services/confluence.service';
 import {PickedBuild} from '../../shared/components/confluence-builds/confluence-builds.component';
 import {PickedRelease} from './firebase-builds.component';
 
-export type Tab = 'store' | 'uat' | 'prodDebug' | 'firebase';
+export type Tab = 'store' | 'uat' | 'prod' | 'firebase';
 
 /** The store app — the only package the freetv-server library holds. */
 const STORE_PACKAGE = 'tv.freetv.androidtv';
 
 /**
  * The builds on "Releases Android TV" the dialog offers, told apart by file name. PROD itself is
- * the store tab; Confluence supplies UAT and the PROD debug build. `.aab` bundles are not installable.
+ * the store tab; Confluence supplies UAT and PROD, each with its debug build. `.aab` bundles are not installable.
  */
-const ANDROID_KINDS: Record<'uat' | 'prodDebug', BuildKind[]> = {
+const ANDROID_KINDS: Record<'uat' | 'prod', BuildKind[]> = {
     uat: [
         {label: 'UAT', match: /-nodebugTesting-FreeTVUat-.*\.apk$/},
         {label: 'UAT', debug: true, match: /-debug(?:Testing|Developer)-FreeTVUat-.*\.apk$/},
     ],
-    prodDebug: [
+    prod: [
+        {label: 'PROD', match: /-release-FreeTVProd-.*\.apk$/},
         {label: 'PROD', debug: true, match: /-debug(?:Testing|Developer)-FreeTVProd-.*\.apk$/},
     ],
 };
@@ -55,7 +56,7 @@ export interface LibraryRow {
 
 /**
  * FreeTV builds to install, in four tabs. Store / PROD is every Google-signed store build in the
- * team's library on freetv-server, the live one marked. UAT (debug included) and PROD Debug are
+ * team's library on freetv-server, the live one marked. UAT and PROD (debug included) are
  * the newest builds from the "Releases Android TV" Confluence page. Firebase is the releases in
  * Firebase App Distribution, signed in with Google. Closes with
  * a {@link LibraryPick}; the caller installs it.
@@ -77,7 +78,9 @@ export class ApkLibraryComponent implements OnInit {
     uploading: string | null = null;
     error: string | null = null;
     /** Why a server library did not answer, when it is Tailscale rather than the server. */
-    tailscale: 'stopped' | 'needs-login' | 'missing' | 'waiting' | null = null;
+    /** Set when a server library did not answer and Tailscale is the reason. */
+    tailscale: 'down' | 'dns' | null = null;
+    host = '';
     /** The library did not answer although Tailscale is up (or it is a folder). */
     unreachable: string | null = null;
     private all: LibraryRow[] = [];
@@ -128,24 +131,12 @@ export class ApkLibraryComponent implements OnInit {
             this.all = [];
             this.unreachable = extractMessage(e, 'Could not read the library');
             if (/^https?:/.test(this.source.trim())) {
-                const state = await this.adb.tailscaleState().catch(() => 'running' as const);
-                if (state !== 'running') this.tailscale = state;
+                this.host = new URL(this.source.trim()).hostname;
+                const state = await this.adb.tailscaleState(this.host).catch(() => 'up' as const);
+                this.tailscale = state === 'up' ? null : state;
             }
         } finally {
             this.loading = false;
-        }
-    }
-
-    /** Runs `tailscale up`, then loads the list. */
-    async tailscaleUp(): Promise<void> {
-        this.tailscale = 'waiting';
-        this.error = null;
-        try {
-            await this.adb.tailscaleUp();
-            await this.load();
-        } catch (e) {
-            this.tailscale = 'stopped';
-            this.error = extractMessage(e, 'tailscale up failed');
         }
     }
 

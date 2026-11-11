@@ -1,4 +1,5 @@
 import {NgModule} from '@angular/core';
+import {AppConfig} from '../environments/environment';
 import {RouterModule, Routes} from '@angular/router';
 import {LgComponent} from './lg/lg.component';
 import {NavMoreComponent} from './lg/nav-more/nav-more.component';
@@ -34,10 +35,11 @@ const routes: Routes = [
         path: 'vidaa',
         loadChildren: () => import('./vidaa/vidaa.module').then(m => m.VidaaModule),
     },
-    {
+    // The minimal build has no Android Phone.
+    ...(AppConfig.minimal ? [] : [{
         path: 'android-phone',
         loadChildren: () => import('./android-phone/android-phone.module').then(m => m.AndroidPhoneModule),
-    },
+    }]),
 {path: '**', redirectTo: ''},
 ];
 

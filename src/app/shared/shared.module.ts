@@ -15,6 +15,10 @@ import {FilesizePipe} from "./pipes/filesize.pipe";
 import {ConfluenceBuildsComponent} from './components/confluence-builds/confluence-builds.component';
 import {ConfluenceBuildsDialogComponent} from './components/confluence-builds/confluence-builds-dialog.component';
 
+import {ListFilterComponent} from './components/list-filter/list-filter.component';
+
+import {AppListHeaderComponent} from './components/app-list-header/app-list-header.component';
+
 @NgModule({
     declarations: [
         PageNotFoundComponent,
@@ -28,6 +32,8 @@ import {ConfluenceBuildsDialogComponent} from './components/confluence-builds/co
         StatStorageInfoComponent,
         ConfluenceBuildsComponent,
         ConfluenceBuildsDialogComponent,
+        ListFilterComponent,
+        AppListHeaderComponent,
     ],
     imports: [CommonModule, FormsModule, NgbModule,
         ExternalLinkDirective],
@@ -43,6 +49,8 @@ import {ConfluenceBuildsDialogComponent} from './components/confluence-builds/co
         StatStorageInfoComponent,
         ConfluenceBuildsComponent,
         ConfluenceBuildsDialogComponent,
+        ListFilterComponent,
+        AppListHeaderComponent,
     ]
 })
 export class SharedModule {

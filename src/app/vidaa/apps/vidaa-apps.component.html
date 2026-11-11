@@ -18,8 +18,8 @@
             <span class="spinner-mini me-2"></span>
             <span>Installing...</span>
           } @else {
-            <i class="bi bi-link-45deg me-2"></i>
-            <span>Install App</span>
+            <i class="bi bi-folder-fill me-2"></i>
+            <span>Install</span>
           }
         </button>
       </div>
@@ -67,6 +67,7 @@
           <div class="installed-apps-panel">
             <div class="installed-apps-header">
               <h3>Install from a URL</h3>
+              @if (!minimal) {
               <select class="modern-input preset-select" name="preset" [ngModel]="''" (ngModelChange)="fillPreset($event)"
                       title="Fill the fields with a FreeTV build">
                 <option value="" disabled>Fill with a FreeTV build…</option>
@@ -74,6 +75,7 @@
                   <option [value]="preset.url">{{ preset.environment }}</option>
                 }
               </select>
+              }
             </div>
             <form class="custom-form" (ngSubmit)="installCustom()">
               <input class="modern-input" name="name" placeholder="App name (letters, digits, spaces)" [(ngModel)]="custom.name" required>
@@ -95,23 +97,19 @@
           </div>
         }
 
-        <div class="tizen-header">
-          <div>
-            <div class="tizen-kicker">Hisense VIDAA</div>
-            <h2>Installed Apps</h2>
-          </div>
-        </div>
+        <app-list-header kicker="Hisense VIDAA" [shown]="shownApps.length" [total]="apps.length"
+                         [(search)]="search" (refresh)="reload()"></app-list-header>
 
         @if (apps.length === 0) {
           <div class="tizen-empty-state">
             <i class="bi bi-inbox"></i>
             <h3>No apps installed</h3>
-            <p>There are no sideloaded apps on this TV. Use <strong>Install App</strong> to add one.</p>
+            <p>There are no sideloaded apps on this TV. Use <strong>Install</strong> to add one.</p>
           </div>
         } @else {
-          <div class="tizen-app-list">
-            @for (app of apps; track app.Id) {
-              <article class="tizen-app-row">
+          <div class="app-list">
+            @for (app of shownApps; track app.Id) {
+              <article class="app-row">
                 <div class="app-identity">
                   <div class="app-icon-frame">
                     @if (app.IconURL) {
@@ -156,14 +154,14 @@
                     }
                     <span>Launch</span>
                   </button>
-                  <button class="app-action warning" type="button" aria-label="Close" (click)="close(app)" [disabled]="!!busy"
+                  <button class="app-action warning" type="button" aria-label="Kill" (click)="close(app)" [disabled]="!!busy"
                           title="Closes the app on screen and returns the TV to its home screen">
                     @if (busy === 'close:' + app.Id) {
                       <span class="spinner-mini"></span>
                     } @else {
                       <i class="bi bi-stop-fill"></i>
                     }
-                    <span>Close</span>
+                    <span>Kill</span>
                   </button>
                   <button class="app-action danger" type="button" aria-label="Remove" (click)="remove(app)" [disabled]="!!busy">
                     <i class="bi bi-trash"></i>

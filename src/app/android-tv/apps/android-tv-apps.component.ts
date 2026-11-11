@@ -1,3 +1,5 @@
+import {matches} from '../../shared/components/list-filter/list-filter.component';
+import {AppConfig} from '../../../environments/environment';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {noop, Subscription} from 'rxjs';
@@ -19,8 +21,10 @@ const REPLACE_REFUSED = /INSTALL_FAILED_UPDATE_INCOMPATIBLE|INSTALL_FAILED_VERSI
     styleUrls: ['./android-tv-apps.component.scss']
 })
 export class AndroidTvAppsComponent implements OnInit, OnDestroy {
+    readonly minimal = AppConfig.minimal;
 
     packages: AdbPackageInfo[] | null = null;
+    search = '';
     packagesError?: Error;
     loading = false;
     selected: SavedDevice | null = null;
@@ -48,6 +52,10 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
      * Resolved here rather than in `iconPath`, which the template calls on every row on every
      * change-detection pass.
      */
+    get shown(): AdbPackageInfo[] {
+        return (this.packages ?? []).filter(p => matches(this.search, p.name, p.id));
+    }
+
     private setPackages(packages: AdbPackageInfo[] | null): void {
         this.packages = packages;
         this.iconPaths = new Map((packages ?? []).flatMap(pkg => {

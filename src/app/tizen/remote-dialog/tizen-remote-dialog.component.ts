@@ -1,9 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {SdbAppInfo} from '../../core/services/sdb.service';
 import {TizenRemoteService} from '../../core/services/tizen-remote.service';
 import {TizenDevice} from '../tizen-state.service';
-import {TizenStressWizardComponent} from '../stress-wizard/tizen-stress-wizard.component';
 
 @Component({
     selector: 'app-tizen-remote-dialog',
@@ -12,7 +10,6 @@ import {TizenStressWizardComponent} from '../stress-wizard/tizen-stress-wizard.c
 })
 export class TizenRemoteDialogComponent {
     @Input() device!: TizenDevice;
-    @Input() wgtApps: SdbAppInfo[] = [];
     @Input() serial = '';
 
     pressing: string | null = null;
@@ -35,16 +32,5 @@ export class TizenRemoteDialogComponent {
         } finally {
             this.pressing = null;
         }
-    }
-
-    openStress(): void {
-        this.modal.dismiss();
-        const ref = this.modalService.open(TizenStressWizardComponent, {
-            size: 'lg', centered: true, backdrop: 'static',
-        });
-        const inst = ref.componentInstance as TizenStressWizardComponent;
-        inst.apps = this.wgtApps;
-        inst.serial = this.serial;
-        inst.device = this.device;
     }
 }

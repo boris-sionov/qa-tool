@@ -17,10 +17,14 @@ env:
 
 jobs:
   release:
-    name: Build & Release (${{ matrix.target }})
+    name: Build & Release (${{ matrix.target }}, ${{ matrix.variant }})
     strategy:
       fail-fast: false
       matrix:
+        # `full` is QA Tool; `minimal` is QA Tool Lite, which hides the library / Confluence installs, the Samsung
+        # remote and LG's SSAP pairing (see "Minimal Build" in AGENTS.md).
+        variant: [ full, minimal ]
+        target: [ windows-x64, windows-arm64, linux-x86_64, linux-arm64, macos ]
         include:
           - target: windows-x64
             os: windows-latest
@@ -35,8 +39,20 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      QA_TOOL_MINIMAL: ${{ matrix.variant == 'minimal' && '1' || '0' }}
+
     steps:
       - uses: actions/checkout@v4
+
+      # QA Tool Lite has its own name and identifier (scripts/minimal-config.js), so it installs
+      # next to QA Tool and keeps its own saved devices.
+      - name: Name the app (Lite)
+        if: matrix.variant == 'minimal'
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then arg=linux; else arg=; fi
+          echo "TAURI_CONFIG=$(node scripts/minimal-config.js $arg)" >> "$GITHUB_ENV"
 
       - name: Install Required Packages (Linux)
         if: startsWith(matrix.target, 'linux')
@@ -157,6 +173,8 @@ jobs:
           # No globstar: macOS ships bash 3.2. Bundles sit in target/release or target/<triple>/release.
           shopt -s nullglob
           version=$(node -p "require('./package.json').version")
+          # Lite builds get their own file names, so both variants sit side by side on a release.
+          if [ "$QA_TOOL_MINIMAL" = "1" ]; then base=QA-Tool-Lite; else base=QA-Tool; fi
           mkdir -p release-files
           for f in target/release/bundle/*/* target/*/release/bundle/*/*; do
             case "$f" in *.deb|*.rpm|*.AppImage|*.msi|*.exe|*.dmg) ;; *) continue ;; esac
@@ -174,7 +192,7 @@ jobs:
               *.exe) suffix=-setup.exe ;;
               *)     suffix=.${name##*.} ;;
             esac
-            cp "$f" "release-files/QA-Tool_${version}_${platform}${suffix}"
+            cp "$f" "release-files/${base}_${version}_${platform}${suffix}"
           done
           ls -l release-files
 
@@ -182,7 +200,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: github.event_name != 'release'
         with:
-          name: ${{ matrix.target }}-package
+          name: ${{ matrix.target }}-${{ matrix.variant }}-package
           path: release-files/*
 
       - name: Attach to Release

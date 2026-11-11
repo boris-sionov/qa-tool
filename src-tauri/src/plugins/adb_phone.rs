@@ -77,7 +77,8 @@ pub(crate) async fn adb_list_usb_devices<R: Runtime>(app: AppHandle<R>) -> Resul
     Ok(parse_usb_devices(&run_adb(&app, &["devices", "-l"]).await?))
 }
 
-/// The installed packages that match `patterns`, with their version names. `name` is the id; the
+/// The installed packages that match `patterns`, with their version names. No patterns means every
+/// package the user installed (`pm list packages -3`, system apps left out). `name` is the id; the
 /// frontend owns the display names.
 #[tauri::command]
 pub(crate) async fn adb_list_packages_matching<R: Runtime>(
@@ -85,10 +86,14 @@ pub(crate) async fn adb_list_packages_matching<R: Runtime>(
     serial: String,
     patterns: Vec<String>,
 ) -> Result<Vec<AdbPackageInfo>, Error> {
-    let ids: Vec<String> = package_ids(&run_adb(&app, &["-s", &serial, "shell", "pm", "list", "packages"]).await?)
-        .into_iter()
-        .filter(|id| patterns.iter().any(|p| matches_pattern(id, p)))
-        .collect();
+    let ids: Vec<String> = if patterns.is_empty() {
+        package_ids(&run_adb(&app, &["-s", &serial, "shell", "pm", "list", "packages", "-3"]).await?)
+    } else {
+        package_ids(&run_adb(&app, &["-s", &serial, "shell", "pm", "list", "packages"]).await?)
+            .into_iter()
+            .filter(|id| patterns.iter().any(|p| matches_pattern(id, p)))
+            .collect()
+    };
     let versions = join_all(ids.iter().map(|id| {
         let app = app.clone();
         let serial = serial.clone();

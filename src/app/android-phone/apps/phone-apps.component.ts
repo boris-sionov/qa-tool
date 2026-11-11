@@ -1,8 +1,9 @@
+import {matches} from '../../shared/components/list-filter/list-filter.component';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AdbPackageInfo, AdbService} from '../../core/services/adb.service';
-import {PHONE_APPS, phoneAppIcon, PhoneService} from '../phone.service';
+import {phoneAppIcon, PhoneService} from '../phone.service';
 import {phoneName, PhoneStateService} from '../phone-state.service';
 import {mirrorPhone} from '../scrcpy-help/scrcpy-help.component';
 import {MessageDialogComponent} from '../../shared/components/message-dialog/message-dialog.component';
@@ -24,7 +25,7 @@ function fileName(path: string): string {
     return path.split(/[\\/]/).pop() ?? path;
 }
 
-/** The `PHONE_APPS` installed on the current phone, with Launch / Kill / Remove, Install APK and Mirror. */
+/** The apps the user installed on the current phone, with Launch / Kill / Remove, Install and Mirror. */
 @Component({
     selector: 'app-phone-apps',
     templateUrl: './phone-apps.component.html',
@@ -34,9 +35,13 @@ export class PhoneAppsComponent implements OnInit, OnDestroy {
 
     /** The phone whose apps are listed, or '' while there is none ready. */
     serial = '';
+    get shown(): AdbPackageInfo[] {
+        return (this.packages ?? []).filter(p => matches(this.search, p.name, p.id));
+    }
+
     packages: AdbPackageInfo[] | null = null;
+    search = '';
     error?: Error;
-    readonly appNames = PHONE_APPS.map(a => a.name).join(' and ');
     readonly icon = phoneAppIcon;
     readonly name = phoneName;
     private sub?: Subscription;

@@ -11,5 +11,5 @@ fn main() {
             .filter_level(LevelFilter::Debug)
             .init();
     }
-    devman::run();
+    qa_tool::run();
 }

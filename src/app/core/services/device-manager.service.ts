@@ -164,7 +164,7 @@ export class DeviceManagerService extends BackendClient {
     async takeScreenshot(device: DeviceLike, method: ScreenshotMethod = 'DISPLAY'): Promise<string> {
         // See app-manager.service.ts: /tmp is not readable/writable by `prisoner`
         // on newer webOS builds, so keep captures in the developer home.
-        const tmpPath = `/media/developer/temp/devman_shot_${Date.now()}.png`
+        const tmpPath = `/media/developer/temp/qa-tool_shot_${Date.now()}.png`
         const param: Record<string, any> = {
             path: tmpPath,
             method: method,
