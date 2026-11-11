@@ -16,20 +16,24 @@
   &.compact { --tile: 56px; gap: 12px; width: 88px; padding: 16px 0; }
 }
 
-.home-btn {
+// Home is a tile like the logos, so the rail reads as one column; a hairline sets it apart.
+.divider {
   flex: none;
-  width: 40px;
-  height: 40px;
-  margin-bottom: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #A8B8CC;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
+  width: 32px;
+  height: 1px;
+  margin: -2px 0;
+  background: rgba(255, 255, 255, 0.1);
+}
 
-  &:hover { color: #fff; border-color: rgba(255, 255, 255, 0.25); }
-  &:focus-visible { outline: 2px solid #5B9FF5; outline-offset: 2px; }
+.home-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #16275A 0%, #0A1230 100%);
+  border: 2px solid rgba(91, 159, 245, 0.7);
+  box-shadow: 0 0 14px rgba(91, 159, 245, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  i { font-size: calc(var(--tile) * 0.42); color: #fff; }
 }
 
 .tile {

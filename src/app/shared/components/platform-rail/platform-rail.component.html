@@ -1,9 +1,9 @@
 <nav class="rail" [class.compact]="compact" aria-label="Platforms">
-  @if (compact) {
-    <button class="home-btn" type="button" title="Home" aria-label="Home" (click)="home()">
-      <i class="bi bi-grid-3x3-gap"></i>
-    </button>
-  }
+  <button class="tile home-tile" type="button" [class.active]="active === ''" [attr.aria-pressed]="active === ''"
+          aria-label="Home" title="Home" (click)="goHome()">
+    <i class="bi bi-house-door-fill"></i>
+  </button>
+  <span class="divider"></span>
   @for (p of platforms; track p.id) {
     <button class="tile" type="button" [class.active]="p.id === active" [attr.aria-pressed]="p.id === active"
             [attr.aria-label]="p.name" [title]="p.name" (click)="pick(p)">

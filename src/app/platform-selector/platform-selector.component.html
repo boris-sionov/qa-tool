@@ -1,9 +1,10 @@
 <div class="home">
-  <app-platform-rail [active]="current.id" [navigate]="false" (picked)="select($event)"></app-platform-rail>
+  <app-platform-rail [active]="current?.id ?? ''" [navigate]="false" (picked)="select($event)" (homePicked)="select(null)"></app-platform-rail>
 
   <main class="stage">
     <div class="aura"></div>
 
+    @if (current) {
     <section class="panel" [attr.aria-label]="current.name">
       <div class="hero">
         <img [src]="'assets/platform-logos/' + current.logo" [alt]="current.name">
@@ -42,6 +43,31 @@
         }
       </div>
     </section>
+    } @else {
+    <section class="overview" [attr.aria-label]="appName">
+      <h1>{{ appName }}</h1>
+      <p class="lead">
+        Install, launch and inspect apps on the TVs and phones you test, from one window: Android TV,
+        LG webOS, Samsung Tizen, VIDAA and Android phones.
+      </p>
+
+      <ul class="features">
+        <li><i class="bi bi-box-arrow-in-down"></i><b>Install</b><span>An APK, WGT or IPK straight onto the device</span></li>
+        <li><i class="bi bi-play-circle"></i><b>Launch and stop</b><span>Start, kill or remove any installed app</span></li>
+        <li><i class="bi bi-bug"></i><b>Inspect</b><span>Open DevTools on an app that is running</span></li>
+        <li><i class="bi bi-wifi"></i><b>Find TVs</b><span>Scan the network, no addresses to type</span></li>
+      </ul>
+
+      <div class="start">
+        <span>Pick a platform to begin</span>
+        @for (p of platforms; track p.id) {
+          <button type="button" [attr.aria-label]="p.name" [title]="p.name" (click)="select(p)">
+            <img [src]="'assets/platform-logos/' + p.logo" alt="">
+          </button>
+        }
+      </div>
+    </section>
+    }
 
     <div class="footer">
       {{ appName }} v{{ appVersion }}

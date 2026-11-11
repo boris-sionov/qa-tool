@@ -3,8 +3,9 @@ import {Router} from '@angular/router';
 import {AVAILABLE_PLATFORMS, PlatformInfo} from '../../platforms';
 
 /**
- * The column of platform logos on the home page and beside every platform's pages. `navigate`
- * (the default) opens the platform's route; the home page turns it off and handles `picked` itself.
+ * The column of platform logos on the home page and beside every platform's pages, headed by a Home
+ * tile (`active=""`). `navigate` (the default) opens the route; the home page turns it off and
+ * handles `picked` / `homePicked` itself.
  */
 @Component({
     selector: 'app-platform-rail',
@@ -15,10 +16,11 @@ import {AVAILABLE_PLATFORMS, PlatformInfo} from '../../platforms';
 export class PlatformRailComponent {
     readonly platforms = AVAILABLE_PLATFORMS;
     @Input() active = '';
-    /** Smaller tiles and a button back to the home page, for the platform pages. */
+    /** Smaller tiles, for the platform pages. */
     @Input() compact = false;
     @Input() navigate = true;
     @Output() picked = new EventEmitter<PlatformInfo>();
+    @Output() homePicked = new EventEmitter<void>();
 
     constructor(private router: Router) {}
 
@@ -27,7 +29,8 @@ export class PlatformRailComponent {
         if (this.navigate) void this.router.navigate([p.route]);
     }
 
-    home(): void {
-        void this.router.navigate(['/']);
+    goHome(): void {
+        this.homePicked.emit();
+        if (this.navigate) void this.router.navigate(['/']);
     }
 }
