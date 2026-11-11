@@ -38,17 +38,11 @@ rect { fill: none; stroke: var(--spin); stroke-linecap: round; }
 
 .track { stroke-width: 4; opacity: 0.14; }
 
-// The lights chase round the edge; the dash lengths are fractions of each square's perimeter.
-.chase { stroke-width: 5; }
-.outer { stroke-dasharray: 70 205.4; animation: chase-outer 1.8s linear infinite; }
-.inner { stroke-width: 4; opacity: 0.6; stroke-dasharray: 40 138.8; animation: chase-inner 1.4s linear infinite; }
-
-.core {
-  fill: var(--spin);
-  stroke: none;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: pulse 1.8s ease-in-out infinite;
+// One light runs round the edge (the dash is a fraction of the square's perimeter), clockwise.
+.chase {
+  stroke-width: 6;
+  stroke-dasharray: 90 185.4;
+  animation: run 1.5s linear infinite;
 }
 
 :host(.md) .glyph, :host(.lg) .glyph {
@@ -56,11 +50,10 @@ rect { fill: none; stroke: var(--spin); stroke-linecap: round; }
 }
 :host(.lg) .glyph { filter: drop-shadow(0 0 18px color-mix(in srgb, var(--spin) 60%, transparent)); }
 
-// Inline, next to text, only the chasing edge is left.
+// Inline, next to text, the stroke is thicker so it still reads at 1em.
 :host(.sm) {
-  .inner, .core { display: none; }
   .track { stroke-width: 10; }
-  .outer { stroke-width: 12; }
+  .chase { stroke-width: 13; }
 }
 
 .label {
@@ -68,17 +61,12 @@ rect { fill: none; stroke: var(--spin); stroke-linecap: round; }
   font-size: 0.875rem;
   letter-spacing: 0.02em;
 }
-:host(.center) .label { color: #DCE6F5; font-size: 1rem; font-weight: 500; letter-spacing: 0.03em; }
+:host(.center) .label, :host(.caption) .label { color: #DCE6F5; font-size: 1rem; font-weight: 500; letter-spacing: 0.03em; }
+:host(.caption) { flex-direction: column; gap: 14px; }
 :host(.inherit) .label { color: inherit; }
 
-@keyframes chase-outer { to { stroke-dashoffset: -275.4; } }
-@keyframes chase-inner { to { stroke-dashoffset: 178.8; } }
-@keyframes pulse {
-  0%, 100% { transform: scale(0.8); opacity: 0.7; }
-  50% { transform: scale(1.25); opacity: 1; }
-}
+@keyframes run { to { stroke-dashoffset: -275.4; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .outer, .inner { animation-duration: 6s; }
-  .core { animation: none; }
+  .chase { animation-duration: 6s; }
 }
