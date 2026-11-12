@@ -21,13 +21,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # `full` is QA Tool; `minimal` is QA Tool Lite (see release.yml).
-        variant: [ full, minimal ]
+        # `full` is QA Tool; `minimal` is QA Tool Lite (see release.yml). Spelled out: an `include`
+        # entry added to a `variant` dimension overwrites the previous one, leaving two jobs.
         include:
           - os: ubuntu-24.04
+            variant: full
           - os: macos-latest
+            variant: full
           - os: windows-latest
+            variant: full
           - os: windows-latest
+            variant: full
+            rust-target: aarch64-pc-windows-msvc
+          - os: ubuntu-24.04
+            variant: minimal
+          - os: macos-latest
+            variant: minimal
+          - os: windows-latest
+            variant: minimal
+          - os: windows-latest
+            variant: minimal
             rust-target: aarch64-pc-windows-msvc
 
     runs-on: ${{ matrix.os }}
