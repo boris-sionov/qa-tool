@@ -7,6 +7,7 @@ import {extractMessage} from '../../../core/utils/error.utils';
 import {ExternalLinkDirective} from '../../directives';
 import {FixGuide, fixGuidesFor, osLabel} from './tizen-fix-guides';
 import {changedChecks, loadSavedCheck, saveCheck} from './saved-check';
+import {SpinnerComponent} from '../spinner/spinner.component';
 
 /**
  * Lists what the Samsung flows need installed on this machine — sdb, Tizen Studio, its CLI and
@@ -18,7 +19,7 @@ import {changedChecks, loadSavedCheck, saveCheck} from './saved-check';
 @Component({
     selector: 'app-tizen-prerequisites',
     standalone: true,
-    imports: [CommonModule, ExternalLinkDirective],
+    imports: [SpinnerComponent, CommonModule, ExternalLinkDirective],
     templateUrl: './tizen-prerequisites.component.html',
     styleUrls: ['./tizen-prerequisites.component.scss'],
 })

@@ -1,0 +1,72 @@
+:host {
+  --glyph: 40px;
+  --spin: #5B9FF5;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  vertical-align: middle;
+  color: var(--spin);
+}
+
+:host(.inherit) { --spin: currentColor; color: inherit; }
+:host(.sm) { --glyph: 1.15em; }
+:host(.md) { --glyph: 40px; }
+:host(.lg) { --glyph: 132px; }
+
+// A page is loading: the middle of the app window, over the page, never in the way of a click.
+:host(.center) {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(11, 17, 32, 0.82) 0, rgba(11, 17, 32, 0.45) 22%, transparent 48%);
+}
+
+.glyph {
+  display: block;
+  flex: none;
+  width: var(--glyph);
+  height: var(--glyph);
+}
+
+svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+rect { fill: none; stroke: var(--spin); stroke-linecap: round; }
+
+.track { stroke-width: 4; opacity: 0.14; }
+
+// One light runs round the edge (the dash is a fraction of the square's perimeter), clockwise.
+.chase {
+  stroke-width: 6;
+  stroke-dasharray: 90 185.4;
+  animation: run 1.5s linear infinite;
+}
+
+:host(.md) .glyph, :host(.lg) .glyph {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--spin) 55%, transparent));
+}
+:host(.lg) .glyph { filter: drop-shadow(0 0 18px color-mix(in srgb, var(--spin) 60%, transparent)); }
+
+// Inline, next to text, the stroke is thicker so it still reads at 1em.
+:host(.sm) {
+  .track { stroke-width: 10; }
+  .chase { stroke-width: 13; }
+}
+
+.label {
+  color: #A8B8CC;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+}
+:host(.center) .label, :host(.caption) .label { color: #DCE6F5; font-size: 1rem; font-weight: 500; letter-spacing: 0.03em; }
+:host(.caption) { flex-direction: column; gap: 14px; }
+:host(.inherit) .label { color: inherit; }
+
+@keyframes run { to { stroke-dashoffset: -275.4; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .chase { animation-duration: 6s; }
+}

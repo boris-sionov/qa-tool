@@ -10,7 +10,7 @@
   </p>
 
   <div class="approval-status">
-    <span class="spinner-mini"></span>
+    <app-spinner size="sm"></app-spinner>
     <span>Waiting for the TV…</span>
   </div>
 
@@ -22,7 +22,7 @@
     </p>
   }
   <button class="approval-btn" type="button" (click)="showPromptAgain()" [disabled]="reprompting">
-    @if (reprompting) { <span class="spinner-mini"></span> } @else { <i class="bi bi-arrow-repeat"></i> }
+    @if (reprompting) { <app-spinner size="sm" tone="inherit"></app-spinner> } @else { <i class="bi bi-arrow-repeat"></i> }
     <span>Show the prompt again</span>
   </button>
 </div>

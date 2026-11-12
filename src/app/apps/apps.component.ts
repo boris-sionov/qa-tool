@@ -25,6 +25,7 @@ const LG_TABS: BuildTab[] = [
 import {HbchannelRemoveComponent} from "./hbchannel-remove/hbchannel-remove.component";
 import {DetailsComponent} from "./details/details.component";
 import {InstalledComponent} from "./installed/installed.component";
+import {InstallSource} from '../shared/components/install-menu/install-menu.component';
 
 @Component({
     selector: 'app-apps',
@@ -33,6 +34,7 @@ import {InstalledComponent} from "./installed/installed.component";
 })
 export class AppsComponent implements OnInit, OnDestroy {
     readonly minimal = AppConfig.minimal;
+    readonly installSources: InstallSource[] = [{id: 'file', label: 'From file', icon: 'bi-folder2-open'}, ...(AppConfig.minimal ? [] : [{id: 'confluence', label: 'From Confluence', icon: 'bi-journal-arrow-down', hint: 'The newest UAT or PREPROD build from Confluence'}])];
 
     packages$?: Observable<PackageInfo[] | null>;
     device: Device | null = null;
@@ -82,6 +84,10 @@ export class AppsComponent implements OnInit, OnDestroy {
         // Developer apps only: the full TV list needs the remote-control pairing, which makes the
         // TV ask for confirmation.
         this.appManager.load(device).catch(noop);
+    }
+
+    install(source: string): void {
+        void (source === 'confluence' ? this.installFromConfluence() : this.openInstallChooser());
     }
 
     async openInstallChooser(): Promise<void> {

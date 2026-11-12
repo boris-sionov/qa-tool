@@ -8,6 +8,7 @@ import {errorMessage, VidaaApp, VidaaResolution, VidaaService, VidaaState} from 
 import {MessageDialogComponent} from '../../shared/components/message-dialog/message-dialog.component';
 import {appEnvironment, isPriorityApp} from '../../shared/known-apps';
 import {DEVTOOLS_PORTS, devtoolsLauncher, devtoolsUpstream, launcherTarget, presetForUrl, VIDAA_PRESETS} from '../vidaa-presets';
+import {InstallSource} from '../../shared/components/install-menu/install-menu.component';
 
 @Component({
     selector: 'app-vidaa-apps',
@@ -17,6 +18,7 @@ import {DEVTOOLS_PORTS, devtoolsLauncher, devtoolsUpstream, launcherTarget, pres
 })
 export class VidaaAppsComponent implements OnInit, OnDestroy {
     readonly minimal = AppConfig.minimal;
+    readonly installSources: InstallSource[] = [{id: 'form', label: 'Install', icon: 'bi-download', hint: 'Install an app from a URL'}];
     readonly presets = VIDAA_PRESETS;
     state!: VidaaState;
 

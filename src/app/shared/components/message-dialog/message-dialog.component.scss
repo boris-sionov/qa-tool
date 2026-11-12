@@ -1,3 +1,4 @@
+@use '../../../../styles/btn' as *;
 // Design tokens
 $bg-dark: #0F172B;
 $bg-light: #1a2744;
@@ -210,74 +211,11 @@ $border-color: rgba(91, 159, 245, 0.2);
 }
 
 .dialog-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  border: 1.5px solid transparent;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-family: 'Segoe UI', 'San Francisco', -apple-system, sans-serif;
-  white-space: nowrap;
-  min-width: 70px;
+  @include btn-base(44px);
+  padding: 0 18px;
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed !important;
-  }
-
-  // Primary positive button
-  &.positive-primary {
-    background: linear-gradient(135deg, $primary-blue 0%, $accent-purple 100%);
-    color: white;
-    box-shadow: 0 4px 14px rgba(91, 159, 245, 0.25);
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(91, 159, 245, 0.4);
-    }
-  }
-
-  // Danger positive button
-  &.positive-danger {
-    background: linear-gradient(135deg, $accent-red 0%, #FF5252 100%);
-    color: white;
-    box-shadow: 0 4px 14px rgba(255, 107, 107, 0.25);
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-    }
-  }
-
-  // Negative / Cancel button
-  &.negative {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-secondary;
-    border-color: rgba(255, 255, 255, 0.1);
-
-    &:hover:not(:disabled) {
-      background: rgba(91, 159, 245, 0.12);
-      color: $primary-blue;
-      border-color: rgba(91, 159, 245, 0.3);
-      transform: translateY(-2px);
-    }
-  }
-
-  // Alternative button
-  &.alternative {
-    background: rgba(91, 159, 245, 0.12);
-    color: $primary-blue;
-    border-color: rgba(91, 159, 245, 0.3);
-
-    &:hover:not(:disabled) {
-      background: rgba(91, 159, 245, 0.2);
-      border-color: $primary-blue;
-      transform: translateY(-2px);
-    }
-  }
+  &.positive-primary { @include btn-primary; }
+  &.positive-danger { @include btn-danger-solid; }
+  &.negative, &.alternative { @include btn-secondary; }
 }
+

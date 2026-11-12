@@ -2,10 +2,7 @@
   @if (!serial) {
     <app-phone-status></app-phone-status>
   } @else if (loading) {
-    <div class="loading-state">
-      <div class="spinner-modern"></div>
-      <p>Loading phone information...</p>
-    </div>
+    <app-spinner size="lg" [center]="true"></app-spinner>
   } @else if (error) {
     <div class="error-state">
       <div class="error-icon">

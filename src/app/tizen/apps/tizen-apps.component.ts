@@ -27,6 +27,7 @@ const TIZEN_TABS: BuildTab[] = [
 ];
 import {info as logInfo, warn as logWarn} from '@tauri-apps/plugin-log';
 import {renderEnvironmentBadge, renderEnvironmentBadgeUrl, readIcon} from '../../shared/environment-badge';
+import {InstallSource} from '../../shared/components/install-menu/install-menu.component';
 
 @Component({
     selector: 'app-tizen-apps',
@@ -35,6 +36,7 @@ import {renderEnvironmentBadge, renderEnvironmentBadgeUrl, readIcon} from '../..
 })
 export class TizenAppsComponent implements OnInit, OnDestroy {
     readonly minimal = AppConfig.minimal;
+    readonly installSources: InstallSource[] = [{id: 'file', label: 'From file', icon: 'bi-folder2-open'}, ...(AppConfig.minimal ? [] : [{id: 'confluence', label: 'From Confluence', icon: 'bi-journal-arrow-down', hint: 'The newest UAT or PREPROD build from Confluence'}])];
     selected: TizenDevice | null = null;
     devices: TizenDevice[] = [];
     apps: SdbAppInfo[] | null = null;
@@ -236,6 +238,10 @@ export class TizenAppsComponent implements OnInit, OnDestroy {
             tizenLog('could not draw the environment icon', e);
             return null;
         }
+    }
+
+    install(source: string): void {
+        void (source === 'confluence' ? this.installFromConfluence() : this.installWgt());
     }
 
     async installWgt(): Promise<void> {

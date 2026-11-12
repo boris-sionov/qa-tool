@@ -1,0 +1,145 @@
+// The one button set. Every button family in the app (Bootstrap's `.btn`, the app-list row
+// buttons, the wizard / device / dialog buttons) builds on these mixins, so a button looks the same
+// wherever it is: a solid accent for the main action, glass for the rest, soft red for Remove, soft
+// amber for Kill. `@use '…/styles/btn' as *;` in a component stylesheet, then `@include btn-…`.
+
+@mixin btn-base($height: 44px) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: $height;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease,
+    color 0.18s ease, transform 0.18s ease, filter 0.18s ease;
+
+  i.bi { font-size: 17px; line-height: 1; }
+
+  &:focus { outline: none; }
+  &:focus-visible { outline: 2px solid rgba(91, 159, 245, 0.75); outline-offset: 2px; }
+
+  &:disabled, &.disabled, &[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    filter: none;
+  }
+}
+
+@mixin btn-sm { height: 36px; padding: 0 14px; font-size: 13px; border-radius: 10px; i.bi { font-size: 15px; } }
+@mixin btn-lg { height: 52px; padding: 0 28px; font-size: 15px; }
+@mixin btn-icon($size: 38px) { width: $size; height: $size; padding: 0; }
+
+@mixin btn-primary {
+  --bs-btn-disabled-bg: #5B9FF5;
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  background: linear-gradient(180deg, #6BAAF8 0%, #4C8EEA 100%);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 16px -6px rgba(91, 159, 245, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: #fff;
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -8px rgba(91, 159, 245, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  &:active:not(:disabled):not(.disabled) { transform: translateY(0); filter: brightness(0.96); }
+}
+
+@mixin btn-secondary {
+  --bs-btn-disabled-bg: rgba(255, 255, 255, 0.06);
+  --bs-btn-disabled-color: #DCE6F5;
+  --bs-btn-disabled-border-color: rgba(255, 255, 255, 0.12);
+  color: #DCE6F5;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: #fff;
+    background: rgba(91, 159, 245, 0.14);
+    border-color: rgba(91, 159, 245, 0.5);
+    transform: translateY(-1px);
+  }
+  &:active:not(:disabled):not(.disabled) { transform: translateY(0); }
+}
+
+@mixin btn-danger {
+  --bs-btn-disabled-bg: rgba(255, 107, 107, 0.1);
+  --bs-btn-disabled-color: #FF8F8F;
+  --bs-btn-disabled-border-color: rgba(255, 107, 107, 0.32);
+  color: #FF8F8F;
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.32);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: #fff;
+    background: #E5484D;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -8px rgba(229, 72, 77, 0.8);
+  }
+  &:active:not(:disabled):not(.disabled) { transform: translateY(0); }
+}
+
+// The confirming button of a delete dialog: solid, not the soft red of an inline Remove.
+@mixin btn-danger-solid {
+  --bs-btn-disabled-bg: #E5484D;
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-border-color: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  background: linear-gradient(180deg, #F0646A 0%, #E5484D 100%);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 6px 16px -6px rgba(229, 72, 77, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  &:hover:not(:disabled):not(.disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+  &:active:not(:disabled):not(.disabled) { transform: translateY(0); filter: brightness(0.96); }
+}
+
+@mixin btn-warning {
+  --bs-btn-disabled-bg: rgba(250, 204, 21, 0.1);
+  --bs-btn-disabled-color: #FACC15;
+  --bs-btn-disabled-border-color: rgba(250, 204, 21, 0.32);
+  color: #FACC15;
+  background: rgba(250, 204, 21, 0.1);
+  border-color: rgba(250, 204, 21, 0.32);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: #2A1F00;
+    background: #FACC15;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -8px rgba(250, 204, 21, 0.7);
+  }
+  &:active:not(:disabled):not(.disabled) { transform: translateY(0); }
+}
+
+// A state shown as a button, not an action (e.g. "Connected"): no hover.
+@mixin btn-success {
+  --bs-btn-disabled-bg: rgba(74, 222, 128, 0.12);
+  --bs-btn-disabled-color: #4ADE80;
+  --bs-btn-disabled-border-color: rgba(74, 222, 128, 0.3);
+  color: #4ADE80;
+  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.3);
+  cursor: default;
+}
+
+@mixin btn-ghost {
+  color: #A8B8CC;
+  background: transparent;
+  border-color: transparent;
+
+  &:hover:not(:disabled):not(.disabled) { color: #fff; background: rgba(255, 255, 255, 0.07); }
+}

@@ -1,3 +1,4 @@
+@use '../../../../styles/btn' as *;
 .build-list {
   display: flex;
   flex-direction: column;
@@ -48,23 +49,13 @@
 }
 
 .build-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: 10px;
-  border: 0;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
+  @include btn-base(38px);
+  @include btn-sm;
 
-  &.primary {
-    background: linear-gradient(135deg, #5B9FF5 0%, #8B5CF6 100%);
-    color: #FFFFFF;
-  }
-
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &.primary { @include btn-primary; }
+  &.secondary { @include btn-secondary; }
 }
+
 
 .build-state, .build-error {
   padding: 14px 16px;
@@ -92,16 +83,8 @@
   span { display: inline-flex; align-items: center; gap: 6px; margin-right: auto; }
 }
 
-.link-btn {
-  border: 0;
-  background: none;
-  padding: 0;
-  color: #5B9FF5;
-  font-size: 12px;
-  font-weight: 600;
+.link-btn { @include btn-base(30px); @include btn-sm; @include btn-ghost; }
 
-  &:hover { text-decoration: underline; }
-}
 
 .token-card {
   padding: 18px;

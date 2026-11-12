@@ -1,3 +1,4 @@
+@use '../../../styles/btn' as *;
 // Design tokens
 $bg-dark: #0F172B;
 $bg-light: #1a2744;
@@ -72,34 +73,13 @@ $border-color: rgba(91, 159, 245, 0.2);
 .hero-text { flex: 1; }
 
 .add-device-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(135deg, $primary-blue 0%, $accent-purple 100%);
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 14px rgba(91, 159, 245, 0.3);
-  white-space: nowrap;
+  @include btn-base(44px);
+  padding: 0 22px;
 
-  i.bi { font-size: 16px; }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(91, 159, 245, 0.45);
-  }
-
-  &.scan {
-    background: rgba(91, 159, 245, 0.12);
-    border: 1px solid rgba(91, 159, 245, 0.45);
-    box-shadow: none;
-  }
+  &:not(.scan) { @include btn-primary; }
+  &.scan { @include btn-secondary; }
 }
+
 
 .hero-avatar {
   width: 80px;
@@ -272,20 +252,6 @@ $border-color: rgba(91, 159, 245, 0.2);
   }
 }
 
-.spinner-mini {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 // Devices Grid
 .devices-grid {
   display: grid;
@@ -430,59 +396,13 @@ $border-color: rgba(91, 159, 245, 0.2);
 }
 
 .device-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1.5px solid transparent;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-family: 'Segoe UI', 'San Francisco', -apple-system, sans-serif;
-  white-space: nowrap;
+  @include btn-base(44px);
 
-  i.bi {
-    font-size: 14px;
-  }
-
-  &.primary {
-    flex: 1;
-    background: linear-gradient(135deg, $primary-blue 0%, $accent-purple 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(91, 159, 245, 0.25);
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(91, 159, 245, 0.35);
-    }
-  }
-
-  &.secondary {
-    flex: 1;
-    background: rgba(76, 175, 80, 0.15);
-    color: $accent-green;
-    border-color: rgba(76, 175, 80, 0.3);
-    cursor: default !important;
-  }
-
-  &.danger {
-    width: 42px;
-    height: 42px;
-    padding: 0;
-    background: rgba(255, 107, 107, 0.12);
-    color: $accent-red;
-    border-color: rgba(255, 107, 107, 0.25);
-
-    &:hover {
-      background: rgba(255, 107, 107, 0.25);
-      border-color: $accent-red;
-      transform: translateY(-2px);
-    }
-  }
+  &.primary { @include btn-primary; flex: 1; }
+  &.secondary { @include btn-success; flex: 1; }
+  &.danger { @include btn-danger; @include btn-icon(44px); }
 }
+
 
 // Empty State
 .empty-state {

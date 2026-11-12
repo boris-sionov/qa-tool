@@ -1,0 +1,28 @@
+:host { display: inline-block; }
+
+.dropdown-toggle::after { margin-left: 4px; }
+
+.install-menu {
+  min-width: 220px;
+  padding: 8px;
+  background: rgba(18, 30, 55, 0.98);
+  border: 1px solid rgba(91, 159, 245, 0.25);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(14px);
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: #DCE6F5;
+    font-size: 14px;
+    font-weight: 500;
+
+    i.bi { font-size: 17px; color: #5B9FF5; }
+
+    &:hover, &:focus { background: rgba(91, 159, 245, 0.16); color: #fff; }
+  }
+}

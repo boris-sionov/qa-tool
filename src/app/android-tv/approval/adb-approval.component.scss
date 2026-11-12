@@ -1,3 +1,4 @@
+@use '../../../styles/btn' as *;
 .approval {
   display: flex;
   flex-direction: column;
@@ -62,30 +63,8 @@
 }
 
 .approval-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 10px;
-  border: 1px solid rgba(91, 159, 245, 0.4);
-  background: rgba(91, 159, 245, 0.12);
-  color: #FFFFFF;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover:not([disabled]) { background: rgba(91, 159, 245, 0.22); }
-  &[disabled] { opacity: 0.6; cursor: default; }
+  @include btn-base(40px);
+  @include btn-secondary;
 }
 
-.spinner-mini {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(91, 159, 245, 0.3);
-  border-top-color: #5B9FF5;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
 
-@keyframes spin { to { transform: rotate(360deg); } }

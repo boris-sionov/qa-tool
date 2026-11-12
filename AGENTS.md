@@ -252,7 +252,28 @@ VIDAA, Android Phone). A Home tile heads the rail (it opens `/`); a shell passes
 The home page (`platform-selector/`) opens on an overview — what the tool does, in four lines, and the
 five logos to start from — and shows the picked platform on a stage: big logo with a glow, **Open apps** (VIDAA: *Connect to a TV*), **Manage devices**, **Device info**, and the
 saved devices of Android TV and Samsung (`getSavedDevices()`); LG, VIDAA and Android Phone have no
-list the home page can read cheaply. 
+list the home page can read cheaply.
+
+### Buttons
+
+One set, `src/styles/_btn.scss` (mixins `btn-base`, `btn-primary`, `btn-secondary`, `btn-danger`,
+`btn-danger-solid`, `btn-warning`, `btn-success`, `btn-ghost`, `btn-sm`). Bootstrap's `.btn-*` classes
+are restyled with them in `styles/buttons.scss`; the app-list row buttons (`.app-action`: Inspect
+secondary, Launch primary, Kill warning, Remove danger) and every local family (`.wizard-btn`,
+`.device-btn`, `.add-device-btn`, `.dialog-btn`, `.editor-btn`, …) include them too. Every platform's apps page has the **one Install button** (`<app-install-menu>`, `shared/components/install-menu/`): with several sources (file, APK library, Confluence) it opens a menu of them, with one it installs directly. A new button
+uses a mixin (`@use '…/styles/btn' as *;`), not its own colours.
+
+### Spinners
+
+One component, `<app-spinner>` (`shared/components/spinner/`): the rounded square of the platform
+logos with one light running round its edge, always clockwise. `size` `sm` (inline in text or a
+button), `md` (cards, dialog headers), `lg`; `center` puts it in the middle of the app window, over
+the page and never blocking a click; `caption` adds the word under it without taking over the window
+(for the middle of a dialog); `tone="inherit"` takes the text colour, for buttons. **The word is
+always "Loading"** — there is no label input; what is loading is clear from where the spinner is.
+`<app-loading-card>` is `lg` + `center`. Do not add another spinner. Standalone components must
+import `SpinnerComponent`; modules get it through `SharedModule`.
+
 ### Route Structure
 
 ```

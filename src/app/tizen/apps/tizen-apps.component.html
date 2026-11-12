@@ -25,23 +25,10 @@
       @if (!minimal) {
         <button class="btn btn-secondary text-nowrap me-2" (click)="openRemote()" [disabled]="!selected"
                 title="Open remote control" style="height:42px;">
-          <i class="bi bi-controller me-2"></i>Remote
-        </button>
-        <button class="btn btn-outline-light text-nowrap install-btn me-2" (click)="installFromConfluence()"
-                [disabled]="!serial || installing" title="Install the newest UAT or PREPROD build from Confluence">
-          <i class="bi bi-journal-arrow-down me-2"></i>From Confluence
+          <i class="bi bi-controller"></i>Remote
         </button>
       }
-      <button class="btn btn-primary text-nowrap install-btn" (click)="installWgt()"
-              [disabled]="!serial || installing">
-        @if (installing) {
-          <span class="spinner-mini me-2"></span>
-          <span>Installing...</span>
-        } @else {
-          <i class="bi bi-folder-fill me-2"></i>
-          <span>Install</span>
-        }
-      </button>
+      <app-install-menu [sources]="installSources" [disabled]="!serial" [busy]="installing" (choose)="install($event)"></app-install-menu>
     </div>
   </div>
 
@@ -58,7 +45,7 @@
     </div>
   }
 
-  <div class="p-3 flex-fill overflow-auto">
+  <div class="p-4 flex-fill overflow-auto">
     @if (!serial) {
       <div class="tizen-empty-state">
         <i class="bi bi-hdd-network"></i>
@@ -107,7 +94,7 @@
                   <button class="app-action secondary" type="button" aria-label="Inspect"
                           (click)="inspectApp(app)" [disabled]="!!inspecting">
                     @if (inspecting === app.id) {
-                      <span class="spinner-mini"></span>
+                      <app-spinner size="sm" tone="inherit"></app-spinner>
                     } @else {
                       <i class="bi bi-search"></i>
                     }
@@ -121,7 +108,7 @@
                 <button class="app-action warning" type="button" aria-label="Kill" (click)="killApp(app)"
                         [disabled]="killing === app.id">
                   @if (killing === app.id) {
-                    <span class="spinner-mini"></span>
+                    <app-spinner size="sm" tone="inherit"></app-spinner>
                   } @else {
                     <i class="bi bi-stop-fill"></i>
                   }

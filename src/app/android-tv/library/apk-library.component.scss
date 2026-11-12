@@ -1,3 +1,4 @@
+@use '../../../styles/btn' as *;
 @import "../wizard/android-tv-wizard.component";
 
 .library-bar {
@@ -9,16 +10,8 @@
   .wizard-btn { height: 40px; padding: 0 14px; }
 }
 
-.link-btn {
-  border: 0;
-  background: none;
-  padding: 0;
-  color: #5B9FF5;
-  font-size: 13px;
-  font-weight: 600;
+.link-btn { @include btn-base(30px); @include btn-sm; @include btn-ghost; }
 
-  &:hover { text-decoration: underline; }
-}
 
 .play-now {
   margin-top: 6px;
@@ -49,14 +42,8 @@
   white-space: nowrap;
 }
 
-.wizard-btn.add-btn {
-  border: 1.5px solid rgba(74, 222, 128, 0.4);
-  background: rgba(74, 222, 128, 0.12);
-  color: #4ADE80;
+.wizard-btn.add-btn { @include btn-success; &:hover:not(:disabled) { background: rgba(74, 222, 128, 0.2); } }
 
-  &:hover:not(:disabled) { background: rgba(74, 222, 128, 0.2); }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
-}
 
 .library-empty {
   margin-top: 18px;
