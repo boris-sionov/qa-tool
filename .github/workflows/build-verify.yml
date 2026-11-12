@@ -17,10 +17,12 @@ env:
 
 jobs:
   build:
-    name: Build (${{ matrix.os }}${{ matrix.rust-target && format(' · {0}', matrix.rust-target) || '' }})
+    name: Build (${{ matrix.os }}, ${{ matrix.variant }}${{ matrix.rust-target && format(' · {0}', matrix.rust-target) || '' }})
     strategy:
       fail-fast: false
       matrix:
+        # `full` is QA Tool; `minimal` is QA Tool Lite (see release.yml).
+        variant: [ full, minimal ]
         include:
           - os: ubuntu-24.04
           - os: macos-latest
@@ -30,8 +32,18 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      QA_TOOL_MINIMAL: ${{ matrix.variant == 'minimal' && '1' || '0' }}
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Name the app (Lite)
+        if: matrix.variant == 'minimal'
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then arg=linux; else arg=; fi
+          echo "TAURI_CONFIG=$(node scripts/minimal-config.js $arg)" >> "$GITHUB_ENV"
 
       - name: Install Required Packages (Linux)
         if: runner.os == 'Linux'
