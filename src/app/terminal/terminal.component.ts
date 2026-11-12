@@ -26,6 +26,7 @@ import {SizeCalculatorComponent} from "../shared/components/term-size-calculator
 import {DumbComponent} from "./dumb/dumb.component";
 import {PtyComponent} from "./pty/pty.component";
 import {SpinnerComponent} from '../shared/components/spinner/spinner.component';
+import {EmptyStateComponent} from '../shared/components/empty-state/empty-state.component';
 
 
 @Component({
@@ -34,7 +35,7 @@ import {SpinnerComponent} from '../shared/components/spinner/spinner.component';
     styleUrls: ['./terminal.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [SpinnerComponent, 
+    imports: [SpinnerComponent, EmptyStateComponent, 
         NgbNavContent,
         NgbNav,
         NgbNavItem,

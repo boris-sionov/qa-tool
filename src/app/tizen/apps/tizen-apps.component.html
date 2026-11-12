@@ -47,11 +47,7 @@
 
   <div class="p-4 flex-fill overflow-auto">
     @if (!serial) {
-      <div class="tizen-empty-state">
-        <i class="bi bi-hdd-network"></i>
-        <h3>No device detected</h3>
-        <p>Go to <strong>Manage</strong> and add a Samsung Tizen device to get started.</p>
-      </div>
+      <app-empty-state [link]="['../devices']"></app-empty-state>
     } @else if (appsError) {
       <app-error-card title="Unable to get installed apps" [error]="appsError" (retry)="loadApps(true)">
       </app-error-card>

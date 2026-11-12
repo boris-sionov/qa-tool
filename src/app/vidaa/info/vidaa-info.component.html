@@ -1,10 +1,6 @@
 <div class="vidaa-info">
   @if (!state.connected || !state.tvInfo) {
-    <div class="empty">
-      <i class="bi bi-tv"></i>
-      <h4>Not connected</h4>
-      <p>Connect to the TV from the <strong>Apps</strong> tab with the code DevKit shows.</p>
-    </div>
+    <app-empty-state [link]="['../apps']"></app-empty-state>
   } @else {
     <section class="card-panel">
       <h3>TV Information</h3>

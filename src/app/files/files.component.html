@@ -92,3 +92,7 @@
     </div>
   </div>
 </ng-container>
+
+@if (!device) {
+  <app-empty-state class="w-100" [link]="['../devices']"></app-empty-state>
+}

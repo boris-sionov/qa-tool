@@ -32,11 +32,7 @@
     </h5>
 
     @if (devices.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon"><i class="bi bi-inbox"></i></div>
-        <h4>No device detected</h4>
-        <p>Click <strong>Add New Device</strong> above to add a Samsung TV.</p>
-      </div>
+      <app-empty-state (add)="openAddWizard()"></app-empty-state>
     } @else {
       <div class="devices-grid">
         @for (dev of devices; track dev.ip + ':' + dev.port) {

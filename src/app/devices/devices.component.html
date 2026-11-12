@@ -34,13 +34,7 @@
     @if (!devices) {
       <app-loading-card></app-loading-card>
     } @else if (devices.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">
-          <i class="bi bi-inbox"></i>
-        </div>
-        <h4>No Devices Yet</h4>
-        <p>Click "Add Device" above to add your first webOS device.</p>
-      </div>
+      <app-empty-state (add)="addDevice()"></app-empty-state>
     } @else {
       <div class="devices-grid">
         @for (device of devices; track device.name) {

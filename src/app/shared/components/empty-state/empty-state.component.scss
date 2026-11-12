@@ -1,0 +1,37 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: min(520px, 70vh);
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 108px;
+  height: 108px;
+  margin-bottom: 8px;
+  border-radius: 32px;
+  background: linear-gradient(160deg, #16275A 0%, #0A1230 100%);
+  border: 2px solid rgba(91, 159, 245, 0.55);
+  box-shadow: 0 0 34px rgba(91, 159, 245, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  i { font-size: 46px; color: #5B9FF5; }
+}
+
+h3 { margin: 0; color: #fff; font-size: 22px; font-weight: 700; }
+
+p {
+  margin: 0;
+  max-width: 44ch;
+  color: #A8B8CC;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.btn { margin-top: 10px; }

@@ -263,6 +263,14 @@ secondary, Launch primary, Kill warning, Remove danger) and every local family (
 `.device-btn`, `.add-device-btn`, `.dialog-btn`, `.editor-btn`, …) include them too. Every platform's apps page has the **one Install button** (`<app-install-menu>`, `shared/components/install-menu/`): with several sources (file, APK library, Confluence) it opens a menu of them, with one it installs directly. A new button
 uses a mixin (`@use '…/styles/btn' as *;`), not its own colours.
 
+### Empty States
+
+Every page with no device shows the same thing, wherever it is: `<app-empty-state>`
+(`shared/components/empty-state/`) — the tile, "No device detected" and an **Add new device** button,
+nothing else. The button goes to a route (`[link]`, relative to the page; VIDAA's goes to Apps, where
+the connect form is) or tells the page to open its own add flow (`(add)`, on the Manage pages). Do not
+write a page-local "no device" block or vary the wording.
+
 ### Spinners
 
 One component, `<app-spinner>` (`shared/components/spinner/`): the rounded square of the platform
