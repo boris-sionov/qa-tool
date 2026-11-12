@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {NgbDropdownModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformRailComponent} from '../shared/components/platform-rail/platform-rail.component';
 
 import {SharedModule} from '../shared/shared.module';
 import {AndroidTvComponent} from './android-tv.component';
@@ -39,6 +40,7 @@ const routes: Routes = [
         AdbApprovalComponent,
     ],
     imports: [
+        PlatformRailComponent,
         CommonModule,
         FormsModule,
         SharedModule,

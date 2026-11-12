@@ -1,12 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {PhoneStateService} from './phone-state.service';
 import {PhoneApprovalComponent} from './approval/phone-approval.component';
 
 /**
- * The Android Phone shell: platform switcher and Apps / Info / Manage on top. It keeps the phone
+ * The Android Phone shell: the platform rail and Apps / Info / Manage tabs. It keeps the phone
  * list polled while the section is open, and pops up the "Allow USB debugging?" message whenever a
  * phone is waiting for it, whichever page is showing.
  */
@@ -22,7 +21,7 @@ export class AndroidPhoneComponent implements OnInit, OnDestroy {
     private dismissed = new Set<string>();
     private sub?: Subscription;
 
-    constructor(private router: Router, private state: PhoneStateService, private modalService: NgbModal) {}
+    constructor(private state: PhoneStateService, private modalService: NgbModal) {}
 
     ngOnInit(): void {
         this.sub = this.state.changed$.subscribe(() => this.followApproval());
@@ -34,10 +33,6 @@ export class AndroidPhoneComponent implements OnInit, OnDestroy {
         this.sub?.unsubscribe();
         this.state.stop();
         this.approval?.ref.dismiss();
-    }
-
-    go(path: string): void {
-        void this.router.navigate([path]);
     }
 
     /** Opens the popup again for a phone whose popup was closed. */

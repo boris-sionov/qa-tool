@@ -2,6 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformRailComponent} from '../shared/components/platform-rail/platform-rail.component';
 
 import {SharedModule} from '../shared/shared.module';
 import {AndroidPhoneComponent} from './android-phone.component';
@@ -25,6 +26,6 @@ const routes: Routes = [
 
 @NgModule({
     declarations: [AndroidPhoneComponent, PhonesComponent, PhoneAppsComponent, PhoneInfoComponent, PhoneStatusComponent],
-    imports: [CommonModule, SharedModule, NgbDropdownModule, RouterModule.forChild(routes)],
+    imports: [PlatformRailComponent, CommonModule, SharedModule, NgbDropdownModule, RouterModule.forChild(routes)],
 })
 export class AndroidPhoneModule {}

@@ -3,6 +3,7 @@ import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
 import {NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformRailComponent} from '../shared/components/platform-rail/platform-rail.component';
 
 import {SharedModule} from '../shared/shared.module';
 import {VidaaAppsComponent} from './apps/vidaa-apps.component';
@@ -24,6 +25,7 @@ const routes: Routes = [
 @NgModule({
     declarations: [VidaaComponent, VidaaAppsComponent, VidaaInfoComponent],
     imports: [
+        PlatformRailComponent,
         CommonModule,
         FormsModule,
         SharedModule,

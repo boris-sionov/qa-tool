@@ -28,6 +28,7 @@ import {Router} from "@angular/router";
 import {createErrorHandler, TraceService} from "@sentry/angular";
 import {ExternalLinkDirective} from "./shared/directives";
 import {EnvironmentMarkerComponent} from "./core/components/environment-marker/environment-marker.component";
+import {PlatformRailComponent} from './shared/components/platform-rail/platform-rail.component';
 
 @NgModule({
     declarations: [
@@ -41,6 +42,7 @@ import {EnvironmentMarkerComponent} from "./core/components/environment-marker/e
         EnvironmentMarkerComponent,
     ],
     imports: [
+        PlatformRailComponent,
         BrowserModule,
         BrowserAnimationsModule,
         FormsModule,

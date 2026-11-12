@@ -1,16 +1,10 @@
-<div class="home" [style.--brand]="current.brand" [style.--brand-glow]="current.glow" [style.--on-brand]="current.ink ?? '#fff'">
-  <nav class="rail" aria-label="Platforms">
-    @for (p of platforms; track p.id) {
-      <button class="tile" type="button" [class.active]="p === current" [attr.aria-pressed]="p === current"
-              [attr.aria-label]="p.name" (click)="select(p)">
-        <img [src]="'assets/platform-logos/' + p.logo" alt="">
-      </button>
-    }
-  </nav>
+<div class="home">
+  <app-platform-rail [active]="current?.id ?? ''" [navigate]="false" (picked)="select($event)" (homePicked)="select(null)"></app-platform-rail>
 
   <main class="stage">
     <div class="aura"></div>
 
+    @if (current) {
     <section class="panel" [attr.aria-label]="current.name">
       <div class="hero">
         <img [src]="'assets/platform-logos/' + current.logo" [alt]="current.name">
@@ -19,13 +13,13 @@
       <div class="info">
         <div class="actions">
           <button class="action primary" type="button" (click)="open('apps')">
-            @switch (current.primary.icon) {
+            @switch (stage.primary.icon) {
               @case ('plug') { <svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6M7 8h10v3a5 5 0 0 1-10 0zM12 16v6"/></svg> }
               @default { <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg> }
             }
-            {{ current.primary.label }}
+            {{ stage.primary.label }}
           </button>
-          @for (a of current.actions; track a.path) {
+          @for (a of stage.actions; track a.path) {
             <button class="action" type="button" (click)="open(a.path)">
               @switch (a.icon) {
                 @case ('tv') { <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2.5"/><path d="M8 21h8"/></svg> }
@@ -44,11 +38,36 @@
               <div class="dev"><b>{{ d.name }}</b><code>{{ d.ip }}</code></div>
             }
           </div>
-        } @else if (current.note) {
-          <p class="note">{{ current.note }}</p>
+        } @else if (stage.note) {
+          <p class="note">{{ stage.note }}</p>
         }
       </div>
     </section>
+    } @else {
+    <section class="overview" [attr.aria-label]="appName">
+      <h1>{{ appName }}</h1>
+      <p class="lead">
+        Install, launch and inspect apps on the TVs and phones you test, from one window: Android TV,
+        LG webOS, Samsung Tizen, VIDAA and Android phones.
+      </p>
+
+      <ul class="features">
+        <li><i class="bi bi-box-arrow-in-down"></i><b>Install</b><span>An APK, WGT or IPK straight onto the device</span></li>
+        <li><i class="bi bi-play-circle"></i><b>Launch and stop</b><span>Start, kill or remove any installed app</span></li>
+        <li><i class="bi bi-bug"></i><b>Inspect</b><span>Open DevTools on an app that is running</span></li>
+        <li><i class="bi bi-wifi"></i><b>Find TVs</b><span>Scan the network, no addresses to type</span></li>
+      </ul>
+
+      <div class="start">
+        <span>Pick a platform to begin</span>
+        @for (p of platforms; track p.id) {
+          <button type="button" [attr.aria-label]="p.name" [title]="p.name" (click)="select(p)">
+            <img [src]="'assets/platform-logos/' + p.logo" alt="">
+          </button>
+        }
+      </div>
+    </section>
+    }
 
     <div class="footer">
       {{ appName }} v{{ appVersion }}
