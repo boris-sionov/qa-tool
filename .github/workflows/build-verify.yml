@@ -17,21 +17,46 @@ env:
 
 jobs:
   build:
-    name: Build (${{ matrix.os }}${{ matrix.rust-target && format(' · {0}', matrix.rust-target) || '' }})
+    name: Build (${{ matrix.os }}, ${{ matrix.variant }}${{ matrix.rust-target && format(' · {0}', matrix.rust-target) || '' }})
     strategy:
       fail-fast: false
       matrix:
+        # `full` is QA Tool; `minimal` is QA Tool Lite (see release.yml). Spelled out: an `include`
+        # entry added to a `variant` dimension overwrites the previous one, leaving two jobs.
         include:
           - os: ubuntu-24.04
+            variant: full
           - os: macos-latest
+            variant: full
           - os: windows-latest
+            variant: full
           - os: windows-latest
+            variant: full
+            rust-target: aarch64-pc-windows-msvc
+          - os: ubuntu-24.04
+            variant: minimal
+          - os: macos-latest
+            variant: minimal
+          - os: windows-latest
+            variant: minimal
+          - os: windows-latest
+            variant: minimal
             rust-target: aarch64-pc-windows-msvc
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      QA_TOOL_MINIMAL: ${{ matrix.variant == 'minimal' && '1' || '0' }}
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Name the app (Lite)
+        if: matrix.variant == 'minimal'
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then arg=linux; else arg=; fi
+          echo "TAURI_CONFIG=$(node scripts/minimal-config.js $arg)" >> "$GITHUB_ENV"
 
       - name: Install Required Packages (Linux)
         if: runner.os == 'Linux'
