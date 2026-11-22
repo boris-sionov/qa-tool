@@ -162,7 +162,7 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   backdrop-filter: blur(10px);
   border-color: $border-color !important;
   position: relative;
-  z-index: 10;
+  z-index: 20; // above the sticky app-list-header (10), or the Install menu opens behind it
   overflow: visible !important;
   padding: 0 24px !important;
   margin: 0 !important;
