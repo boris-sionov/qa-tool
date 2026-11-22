@@ -68,6 +68,15 @@ async fn list_apks(source: &str) -> Result<Vec<LibraryApk>, Error> {
         .collect())
 }
 
+/// A file name that stays inside the folder it is joined onto: no separators, no leading dot.
+/// Names come from a URL or an APK's manifest, so they are not ours to trust.
+fn check_name(name: &str) -> Result<(), Error> {
+    if name.is_empty() || name.contains('/') || name.contains('\\') || name.starts_with('.') {
+        return Err(Error::new(format!("Bad file name {name}")));
+    }
+    Ok(())
+}
+
 /// The local path of a library APK, downloading it first when it lives on a server.
 #[tauri::command]
 pub(crate) async fn apk_library_fetch<R: Runtime>(app: AppHandle<R>, location: String) -> Result<String, Error> {
@@ -81,6 +90,7 @@ pub(crate) async fn apk_library_fetch<R: Runtime>(app: AppHandle<R>, location: S
         .map(percent_decode)
         .filter(|n| !n.is_empty())
         .unwrap_or_else(|| "library.apk".to_owned());
+    check_name(&name)?;
     let dir = app
         .path()
         .app_cache_dir()
@@ -201,6 +211,7 @@ fn manifest_attributes_opt(axml: &[u8]) -> Option<Vec<(String, String)>> {
 #[tauri::command]
 pub(crate) async fn apk_library_upload(source: String, path: String, name: String, overwrite: bool) -> Result<(), Error> {
     let source = source.trim();
+    check_name(&name)?;
     let bytes = std::fs::read(&path).map_err(|e| Error::new(format!("Could not read {path}: {e}")))?;
     if !is_url(source) {
         let target = std::path::Path::new(source).join(&name);
@@ -384,6 +395,14 @@ fn percent_decode(text: &str) -> String {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn names_cannot_leave_the_folder() {
+        for bad in ["../x.apk", "a/b.apk", "a\\b.apk", ".hidden.apk", ""] {
+            assert!(super::check_name(bad).is_err(), "{bad}");
+        }
+        assert!(super::check_name("tv.freetv.androidtv-1.10.3.apk").is_ok());
+    }
+
     use super::*;
 
     /// Run against a real APK: `APK=/path/to/app.apk cargo test -p qa-tool reads_a_real_manifest -- --ignored`
