@@ -1,0 +1,96 @@
+@use '../../../styles/btn' as *;
+
+$primary: #5B9FF5;
+$muted: #A8B8CC;
+$line: rgba(91, 159, 245, 0.2);
+$faint: rgba(255, 255, 255, 0.06);
+$panel: rgba(15, 23, 43, 0.72);
+$mono: ui-monospace, Menlo, monospace;
+
+:host { display: block; height: 100%; }
+.logs { display: flex; flex-direction: column; height: 100%; gap: 10px; color: #fff; }
+
+.logs-head { display: flex; align-items: center; gap: 16px; }
+.back { @include btn-base(36px); @include btn-secondary; @include btn-sm; text-decoration: none; }
+.title { flex: 1; min-width: 0; .pkg { color: $muted; font-size: 12px; margin-left: 8px; } }
+.status { font-size: 13px; &.live { color: #4ADE80; } &.ended, &.error { color: #FF6B6B; } &.connecting { color: $muted; } }
+.tabs { display: flex; gap: 4px;
+  button { height: 34px; padding: 0 14px; border-radius: 10px; border: 1px solid transparent; background: none; color: $muted;
+    &.on { color: #fff; border-color: $line; background: rgba(91, 159, 245, 0.12); } }
+  .count { font-size: 11px; opacity: .8; margin-left: 4px; }
+}
+
+.note { padding: 14px; border-radius: 12px; border: 1px solid $line; color: $muted; &.error { color: #FF6B6B; } }
+.empty { color: $muted; margin: 0; &.pad { padding: 14px; } }
+.grow { flex: 1; }
+
+// The whole screen is one column: calls, filter, then the details, with draggable splitters.
+.stack { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0; }
+.split { flex: 0 0 8px; cursor: row-resize; position: relative;
+  &::after { content: ''; position: absolute; left: 0; right: 0; top: 3px; height: 2px; border-radius: 1px; background: $faint; }
+  &:hover::after { background: $primary; }
+}
+
+.list { display: flex; flex-direction: column; min-height: 70px; border: 1px solid $line; border-radius: 12px; background: $panel; overflow: hidden; }
+.rows { flex: 1; overflow: auto; min-height: 0; }
+.cols { display: grid; align-items: center; gap: 10px; width: 100%; text-align: left; font-size: 12px; color: #fff;
+  grid-template-columns: 52px 56px minmax(120px, 0.7fr) minmax(160px, 2fr) 70px 74px 70px 74px;
+  white-space: nowrap;
+  padding: 0 12px; }
+.cols.head { color: $muted; font-weight: 600; height: 28px; border-bottom: 1px solid $line; background: rgba(255, 255, 255, 0.03); }
+.cols.row { height: 26px; border: 0; background: none; border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  &:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
+  &.sel { background: rgba(91, 159, 245, 0.28); }
+  .m { color: $primary; font-weight: 600; }
+  .code.bad { color: #FF6B6B; }
+  .ell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+.num { text-align: right; }
+
+.filter { display: flex; gap: 8px; align-items: center; padding: 4px 0 8px;
+  label { color: $muted; font-size: 12px; }
+  input, select { height: 32px; border-radius: 8px; border: 1px solid $line; background: $panel; color: #fff; padding: 0 12px; }
+  input { flex: 1; min-width: 160px; }
+}
+.tool { @include btn-base(32px); @include btn-secondary; @include btn-sm; }
+
+.detail { flex: 1; min-height: 0; display: flex; flex-direction: column; border: 1px solid $line; border-radius: 12px; background: $panel; overflow: hidden; font-size: 12px; }
+.dtabs { display: flex; gap: 2px; align-items: center; padding: 6px 10px; border-bottom: 1px solid $line; background: rgba(255, 255, 255, 0.03); }
+.flash { color: #4ADE80; font-size: 11px; margin-right: 8px; }
+
+.panes { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0 0 2px; }
+.pane { display: flex; flex-direction: column; min-height: 60px; overflow: hidden; }
+.body { flex: 1; min-height: 0; overflow: auto; padding: 8px 12px; }
+
+// Tabs sit under the content they switch, as in Charles; the open one is a grey pill.
+.vtabs { display: flex; gap: 2px; align-items: center; padding: 4px 10px; border-top: 1px solid $faint; background: rgba(255, 255, 255, 0.03); }
+.dtabs, .vtabs {
+  button:not(.mini) { height: 26px; padding: 0 12px; border-radius: 6px; border: 0; background: none; color: #D5DEEA; font-size: 12px;
+    &:hover { background: $faint; }
+    &.on { background: rgba(255, 255, 255, 0.16); color: #fff; } }
+}
+.mini { height: 24px; padding: 0 9px; border-radius: 8px; border: 1px solid $line; background: none; color: $primary; font-size: 11px; white-space: nowrap; margin-left: 4px; }
+
+// Header names on the right, bold and grey, values beside them: Charles' header table.
+.kv { display: grid; grid-template-columns: minmax(110px, max-content) 1fr; gap: 10px; padding: 1px 0; line-height: 1.7;
+  b { color: $muted; font-weight: 700; text-align: right; }
+  span { word-break: break-all; }
+}
+.code { white-space: pre-wrap; word-break: break-all; margin: 0; font: 12px/1.5 $mono; color: #E8EEF6;
+  .key { color: #F0A44B; } .string { color: #E9D17A; } .number { color: #8FD18B; } .bool { color: #6FA8FF; } }
+
+.jn { font: 12px/1.7 $mono; white-space: nowrap; display: flex; align-items: baseline; gap: 4px;
+  &:hover .acts { opacity: 1; }
+  .tw { width: 16px; background: none; border: 0; color: $muted; padding: 0; }
+  .k { color: #F0A44B; } .sep { color: $muted; }
+  .val { overflow: hidden; text-overflow: ellipsis; max-width: 70ch;
+    &.string { color: #E9D17A; } &.number { color: #8FD18B; } &.boolean, &.null { color: #6FA8FF; } &.array, &.object { color: $muted; } }
+  .acts { opacity: 0; margin-left: 8px; button { background: none; border: 0; color: $primary; font-size: 10px; padding: 0 4px; } }
+}
+.kids { margin-left: 18px; border-left: 1px solid rgba(255, 255, 255, 0.07); padding-left: 6px; }
+.more { background: none; border: 0; color: $primary; font-size: 11px; padding: 2px 0 2px 16px; }
+
+.raw { flex: 1; min-height: 0; overflow: auto; padding: 8px 12px; border: 1px solid $line; border-radius: 12px; background: $panel; font: 11.5px/1.5 $mono;
+  .row { white-space: pre-wrap; word-break: break-all; }
+  .lv-E, .lv-F { color: #FF6B6B; } .lv-W { color: #FBBF24; } .lv-D, .lv-V { color: $muted; }
+}

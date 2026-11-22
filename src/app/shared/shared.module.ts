@@ -11,6 +11,7 @@ import {ErrorCardComponent} from './components/error-card/error-card.component';
 import {ExternalLinkDirective} from "./directives";
 import {EmptyStateComponent} from './components/empty-state/empty-state.component';
 import {InstallMenuComponent} from './components/install-menu/install-menu.component';
+import {HostIpComponent} from './components/host-ip/host-ip.component';
 import {SpinnerComponent} from './components/spinner/spinner.component';
 import {LoadingCardComponent} from './components/loading-card/loading-card.component';
 import {StatStorageInfoComponent} from './components/stat-storage-info/stat-storage-info.component';
@@ -39,8 +40,9 @@ import {AppListHeaderComponent} from './components/app-list-header/app-list-head
         AppListHeaderComponent,
     ],
     imports: [CommonModule, FormsModule, NgbModule,
-        ExternalLinkDirective, SpinnerComponent, InstallMenuComponent, EmptyStateComponent],
+        ExternalLinkDirective, SpinnerComponent, InstallMenuComponent, EmptyStateComponent, HostIpComponent],
     exports: [
+        HostIpComponent,
         SpinnerComponent,
         InstallMenuComponent,
         EmptyStateComponent,
