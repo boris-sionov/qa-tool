@@ -24,6 +24,9 @@
 
     <!-- Install APK Button -->
     <div class="install-btn-container">
+      <button type="button" class="collect-logs-btn" [disabled]="!serial" (click)="collectLogs()">
+        <i class="bi bi-terminal"></i> Collect logs
+      </button>
       <app-install-menu [sources]="installSources" [disabled]="!serial" (choose)="install($event)"></app-install-menu>
     </div>
   </div>

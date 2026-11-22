@@ -1,0 +1,36 @@
+<div class="wizard-modal">
+  <div class="wizard-header">
+    <div class="header-text">
+      <h5 class="wizard-title">Collect logs</h5>
+      <span class="device">{{ deviceName }}</span>
+    </div>
+  </div>
+
+  @if (phase === 'ask') {
+    <div class="wizard-body">
+      <p class="warn"><i class="bi bi-exclamation-triangle-fill"></i>
+        Starting clears all the logs on the TV.</p>
+      <p class="hint">Then reproduce the bug on the TV. Its whole log (every app and the system) appears here as it happens,
+        and you save it when you are done.</p>
+      @if (error) { <p class="err">{{ error }}</p> }
+    </div>
+    <div class="wizard-footer">
+      <button type="button" class="wizard-btn secondary ms-auto" (click)="modal.dismiss()">Cancel</button>
+      <button type="button" class="wizard-btn primary" (click)="start()">Start collecting logs</button>
+    </div>
+  } @else {
+    <div class="wizard-body live">
+      <div class="status">● Collecting — {{ count }} lines</div>
+      <div class="raw" #scroller>
+        @for (l of shown; track $index) {
+          <div class="row lv-{{ l.level }}">{{ l.raw }}</div>
+        }
+      </div>
+      @if (error) { <p class="err">{{ error }}</p> }
+    </div>
+    <div class="wizard-footer">
+      <button type="button" class="wizard-btn secondary ms-auto" (click)="modal.dismiss()" [disabled]="saving">Close without saving</button>
+      <button type="button" class="wizard-btn primary" (click)="finish()" [disabled]="saving || !count">I finished testing</button>
+    </div>
+  }
+</div>

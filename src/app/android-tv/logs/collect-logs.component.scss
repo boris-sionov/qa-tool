@@ -1,0 +1,17 @@
+@use '../../../styles/btn' as *;
+@import "../wizard/android-tv-wizard.component";
+
+$mono: ui-monospace, Menlo, monospace;
+
+.device { color: #A8B8CC; font-size: 13px; }
+.warn { color: #FBBF24; font-weight: 600; margin: 0 0 8px; i { margin-right: 8px; } }
+.hint { color: #A8B8CC; margin: 0; }
+.err { color: #FF6B6B; margin: 10px 0 0; }
+
+.live { display: flex; flex-direction: column; gap: 8px; }
+.status { color: #4ADE80; font-size: 13px; }
+.raw { height: 52vh; overflow: auto; padding: 8px 12px; border: 1px solid rgba(91, 159, 245, 0.2); border-radius: 12px;
+  background: rgba(15, 23, 43, 0.72); font: 11.5px/1.5 $mono; color: #E8EEF6;
+  .row { white-space: pre-wrap; word-break: break-all; }
+  .lv-E, .lv-F { color: #FF6B6B; } .lv-W { color: #FBBF24; } .lv-D, .lv-V { color: #A8B8CC; }
+}

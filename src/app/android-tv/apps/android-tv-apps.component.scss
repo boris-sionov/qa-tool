@@ -1,3 +1,5 @@
+@use '../../../styles/btn' as *;
+
 // Design tokens
 $primary-blue: #5B9FF5;
 $text-secondary: #A8B8CC;
@@ -213,6 +215,8 @@ $panel-strong: rgba(18, 30, 55, 0.88);
   justify-content: flex-end;
 
   gap: 10px;
+
+  .collect-logs-btn { @include btn-base(40px); @include btn-secondary; }
 
   .install-btn {
     display: flex;
