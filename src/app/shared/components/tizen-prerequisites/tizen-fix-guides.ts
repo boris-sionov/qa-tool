@@ -33,7 +33,13 @@ const LINKS = {
         label: 'Samsung: Installing TV SDK',
         url: 'https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html',
     },
+    certificates: {
+        label: 'Samsung: Creating certificates',
+        url: 'https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/creating-certificates.html',
+    },
+    rosetta: {label: 'Apple: Install Rosetta on your Mac', url: 'https://support.apple.com/en-us/102527'},
     java: {label: 'Eclipse Temurin (Java) downloads', url: 'https://adoptium.net/temurin/releases/'},
+    latestRelease: {label: 'QA Tool: latest release', url: 'https://github.com/boris-sionov/qa-tool/releases/latest'},
 } satisfies Record<string, FixLink>;
 
 /** The Tizen Studio location each OS's installer defaults to, which is where the app looks. */
@@ -74,14 +80,17 @@ function studioInstallers(os: HostOs): {cli: FixLink; ide: FixLink; cliFile: str
 
 /**
  * The CLI-only install, start to finish, without opening a window: the installer and the package
- * manager both take `--accept-license`. The CLI install already carries the tizen CLI, sdb, a JDK
- * and Device Manager; Certificate Manager and the Samsung Certificate Extension (`cert-add-on`)
- * come from `package-manager-cli`. Run on macOS on 2026-10-29 into an empty home; not run on
- * Windows or Linux.
+ * manager both take `--accept-license`. The CLI install already carries everything a signed install
+ * needs — Samsung's package list has it as `COMMON-CLI` → `new-common-cli` → `embedded-java`, `sdb`,
+ * `certificate-generator`, `sdk-utils` — so that is the whole required part. Certificate Manager and
+ * the Samsung Certificate Extension (`cert-add-on`) only create a new certificate, and cost about
+ * 2 GB and 10 minutes, so they are a last, optional step. Run on macOS on 2026-10-29 into an empty
+ * home; not run on Windows or Linux.
  */
 function sdkGuide(os: HostOs, arch: string): FixGuide {
     const dir = studioDir(os);
     const {cli, ide, cliFile} = studioInstallers(os);
+    const rosetta = os === 'macos' && arch === 'aarch64';
     const install = {
         macos: `chmod +x ~/Downloads/${cliFile} && ~/Downloads/${cliFile} --accept-license ${dir}`,
         windows: `%USERPROFILE%\\Downloads\\${cliFile} --accept-license ${dir}`,
@@ -93,24 +102,26 @@ function sdkGuide(os: HostOs, arch: string): FixGuide {
     const shell = os === 'windows' ? 'Command Prompt' : 'Terminal';
 
     const steps = [
-        ...(os === 'macos' && arch === 'aarch64'
+        ...(rosetta
             ? ['Tizen Studio is built for Intel Macs. Install Rosetta first — in Terminal: ' +
                'softwareupdate --install-rosetta --agree-to-license']
             : []),
         `Download the Tizen Studio ${STUDIO_VERSION} CLI installer below (${cliFile}). ` +
         'It is the last Tizen Studio release, and the IDE is not needed.',
         `Install it without any window — in ${shell}: ${install}. It brings the Tizen CLI, sdb, ` +
-        'its own Java and Device Manager.',
-        `Add Certificate Manager and the Samsung Certificate Extension — in ${shell}: ` +
-        `${packageManager} install --accept-license Certificate-Manager,cert-add-on. It first updates ` +
-        'what is already installed; expect over 10 minutes and about 2 GB in all.',
+        'its own Java and the certificate tools the signed install needs.',
+        `--accept-license accepts Samsung's Tizen SDK licence for you. To read it first, run the ` +
+        `installer with --show-license.`,
         `Keep the location ${dir} — the QA tool looks there. Then press "Check again".`,
+        `Optional — only to create a new Samsung certificate (about 2 GB, over 10 minutes; importing ` +
+        `an existing profile does not need it). In ${shell}: ${packageManager} install --accept-license ` +
+        'Certificate-Manager,cert-add-on',
     ];
     return {
         key: 'sdk',
-        title: `Install Tizen Studio ${STUDIO_VERSION} (CLI) and Certificate Manager`,
+        title: `Install Tizen Studio ${STUDIO_VERSION} (CLI)`,
         download: cli.label,
-        links: [cli, ide, LINKS.tizenArchive, LINKS.tvSdk],
+        links: [cli, ide, LINKS.tizenArchive, LINKS.tvSdk, LINKS.certificates, ...(rosetta ? [LINKS.rosetta] : [])],
         steps,
     };
 }
@@ -142,7 +153,7 @@ function bundledSdbGuide(): FixGuide {
     return {
         key: 'bundled-sdb',
         title: 'Restore the sdb that ships with the QA tool',
-        links: [],
+        links: [LINKS.latestRelease],
         steps: [
             'Reinstall the Smart TV QA Tool from the latest release.',
             'Developers running from source: run npm run setup (npm run setup:win on Windows), which ' +
