@@ -34,9 +34,11 @@
         @if (devices?.length) {
           <div class="recent">
             <h4>Saved devices</h4>
-            @for (d of devices; track d.ip) {
-              <div class="dev"><b>{{ d.name }}</b><code>{{ d.ip }}</code></div>
-            }
+            <div class="list">
+              @for (d of devices; track d.ip) {
+                <div class="dev"><b>{{ d.name }}</b><code>{{ d.ip }}</code></div>
+              }
+            </div>
           </div>
         } @else if (stage.note) {
           <p class="note">{{ stage.note }}</p>
