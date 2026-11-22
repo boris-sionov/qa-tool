@@ -54,6 +54,12 @@ fn platform(ports: &[u16]) -> Option<(&'static str, bool)> {
     }
 }
 
+/// This computer's address on the network, for the QA to type into a TV or compare with its subnet.
+#[tauri::command]
+pub(crate) fn local_ip() -> Option<String> {
+    local_ipv4().map(|ip| ip.to_string())
+}
+
 #[tauri::command]
 pub(crate) async fn lan_scan() -> Result<Vec<LanDevice>, Error> {
     let (mut devices, lg_urls) = tauri::async_runtime::spawn_blocking(scan)

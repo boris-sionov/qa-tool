@@ -24,6 +24,9 @@
 
     <!-- Install APK Button -->
     <div class="install-btn-container">
+      <button type="button" class="collect-logs-btn" [disabled]="!serial" (click)="collectLogs()">
+        <i class="bi bi-terminal"></i> Collect logs
+      </button>
       <app-install-menu [sources]="installSources" [disabled]="!serial" (choose)="install($event)"></app-install-menu>
     </div>
   </div>
@@ -78,6 +81,11 @@
                   <i class="bi bi-play-fill"></i>
                   <span>Launch</span>
                 </button>
+                <a class="app-action secondary" aria-label="Logs" routerLink="../logs"
+                   [queryParams]="{pkg: pkg.id, name: pkg.name}">
+                  <i class="bi bi-terminal"></i>
+                  <span>Logs</span>
+                </a>
                 <button class="app-action warning" type="button" aria-label="Kill" (click)="killApp(pkg)">
                   <i class="bi bi-stop-fill"></i>
                   <span>Kill</span>

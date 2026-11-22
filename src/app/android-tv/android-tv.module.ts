@@ -13,6 +13,8 @@ import {AndroidTvDevicesComponent} from './devices/android-tv-devices.component'
 import {AndroidTvWizardComponent} from './wizard/android-tv-wizard.component';
 import {ApkLibraryComponent} from './library/apk-library.component';
 import {FirebaseBuildsComponent} from './library/firebase-builds.component';
+import {AndroidTvLogsComponent} from './logs/android-tv-logs.component';
+import {CollectLogsComponent} from './logs/collect-logs.component';
 import {AdbApprovalComponent} from './approval/adb-approval.component';
 
 const routes: Routes = [
@@ -21,6 +23,7 @@ const routes: Routes = [
         component: AndroidTvComponent,
         children: [
             {path: 'apps', component: AndroidTvAppsComponent},
+            {path: 'logs', component: AndroidTvLogsComponent},
             {path: 'info', component: AndroidTvInfoComponent},
             {path: 'devices', component: AndroidTvDevicesComponent},
             {path: '', redirectTo: 'apps', pathMatch: 'full'},
@@ -38,6 +41,8 @@ const routes: Routes = [
         ApkLibraryComponent,
         FirebaseBuildsComponent,
         AdbApprovalComponent,
+        AndroidTvLogsComponent,
+        CollectLogsComponent,
     ],
     imports: [
         PlatformRailComponent,

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {open as showOpenDialog} from '@tauri-apps/plugin-dialog';
-import {invoke} from '@tauri-apps/api/core';
+import {Channel, invoke} from '@tauri-apps/api/core';
 import {DeviceProvider, DeviceInfo, Platform, PlatformApp, PlatformDevice} from '../models/device-provider.interface';
 
 export interface AdbDevice {
@@ -163,6 +163,17 @@ export class AdbService implements DeviceProvider {
         return invoke<void>('plugin:adb-manager|adb_launch', {serial, packageId});
     }
 
+    /** Streams the app's logcat lines (the whole device's when `packageId` is empty); `null` arrives once when the stream ends. `clear` empties the TV's log first. */
+    async logcatStart(serial: string, packageId: string, onLine: (line: string | null) => void, clear = false): Promise<void> {
+        const channel = new Channel<string | null>();
+        channel.onmessage = onLine;
+        return invoke<void>('plugin:adb-manager|adb_logcat_start', {serial, packageId, clear, onLine: channel});
+    }
+
+    async logcatStop(): Promise<void> {
+        return invoke<void>('plugin:adb-manager|adb_logcat_stop');
+    }
+
     async forceStop(serial: string, packageId: string): Promise<void> {
         return invoke<void>('plugin:adb-manager|adb_force_stop', {serial, packageId});
     }
@@ -211,6 +222,11 @@ export class AdbService implements DeviceProvider {
     /** The Android TVs, LG and Samsung TVs on this computer's /24 network. */
     async lanScan(): Promise<LanDevice[]> {
         return invoke<LanDevice[]>('plugin:adb-manager|lan_scan');
+    }
+
+    /** This computer's address on the network, or null when it is offline. */
+    async localIp(): Promise<string | null> {
+        return invoke<string | null>('plugin:adb-manager|local_ip');
     }
 
     async openLibraryFolderChooser(): Promise<string | null> {

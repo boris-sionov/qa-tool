@@ -1,0 +1,193 @@
+<div class="logs">
+  <header class="logs-head">
+    <a class="back" routerLink="../apps"><i class="bi bi-arrow-left"></i> Apps</a>
+    <div class="title">
+      <b>{{ name }}</b> <span class="pkg">{{ pkg }}</span>
+    </div>
+    <div class="tabs">
+      <button type="button" [class.on]="tab === 'network'" (click)="tab = 'network'">
+        Network <span class="count">{{ calls.length }}</span>
+      </button>
+      <button type="button" [class.on]="tab === 'log'" (click)="tab = 'log'">Log</button>
+    </div>
+    <span class="status" [class]="status">
+      @switch (status) {
+        @case ('live') { ● Live }
+        @case ('connecting') { Connecting… }
+        @case ('ended') { ● Stream ended }
+        @default { ● Error }
+      }
+    </span>
+  </header>
+
+  @if (status === 'error') {
+    <div class="note error">{{ error }}</div>
+  } @else if (tab === 'network') {
+    <div class="stack" #stack>
+      <!-- The calls, newest at the bottom, like Charles' Sequence. -->
+      <div class="list" [style.flex-basis.%]="listPct">
+        <div class="cols head"><span>Code</span><span>Method</span><span>Host</span><span>Path</span><span>Start</span><span>Duration</span><span>Size</span><span>Status</span></div>
+        <div class="rows" #scroller>
+          @for (c of visibleCalls; track c.id) {
+            <button type="button" class="cols row" [class.sel]="selected === c" (click)="selected = c">
+              <span class="code" [class.bad]="c.status !== null && c.status >= 400">{{ c.status ?? '' }}</span>
+              <span class="m">{{ c.method }}</span>
+              <span class="ell" [title]="host(c)">{{ host(c) }}</span>
+              <span class="ell" [title]="c.url">{{ path(c) }}</span>
+              <span>{{ start(c) }}</span>
+              <span class="num">{{ c.ms === null ? '' : c.ms + ' ms' }}</span>
+              <span class="num">{{ size(c) }}</span>
+              <span>{{ c.status === null ? 'Pending' : 'Complete' }}</span>
+            </button>
+          }
+          @if (!visibleCalls.length) {
+            <p class="empty pad">
+              @if (calls.length) { No request matches the filter. }
+              @else if (hasCurlLines) { Waiting for the next request… }
+              @else if (status === 'live') { No requests yet. Only the debug build logs its requests; use the app, or check the other build. }
+              @else { Connecting… }
+            </p>
+          }
+        </div>
+      </div>
+      <div class="split" (pointerdown)="drag($event, 'listPct', stack)" role="separator" aria-orientation="horizontal"></div>
+
+      <ng-container *ngTemplateOutlet="filterbar"></ng-container>
+
+      @if (selected; as c) {
+        <div class="detail">
+          <div class="dtabs">
+            <button type="button" [class.on]="detail === 'overview'" (click)="detail = 'overview'">Overview</button>
+            <button type="button" [class.on]="detail === 'contents'" (click)="detail = 'contents'">Contents</button>
+            <span class="grow"></span>
+            @if (copied) { <span class="flash">{{ copied }}</span> }
+            <button type="button" class="mini" (click)="copy(c.url, 'URL copied')">Copy URL</button>
+            <button type="button" class="mini" (click)="copyCurl(c)">Copy cURL</button>
+          </div>
+
+          @if (detail === 'overview') {
+            <div class="body ov">
+              <div class="kv"><b>URL</b><span>{{ c.url }}</span></div>
+              <div class="kv"><b>Method</b><span>{{ c.method }}</span></div>
+              <div class="kv"><b>Status</b><span>{{ c.status ?? 'No response yet' }}</span></div>
+              <div class="kv"><b>Duration</b><span>{{ c.ms === null ? '—' : c.ms + ' ms' }}</span></div>
+              <div class="kv"><b>Started</b><span>{{ c.time }}</span></div>
+              <div class="kv"><b>Request type</b><span>{{ type(c, 'req') || '—' }}</span></div>
+              <div class="kv"><b>Response type</b><span>{{ type(c, 'res') || '—' }}</span></div>
+              <div class="kv"><b>Request size</b><span>{{ c.reqBody.length }} chars</span></div>
+              <div class="kv"><b>Response size</b><span>{{ c.resBody.length }} chars</span></div>
+            </div>
+          } @else {
+            <div class="panes" #panes>
+              <!-- Request on top, response below; each has its tabs under its content, as in Charles. -->
+              @for (side of ['req', 'res']; track side) {
+                @let s = side === 'req' ? 'req' : 'res';
+                <section class="pane" [style.flex]="s === 'req' ? '0 0 ' + reqPct + '%' : '1 1 0'">
+                  <div class="body">
+                    @switch (view(c, s)) {
+                      @case ('headers') {
+                        @for (h of headers(c, s); track $index) { <div class="kv"><b>{{ h[0] }}</b><span>{{ header(h[0], h[1]) }}</span></div> }
+                        @if (!headers(c, s).length) { <p class="empty">{{ s === 'res' && c.status === null ? 'No response yet' : 'No headers' }}</p> }
+                      }
+                      @case ('query') {
+                        @for (q of query(c); track $index) { <div class="kv"><b>{{ q[0] }}</b><span>{{ q[1] }}</span></div> }
+                        @if (!query(c).length) { <p class="empty">No query string</p> }
+                      }
+                      @case ('json') {
+                        @if (json(c, s).root; as root) {
+                          <ng-container *ngTemplateOutlet="node; context: {$implicit: root}"></ng-container>
+                        } @else {
+                          <p class="empty">{{ body(c, s) ? 'Not valid JSON — the body may be incomplete. See Text.' : 'No body' }}</p>
+                        }
+                      }
+                      @case ('jsontext') {
+                        @if (json(c, s).root) {
+                          <pre class="code">@for (t of tokens(c, s); track $index) {<span [class]="t.c">{{ t.t }}</span>}</pre>
+                        } @else {
+                          <p class="empty">{{ body(c, s) ? 'Not valid JSON — the body may be incomplete. See Text.' : 'No body' }}</p>
+                        }
+                      }
+                      @case ('hex') { <pre class="code">{{ hex(c, s) }}</pre> }
+                      @case ('raw') { <pre class="code">{{ raw(c, s) }}</pre> }
+                      @default {
+                        @if (body(c, s)) { <pre class="code">{{ body(c, s) }}</pre> } @else { <p class="empty">No body</p> }
+                      }
+                    }
+                  </div>
+                  <div class="vtabs">
+                    @for (v of views(c, s); track v) {
+                      <button type="button" [class.on]="view(c, s) === v" (click)="chosen[s] = v">{{ label[v] }}</button>
+                    }
+                    <span class="grow"></span>
+                    @if (view(c, s) === 'json') {
+                      <button type="button" class="mini" (click)="json(c, s).root?.setAll(true)">Expand all</button>
+                      <button type="button" class="mini" (click)="json(c, s).root?.setAll(false)">Collapse all</button>
+                    }
+                    <button type="button" class="mini" (click)="copy(viewText(c, s))">Copy</button>
+                  </div>
+                </section>
+                @if (s === 'req') {
+                  <div class="split" (pointerdown)="drag($event, 'reqPct', panes)" role="separator" aria-orientation="horizontal"></div>
+                }
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="empty pad">Select a request to see its headers and body.</p>
+      }
+    </div>
+  } @else {
+    <ng-container *ngTemplateOutlet="filterbar"></ng-container>
+    <div class="raw" #scroller>
+      @for (l of visibleLines; track $index) {
+        <div class="row lv-{{ l.level }}">{{ text(l) }}</div>
+      }
+    </div>
+  }
+</div>
+
+<ng-template #filterbar>
+  <div class="filter">
+    <label for="logs-filter">Filter:</label>
+    @if (tab === 'log') {
+      <select [(ngModel)]="level" (ngModelChange)="refresh()" aria-label="Minimum level">
+        @for (l of levels; track l) { <option [value]="l">{{ l }}+</option> }
+      </select>
+    }
+    <input id="logs-filter" type="search" [(ngModel)]="search" (ngModelChange)="refresh()"
+           [placeholder]="tab === 'network' ? 'URL, method or status' : 'Search the log'">
+    <button type="button" class="tool" (click)="paused = !paused">
+      <i class="bi" [class.bi-pause-fill]="!paused" [class.bi-play-fill]="paused"></i>{{ paused ? 'Resume' : 'Pause' }}
+    </button>
+    <button type="button" class="tool" (click)="clear()"><i class="bi bi-trash"></i>Clear</button>
+    <button type="button" class="tool" (click)="showSecrets = !showSecrets" [attr.aria-pressed]="showSecrets">
+      <i class="bi" [class.bi-eye]="!showSecrets" [class.bi-eye-slash]="showSecrets"></i>
+      {{ showSecrets ? 'Hide tokens' : 'Show tokens' }}
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #node let-n>
+  <div class="jn">
+    @if (n.expandable) {
+      <button type="button" class="tw" (click)="n.open = !n.open">{{ n.open ? '▾' : '▸' }}</button>
+    } @else {
+      <span class="tw"></span>
+    }
+    @if (n.key !== '') { <span class="k">{{ n.key }}</span><span class="sep">:</span> }
+    <span class="val {{ n.kind }}">{{ n.preview }}</span>
+    <span class="acts">
+      <button type="button" (click)="copy(n.copyText)">copy</button>
+      <button type="button" (click)="copy(n.path, 'Path copied')">path</button>
+    </span>
+  </div>
+  @if (n.open && n.expandable) {
+    <div class="kids">
+      @for (c of n.visibleChildren; track c.path) {
+        <ng-container *ngTemplateOutlet="node; context: {$implicit: c}"></ng-container>
+      }
+      @if (n.hidden) { <button type="button" class="more" (click)="n.more()">Show {{ n.hidden > 200 ? 200 : n.hidden }} more of {{ n.hidden }}</button> }
+    </div>
+  }
+</ng-template>

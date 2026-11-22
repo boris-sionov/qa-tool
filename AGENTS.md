@@ -472,8 +472,7 @@ badge. Giving it one needs an unbadged 2.0 base.
 Entering Samsung runs `tizen_check_prerequisites` quietly (`TizenRequirementsService.autoCheck`):
 once per app start when everything is there, on every entry while something is missing. The first
 time it finds something missing it opens the list. **Requirements**, next to Add New Device on the
-Samsung Manage page, opens it any time, and turns amber while something is missing. A warning (no DUIDs) does not
-count as missing. The dialog also opens Tizen Studio's **Device Manager** and **Certificate
+Samsung Manage page, opens it any time, and turns amber while something is missing. The dialog also opens Tizen Studio's **Device Manager** and **Certificate
 Manager** (on macOS through `open` on their `.app` bundles — the bare binaries the code used to
 start are not there, or not executable).
 The dialog (`plugins/tizen_prereq.rs` behind it) lists each check with ✓ / ! / ✕, what it found and how to fix it.
@@ -487,9 +486,8 @@ TCP themselves — so the checks are what that flow calls:
 | Tizen CLI | `tizen version` does not print `Tizen CLI x.y.z` |
 | Tizen Studio sdb | `<studio>/tools/sdb version` fails — `tizen install` connects through it |
 | Java for the Tizen CLI | the Java `tizen.sh` would pick (`sdk.info` `JDK_PATH`, then `<studio>/jdk`, then `java` on the PATH) does not answer `-version` |
-| Certificate profiles | `profiles.xml` (via `cert_profiles_path`, the file the install reads) is missing or empty |
-| Selected certificate | no profile saved, the saved name is not a profile — the wizard takes it from the `.p12`'s folder name, which need not match — or its author / distributor key file is gone |
-| TVs covered by certificates | *warning* only: no distributor profile lists `<TestDevice>` DUIDs, so per-TV matching cannot work |
+Certificate profiles and the TVs they cover are not on the list (dropped in `34ecf28`): they are set up
+after the install, and `tizen_install_signed` checks them per TV anyway.
 
 Below the list the dialog shows how to fix each miss **for the OS the check ran on** (the command
 returns `std::env::consts::OS` / `ARCH`): what to download, numbered install steps and links that
@@ -500,18 +498,32 @@ directly — `download.tizen.org/sdk/Installer/tizen-studio_6.1/web-{cli,ide}_Ti
 (`macos-64.bin` / `.dmg`, `windows-64.exe`, `ubuntu-64.bin`; CLI-only ≈ 280 MB, IDE ≈ 650 MB).
 Bump `STUDIO_VERSION` if a newer one ever appears.
 
-**The guide installs the CLI only, without a window.** Both installers take `--accept-license`:
+**The guide installs the CLI only, without a window; Certificate Manager is its last, optional step.**
+Both installers take `--accept-license`, which accepts Samsung's Tizen SDK licence for the user, so
+the guide says so and names `--show-license` to read it first (from Samsung's install page; not run):
 
 ```bash
 ./web-cli_Tizen_Studio_6.1_macos-64.bin --accept-license ~/tizen-studio
+# optional — only to create a new certificate:
 ~/tizen-studio/package-manager/package-manager-cli.bin install --accept-license Certificate-Manager,cert-add-on
 ```
 
-The CLI install already has the tizen CLI, sdb, a JDK and Device Manager (`device-manager-product`
-is in `COMMON-MANDATORY`). Certificate Manager is not in it; `cert-add-on` is the Samsung
-Certificate Extension, from an extension repository that is active by default. The second command
-first updates every installed package, then pulls `BASELINE-COMMON` — over 10 minutes and ≈ 2 GB in
-all. Run on macOS on 2026-10-29 into an empty `HOME` (with `JAVA_TOOL_OPTIONS=-Duser.home=…`, since
+**The licence forbids redistribution** ("copy, redistribute or sublicense the Tizen SDK to third
+party", and no use of a component "independent from the Tizen SDK" — text from ScanCode's copy; the
+official link `developer.tizen.org/tizen-sdk-license-agreement` now lands on the samsungtizenos.com
+home page). So Samsung's files are never hosted by us — not in git, not on a release, not on a
+server — the user downloads them from Samsung. Samsung's own package list,
+`download.tizen.org/sdk/tizenstudio/official/pkg_list_macos-64`, has every package with a path and a
+SHA256, and each zip is a `data/` folder to copy into the Studio root.
+
+The CLI install already has everything a signed install needs: in that list `COMMON-CLI` →
+`new-common-cli` → `embedded-java`, `sdb`, `certificate-generator`, `sdk-utils`, `sdk-utils-core`
+(≈ 184 MB, 279 MB unpacked). Copies of those six packages were checked against the files of a working
+Studio on 2026-11-22; a trimmed copy of that Studio signed a WGT with a throwaway certificate. The
+package-by-package install itself was not run, and nothing was installed on a TV. Certificate
+Manager and `cert-add-on` only create certificates (the latter is the Samsung Certificate Extension,
+from an extension repository that is active by default); the command first updates every installed
+package, then pulls `BASELINE-COMMON` — over 10 minutes and ≈ 2 GB in all. Run on macOS on 2026-10-29 into an empty `HOME` (with `JAVA_TOOL_OPTIONS=-Duser.home=…`, since
 Java ignores `$HOME`); Windows and Linux use the same flags (`package-manager-cli.exe` on Windows)
 but were not run. Signing and installing a WGT from that install was not tried — the TV Extensions
 are not in it.

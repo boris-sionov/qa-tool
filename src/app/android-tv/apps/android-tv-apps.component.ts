@@ -10,6 +10,7 @@ import {ProgressDialogComponent} from '../../shared/components/progress-dialog/p
 import {extractMessage} from '../../core/utils/error.utils';
 import {environmentIcon} from '../../shared/app-environment-icons';
 import {brandIcon} from '../../shared/app-brand-icons';
+import {CollectLogsComponent} from '../logs/collect-logs.component';
 import {ApkLibraryComponent, LibraryPick} from '../library/apk-library.component';
 import {InstallSource} from '../../shared/components/install-menu/install-menu.component';
 
@@ -37,6 +38,15 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
     private iconPaths = new Map<string, string>();
 
     constructor(private adb: AdbService, public state: AdbStateService, private modalService: NgbModal) {}
+
+    /** The whole-TV log collector: clears the log, streams it live and saves it when QA is done. */
+    collectLogs(): void {
+        if (!this.serial || !this.selected) return;
+        const ref = this.modalService.open(CollectLogsComponent, {size: 'xl', centered: true, backdrop: 'static', keyboard: false});
+        ref.componentInstance.serial = this.serial;
+        ref.componentInstance.deviceName = this.selected.name;
+        ref.result.catch(noop);
+    }
 
     /** The icon to draw for an app, or `null` for the ATV placeholder. */
     iconPath(packageId: string): string | null {
