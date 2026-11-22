@@ -163,11 +163,11 @@ export class AdbService implements DeviceProvider {
         return invoke<void>('plugin:adb-manager|adb_launch', {serial, packageId});
     }
 
-    /** Streams the app's logcat lines; `null` arrives once when the stream ends. */
-    async logcatStart(serial: string, packageId: string, onLine: (line: string | null) => void): Promise<void> {
+    /** Streams the app's logcat lines (the whole device's when `packageId` is empty); `null` arrives once when the stream ends. `clear` empties the TV's log first. */
+    async logcatStart(serial: string, packageId: string, onLine: (line: string | null) => void, clear = false): Promise<void> {
         const channel = new Channel<string | null>();
         channel.onmessage = onLine;
-        return invoke<void>('plugin:adb-manager|adb_logcat_start', {serial, packageId, onLine: channel});
+        return invoke<void>('plugin:adb-manager|adb_logcat_start', {serial, packageId, clear, onLine: channel});
     }
 
     async logcatStop(): Promise<void> {

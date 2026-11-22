@@ -1,6 +1,7 @@
-//! Live `adb logcat` for one Android TV app.
+//! Live `adb logcat` for one Android TV app, or for the whole device.
 //!
-//! The whole device log is streamed, but only lines written by the app's process are sent on.
+//! The whole device log is streamed, but only lines written by the app's process are sent on
+//! (an empty package id sends every line).
 //! A process id changes every time the app restarts, so `pidof` is asked again every 2 s;
 //! a plain `logcat --pid=<n>` would stop being useful at the first restart.
 
@@ -46,17 +47,22 @@ fn line_pid(line: &str) -> Option<&str> {
     line.split_whitespace().nth(2)
 }
 
-/// Streams the app's log lines to `on_line`; `None` is sent once when the stream ends
-/// (TV gone, adb stopped).
+/// Streams the app's log lines to `on_line` (all lines when `package_id` is empty); `None` is sent
+/// once when the stream ends (TV gone, adb stopped). `clear` empties the device's log buffers first.
 #[tauri::command]
 pub(crate) async fn adb_logcat_start<R: Runtime>(
     app: AppHandle<R>,
     serial: String,
     package_id: String,
+    clear: Option<bool>,
     on_line: Channel<Option<String>>,
 ) -> Result<(), Error> {
     end_session();
-    let pids = Arc::new(Mutex::new(pids_of(&app, &serial, &package_id).await.unwrap_or_default()));
+    if clear == Some(true) {
+        run_adb(&app, &["-s", &serial, "logcat", "-c"]).await?;
+    }
+    let all = package_id.is_empty();
+    let pids = Arc::new(Mutex::new(if all { Vec::new() } else { pids_of(&app, &serial, &package_id).await.unwrap_or_default() }));
 
     let (mut rx, child) = app
         .shell()
@@ -68,7 +74,7 @@ pub(crate) async fn adb_logcat_start<R: Runtime>(
     let stop = Arc::new(AtomicBool::new(false));
     *SESSION.lock().unwrap() = Some(Session { child, stop: stop.clone() });
 
-    {
+    if !all {
         let (pids, stop) = (pids.clone(), stop.clone());
         tauri::async_runtime::spawn(async move {
             while !stop.load(Ordering::SeqCst) {
@@ -86,7 +92,7 @@ pub(crate) async fn adb_logcat_start<R: Runtime>(
                 CommandEvent::Stdout(bytes) => {
                     let text = String::from_utf8_lossy(&bytes);
                     let line = text.trim_end();
-                    let mine = line_pid(line).is_some_and(|p| pids.lock().unwrap().iter().any(|x| x == p));
+                    let mine = all || line_pid(line).is_some_and(|p| pids.lock().unwrap().iter().any(|x| x == p));
                     if mine && on_line.send(Some(line.to_string())).is_err() {
                         break;
                     }
