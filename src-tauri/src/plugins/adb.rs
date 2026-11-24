@@ -260,6 +260,13 @@ pub(crate) async fn adb_get_prop<R: Runtime>(app: AppHandle<R>, serial: String, 
 
 #[tauri::command]
 pub(crate) async fn adb_launch<R: Runtime>(app: AppHandle<R>, serial: String, package_id: String) -> Result<(), Error> {
+    // `monkey -p <pkg> 1` starts the activity the launcher shows (verified on a Xiaomi TV). A bare
+    // `am start -a MAIN -p` takes the first MAIN activity, which for Play Store is a setup screen
+    // that needs a permission shell lacks (SecurityException: PLAY_SETUP_SERVICE).
+    let out = run_adb(&app, &["-s", &serial, "shell", "monkey", "-p", &package_id, "1"]).await;
+    if matches!(&out, Ok(o) if o.contains("Events injected: 1")) {
+        return Ok(());
+    }
     run_adb(&app, &["-s", &serial, "shell", "am", "start", "-a", "android.intent.action.MAIN", "-p", &package_id]).await?;
     Ok(())
 }
