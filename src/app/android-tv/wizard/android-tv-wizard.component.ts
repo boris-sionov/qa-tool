@@ -21,6 +21,8 @@ export class AndroidTvWizardComponent implements AfterViewInit {
 
     name = '';
     ip = '';
+    /** The address the TV had when the edit opened; unchanged means a rename, which needs no connection. */
+    editIp = '';
     connecting = false;
     error: string | null = null;
     /** Set while the TV shows its "Allow USB debugging?" prompt for this computer. */
@@ -97,6 +99,10 @@ export class AndroidTvWizardComponent implements AfterViewInit {
         return this.awaitingApproval ? deviceSerial(this.awaitingApproval) : '';
     }
 
+    get renameOnly(): boolean {
+        return this.editMode && this.ip.trim() === this.editIp;
+    }
+
     get canSubmit(): boolean {
         return !!this.name.trim() && !!this.ip.trim() && !this.connecting;
     }
@@ -105,6 +111,14 @@ export class AndroidTvWizardComponent implements AfterViewInit {
         if (!this.canSubmit) return;
         const name = this.name.trim();
         const ip = this.ip.trim();
+        if (this.renameOnly) {
+            const device: SavedDevice = {name, ip, port: DEFAULT_PORT};
+            this.state.saveDevice(device);
+            // Keep an open TV open, under its new name.
+            if (this.state.selected$.value?.ip === ip) this.state.select(device);
+            this.modal.close(device);
+            return;
+        }
         this.connecting = true;
         this.error = null;
         try {

@@ -101,3 +101,6 @@ WGT-INSTALL-PLAN.md
 
 # Stray screen recordings / media
 *.mp4
+
+# Local scratch of the superpowers workflow (brainstorm mockups, plan ledgers)
+.superpowers/

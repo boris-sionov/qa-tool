@@ -1,0 +1,29 @@
+@if (devices.length === 0) {
+  <app-empty-state [link]="emptyLink"></app-empty-state>
+} @else {
+  <section class="picker">
+    <header class="picker-head">
+      <div>
+        @if (kicker) { <div class="kicker">{{ kicker }}</div> }
+        <h2>Choose a device</h2>
+      </div>
+      <app-list-filter placeholder="Search name or IP" [(value)]="search"></app-list-filter>
+    </header>
+
+    <div class="rows">
+      @for (d of shown; track d.key) {
+        <button type="button" class="pick-row" (click)="pick.emit(d.key)">
+          <span class="tile"><i class="bi" [class]="icon"></i></span>
+          <span class="who"><b>{{ d.name }}</b><code>{{ d.address }}</code></span>
+          <app-status-dot [status]="statusOf(d)"></app-status-dot>
+          <i class="bi bi-chevron-right chev"></i>
+        </button>
+      } @empty {
+        <p class="none">No device matches</p>
+      }
+      @if (emptyLink) {
+        <a class="pick-row add" [routerLink]="emptyLink"><i class="bi bi-plus-lg"></i>Add new device</a>
+      }
+    </div>
+  </section>
+}

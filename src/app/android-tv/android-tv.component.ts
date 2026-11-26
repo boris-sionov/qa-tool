@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AdbService} from '../core/services/adb.service';
-import {AdbStateService, deviceSerial, SavedDevice} from './adb-state.service';
+import {AdbStateService} from './adb-state.service';
 
 @Component({
     selector: 'app-android-tv',
@@ -9,35 +8,10 @@ import {AdbStateService, deviceSerial, SavedDevice} from './adb-state.service';
 })
 export class AndroidTvComponent implements OnInit {
 
-    devices: SavedDevice[] = [];
-    selected: SavedDevice | null = null;
+    constructor(private state: AdbStateService) {}
 
-    constructor(
-        public state: AdbStateService,
-        private adb: AdbService,
-    ) {}
-
+    /** Opening the section checks every saved TV and opens on the only connected one, if any. */
     ngOnInit(): void {
-        this.devices = this.state.getSavedDevices();
-        this.selected = this.state.selected$.value ?? this.devices[0] ?? null;
-        if (this.selected) this.state.select(this.selected);
+        void this.state.scan();
     }
-
-    selectDevice(serial: string): void {
-        const dev = this.devices.find(d => deviceSerial(d) === serial) ?? null;
-        this.selected = dev;
-        this.state.select(dev);
-        if (dev) {
-            this.adb.connect(deviceSerial(dev)).catch(() => {});
-        }
-    }
-
-    onDevicesChanged(): void {
-        this.devices = this.state.getSavedDevices();
-        if (!this.devices.find(d => deviceSerial(d) === deviceSerial(this.selected!))) {
-            this.selected = this.devices[0] ?? null;
-            this.state.select(this.selected);
-        }
-    }
-
 }

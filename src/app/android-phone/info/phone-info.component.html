@@ -1,4 +1,7 @@
 <div class="info-page">
+  @if (serial) {
+    <app-device-chip class="info-chip" [name]="name" status="connected" (back)="state.select(null)"></app-device-chip>
+  }
   @if (!serial) {
     <app-phone-status></app-phone-status>
   } @else if (loading) {

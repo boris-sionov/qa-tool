@@ -1,35 +1,18 @@
 <div class="w-100 h-100 d-flex flex-column overflow-visible" xmlns="http://www.w3.org/1999/html">
+  @if (device) {
   <div class="manager-toolbar bg-panel border-bottom">
-    <!-- Device Selector -->
-    <div class="device-selector-container" ngbDropdown>
-      <button class="device-dropdown-btn" ngbDropdownToggle>
-        <i class="bi bi-tv"></i>
-        <span class="device-name">{{ device ? device.name : 'No device selected' }}</span>
-        <i class="bi bi-chevron-down chevron"></i>
-      </button>
-      <div ngbDropdownMenu class="device-dropdown-menu">
-        @if ((devices$ | async)?.length === 0) {
-          <span class="device-dropdown-empty">No devices saved</span>
-        }
-        @for (dev of devices$ | async; track dev.name) {
-          <button ngbDropdownItem class="device-dropdown-item"
-                  [class.active]="dev.name === device?.name"
-                  (click)="deviceManager.setDefault(dev.name)">
-            <i class="bi bi-check2 check-icon" [class.invisible]="dev.name !== device?.name"></i>
-            <span>{{ dev.name }}</span>
-          </button>
-        }
-      </div>
-    </div>
+    <app-device-chip [name]="device.name" (back)="deviceManager.select(null)"></app-device-chip>
 
     <!-- Install Button -->
     <div class="install-btn-container">
       <app-install-menu [sources]="installSources" (choose)="install($event)"></app-install-menu>
     </div>
   </div>
+  }
   <div class="p-4 flex-fill overflow-auto apps-scroll">
     @if (!device) {
-      <app-empty-state [link]="['../devices']"></app-empty-state>
+      <app-device-picker kicker="LG" [devices]="(deviceManager.pickerDevices$ | async) ?? []"
+                         (pick)="deviceManager.select($event)"></app-device-picker>
     } @else {
       <app-installed #installedComponent [device]="device" [installed$]="packages$"></app-installed>
     }

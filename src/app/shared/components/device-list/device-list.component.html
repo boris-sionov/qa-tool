@@ -1,0 +1,40 @@
+<div class="device-grid">
+  @for (dev of devices; track serialOf(dev)) {
+    <article class="device-card" role="button" tabindex="0" [class.selected]="selected === serialOf(dev)"
+             (click)="pick.emit(dev)" (keydown.enter)="pick.emit(dev)">
+      <div class="device-card-header">
+        <div class="device-icon" [class.active]="statuses[serialOf(dev)] === 'connected'">
+          <i class="bi bi-android2"></i>
+        </div>
+        @switch (statuses[serialOf(dev)]) {
+          @case ('connected') {
+            <span class="status-badge active"><i class="bi bi-check-circle-fill"></i>Connected</span>
+          }
+          @case ('checking') {
+            <span class="status-badge checking"><app-spinner size="sm"></app-spinner>Connecting</span>
+          }
+          @case ('unauthorized') {
+            <span class="status-badge failed" title="Accept the prompt on the TV, then click to check again">
+              <i class="bi bi-shield-exclamation"></i>Allow on TV
+            </span>
+          }
+          @case ('failed') {
+            <span class="status-badge failed" title="Click to reconnect">
+              <i class="bi bi-x-circle-fill"></i>Not connected
+            </span>
+          }
+        }
+      </div>
+      <div class="device-card-body">
+        <h4 class="device-name">{{ dev.name }}</h4>
+        <div class="device-info"><i class="bi bi-router"></i><span>{{ dev.ip }}</span></div>
+      </div>
+      @if (actions) {
+        <!-- Buttons here must not also pick the card. -->
+        <div class="device-card-actions" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()">
+          <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{$implicit: dev}"></ng-container>
+        </div>
+      }
+    </article>
+  }
+</div>

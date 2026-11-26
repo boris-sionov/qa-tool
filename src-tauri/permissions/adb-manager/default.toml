@@ -27,6 +27,7 @@ permissions = [
   "allow-play-store-listing",
   "allow-tailscale-state",
   "allow-lan-scan",
+  "allow-port-probe",
   "allow-local-ip",
   "allow-confluence-token-saved",
   "allow-confluence-save-token",

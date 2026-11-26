@@ -1,12 +1,9 @@
 import {ScannedTv} from "../shared/components/scan-devices/scan-devices.component";
 import {Component, ElementRef, HostListener, Injector, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Device} from '../types';
 import {DeviceManagerService} from '../core/services';
 import {WizardComponent} from "../add-device/wizard/wizard.component";
 import {noop} from "rxjs";
-import {filter} from "rxjs/operators";
-import {isNonNull} from "../shared/operators";
 import {APP_VERSION} from '../core/build-info';
 import {DeviceChooserComponent} from "./device-chooser/device-chooser.component";
 import {DevicesComponent} from "../devices/devices.component";
@@ -18,7 +15,6 @@ import {DevicesComponent} from "../devices/devices.component";
 })
 export class LgComponent implements OnInit {
 
-    selectedDevice?: Device;
     appVersion: string;
     @ViewChild('appNav', {static: true})
     appNav?: ElementRef<HTMLElement>;
@@ -28,16 +24,7 @@ export class LgComponent implements OnInit {
         public deviceManager: DeviceManagerService,
         private modalService: NgbModal,
     ) {
-        deviceManager.devices$.pipe(filter(isNonNull)).subscribe((devices) => {
-            this.selectedDevice = devices.find((device) => device.default) || devices[0];
-        });
         this.appVersion = APP_VERSION;
-    }
-
-    markDefault(device: Device): void {
-        this.deviceManager.setDefault(device.name).catch(reason => {
-            console.log(reason);
-        });
     }
 
     /** `scanned`: a TV Scan Devices found, whose address and name the form starts with. */
@@ -51,7 +38,7 @@ export class LgComponent implements OnInit {
                 ]
             }),
         });
-        ref.result.then((device) => this.deviceManager.setDefault(device.name)).catch(noop);
+        ref.result.catch(noop);
     }
 
     defaultDragOver(event: DragEvent): void {
@@ -83,7 +70,7 @@ export class LgComponent implements OnInit {
         this.modalService.open(DeviceChooserComponent, {
             size: 'sm',
             centered: true,
-        }).result.then((device) => this.markDefault(device)).catch(noop);
+        }).result.then((device) => this.deviceManager.select(device.name)).catch(noop);
     }
 
     ngOnInit(): void {

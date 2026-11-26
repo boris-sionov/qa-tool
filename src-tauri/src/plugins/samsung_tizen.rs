@@ -1579,6 +1579,7 @@ pub fn plugin<R: Runtime>(name: &'static str) -> TauriPlugin<R> {
             super::apk_library::play_store_listing,
             super::apk_library::tailscale_state,
             super::net_scan::lan_scan,
+            super::net_scan::port_probe,
             super::net_scan::local_ip,
             super::confluence::confluence_token_saved,
             super::confluence::confluence_save_token,

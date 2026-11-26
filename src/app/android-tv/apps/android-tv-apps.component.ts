@@ -13,6 +13,8 @@ import {brandIcon} from '../../shared/app-brand-icons';
 import {CollectLogsComponent} from '../logs/collect-logs.component';
 import {ApkLibraryComponent, LibraryPick} from '../library/apk-library.component';
 import {InstallSource} from '../../shared/components/install-menu/install-menu.component';
+import {PickerDevice} from '../../shared/components/device-picker/picker-device';
+import {DeviceStatus} from '../../shared/components/device-list/device-list.component';
 
 /** pm's answers when an APK cannot replace the installed app without an uninstall first. */
 const REPLACE_REFUSED = /INSTALL_FAILED_UPDATE_INCOMPATIBLE|INSTALL_FAILED_VERSION_DOWNGRADE/;
@@ -33,7 +35,8 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
     selected: SavedDevice | null = null;
     connection: AdbConnection = {device: null, status: 'none'};
     connectionError?: Error;
-    devices: SavedDevice[] = [];
+    private devices: SavedDevice[] = [];
+    pickerDevices: PickerDevice[] = [];
     private sub?: Subscription;
     private iconPaths = new Map<string, string>();
 
@@ -90,6 +93,7 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
         }));
 
         this.devices = this.state.getSavedDevices();
+        this.pickerDevices = this.devices.map(d => ({key: deviceSerial(d), name: d.name, address: d.ip}));
     }
 
     ngOnDestroy(): void {
@@ -101,18 +105,15 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
         return dev ? deviceSerial(dev) : null;
     }
 
-    selectDevice(deviceSerial: string): void {
-        if (!deviceSerial) {
-            this.state.select(null);
-            return;
-        }
-        const [ip, portStr] = deviceSerial.split(':');
-        const port = parseInt(portStr, 10);
-        const devices = this.state.getSavedDevices();
-        const device = devices.find(d => d.ip === ip && d.port === port);
-        if (device) {
-            this.state.select(device);
-        }
+    /** A click on a row of the picker: open that TV. */
+    pick(key: string): void {
+        const device = this.devices.find(d => deviceSerial(d) === key);
+        if (device) this.state.choose(device);
+    }
+
+    /** The dot beside the open TV's name. */
+    get chipStatus(): DeviceStatus | undefined {
+        return this.connection.status === 'none' ? undefined : this.connection.status;
     }
 
     /** Retry from the error card: a failed connection is checked again, a failed list reloaded. */

@@ -18,7 +18,7 @@ export class DebugComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(public route: ActivatedRoute, private location: Location, private deviceManager: DeviceManagerService) {
+  constructor(public route: ActivatedRoute, private location: Location, public deviceManager: DeviceManagerService) {
   }
 
   ngOnInit(): void {

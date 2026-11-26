@@ -1,30 +1,13 @@
 <div class="info-page">
+  @if (device) {
   <div class="manager-toolbar bg-panel border-bottom">
-    <div class="device-selector-container" ngbDropdown>
-      <button class="device-dropdown-btn" ngbDropdownToggle>
-        <span class="samsung-dot">S</span>
-        <span class="device-name">{{ device ? device.name : 'No device selected' }}</span>
-        <i class="bi bi-chevron-down chevron"></i>
-      </button>
-      <div ngbDropdownMenu class="device-dropdown-menu">
-        @if (devices.length === 0) {
-          <span class="device-dropdown-empty">No devices saved</span>
-        }
-        @for (item of devices; track item.ip + ':' + item.port) {
-          <button ngbDropdownItem class="device-dropdown-item"
-                  [class.active]="device && item.ip === device.ip && item.port === device.port"
-                  (click)="selectDevice(item.ip + ':' + item.port)">
-            <i class="bi bi-check2 check-icon" [class.invisible]="!(device && item.ip === device.ip && item.port === device.port)"></i>
-            <span>{{ item.name }}</span>
-          </button>
-        }
-      </div>
-    </div>
+    <app-device-chip [name]="device.name" (back)="state.select(null)"></app-device-chip>
   </div>
+  }
 
   <div class="info-content">
     @if (!device) {
-      <app-empty-state [link]="['../devices']"></app-empty-state>
+      <app-device-picker kicker="Samsung" [devices]="pickerDevices" (pick)="pick($event)"></app-device-picker>
     } @else if (loading) {
       <app-spinner size="lg" [center]="true"></app-spinner>
     } @else if (error) {

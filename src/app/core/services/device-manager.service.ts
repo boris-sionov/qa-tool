@@ -1,5 +1,6 @@
 import {Injectable, NgZone} from "@angular/core";
 import {BehaviorSubject, from, Observable, Subject} from "rxjs";
+import {map} from "rxjs/operators";
 import {CrashReportEntry, Device, DeviceLike, FileItem, FileSession, NewDevice, StorageInfo} from '../../types';
 import {BackendClient, IOError} from "./backend-client";
 import {FileSessionImpl} from "./file.session";
@@ -8,22 +9,32 @@ import {LunaResponseError, RemoteLunaService} from "./remote-luna.service";
 import {RemoteCommandService} from "./remote-command.service";
 import {RemoteFileService} from "./remote-file.service";
 import * as path from "@tauri-apps/api/path";
+import {PickerDevice} from "../../shared/components/device-picker/picker-device";
 
 export type ScreenshotMethod = 'DISPLAY' | 'VIDEO' | 'GRAPHIC';
+
+/**
+ * The picked TV after the saved list changed: the same name from the new list, or nothing when it
+ * is gone. A `default` flag in the saved file (older versions picked that TV at start) is ignored.
+ */
+export function keepSelection(devices: Device[], current: Device | null): Device | null {
+    return current ? devices.find(d => d.name === current.name) ?? null : null;
+}
 
 @Injectable({
     providedIn: 'root'
 })
 export class DeviceManagerService extends BackendClient {
 
-    private devicesSubject: Subject<Device[] | null>;
-    private selectedSubject: Subject<Device | null>;
+    private devicesSubject: BehaviorSubject<Device[] | null>;
+    private selectedSubject: BehaviorSubject<Device | null>;
 
     constructor(zone: NgZone, private cmd: RemoteCommandService, private file: RemoteFileService,
                 private luna: RemoteLunaService) {
         super(zone, 'device-manager');
         this.devicesSubject = new BehaviorSubject<Device[] | null>(null);
         this.selectedSubject = new BehaviorSubject<Device | null>(null);
+        this.pickerDevices$ = this.devicesSubject.pipe(map(list => (list ?? []).map(d => ({key: d.name, name: d.name, address: d.host, port: d.port}))));
         this.on('devicesUpdated', (devices: Device[]) => this.onDevicesUpdated(devices));
     }
 
@@ -35,6 +46,15 @@ export class DeviceManagerService extends BackendClient {
         return this.selectedSubject.asObservable();
     }
 
+    /** The saved TVs as the rows of `<app-device-picker>`; the port is the one the dot probes. A field, so `| async` keeps one subscription. */
+    readonly pickerDevices$: Observable<PickerDevice[]>;
+
+    /** Opens a TV for this session, or none. Not remembered: nothing is open when the tool starts. */
+    select(name: string | null): void {
+        const device = name ? this.devicesSubject.value?.find(d => d.name === name) ?? null : null;
+        this.selectedSubject.next(device);
+    }
+
 
     load(): void {
         this.list().then(devices => this.onDevicesUpdated(devices));
@@ -42,12 +62,6 @@ export class DeviceManagerService extends BackendClient {
 
     async list(): Promise<Device[]> {
         return await this.invoke('list');
-    }
-
-    async setDefault(name: string): Promise<Device> {
-        const device = await this.invoke<Device>('set_default', {name});
-        this.load();
-        return device;
     }
 
     async removeDevice(name: string, removeKey: boolean): Promise<void> {
@@ -209,7 +223,7 @@ export class DeviceManagerService extends BackendClient {
 
     private onDevicesUpdated(devices: Device[]) {
         this.devicesSubject.next(devices);
-        this.selectedSubject.next(devices.find((device) => device.default) ?? devices[0]);
+        this.selectedSubject.next(keepSelection(devices, this.selectedSubject.value));
     }
 }
 

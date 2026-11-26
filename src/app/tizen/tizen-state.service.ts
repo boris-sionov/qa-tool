@@ -13,6 +13,7 @@ export function tizenSerial(device: TizenDevice): string {
 }
 
 const STORAGE_KEY = 'smart-tv-qa-tizen-devices';
+/** Written by older versions, which reopened on the last pick; now only cleaned up. */
 const SELECTED_STORAGE_KEY = 'smart-tv-qa-tizen-selected-device';
 const STUDIO_PATH_KEY = 'smart-tv-qa-tizen-studio-path';
 const CERT_PROFILE_KEY = 'smart-tv-qa-tizen-cert-profile';
@@ -24,8 +25,13 @@ export interface TizenAppsCache {
 
 @Injectable({providedIn: 'root'})
 export class TizenStateService {
-    selected$ = new BehaviorSubject<TizenDevice | null>(this.getLastSelectedDevice());
+    /** Nothing is selected until QA picks a TV: not restored, not guessed. */
+    selected$ = new BehaviorSubject<TizenDevice | null>(null);
     private appsCache = new Map<string, TizenAppsCache>();
+
+    constructor() {
+        localStorage.removeItem(SELECTED_STORAGE_KEY);
+    }
 
     getCachedApps(serial: string): TizenAppsCache | null {
         return this.appsCache.get(serial) ?? null;
@@ -62,16 +68,11 @@ export class TizenStateService {
         const list = this.getSavedDevices().filter(d => !(d.ip === device.ip && d.port === device.port));
         localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
         if (this.selected$.value?.ip === device.ip && this.selected$.value?.port === device.port) {
-            this.select(list[0] ?? null);
+            this.select(null);
         }
     }
 
     select(device: TizenDevice | null): void {
-        if (device) {
-            localStorage.setItem(SELECTED_STORAGE_KEY, tizenSerial(device));
-        } else {
-            localStorage.removeItem(SELECTED_STORAGE_KEY);
-        }
         this.selected$.next(device);
     }
 
@@ -95,15 +96,5 @@ export class TizenStateService {
         path
             ? localStorage.setItem(STUDIO_PATH_KEY, path)
             : localStorage.removeItem(STUDIO_PATH_KEY);
-    }
-
-    private getLastSelectedDevice(): TizenDevice | null {
-        const serial = localStorage.getItem(SELECTED_STORAGE_KEY);
-        const devices = this.getSavedDevices();
-        if (serial) {
-            const match = devices.find(d => tizenSerial(d) === serial);
-            if (match) return match;
-        }
-        return devices[0] ?? null;
     }
 }

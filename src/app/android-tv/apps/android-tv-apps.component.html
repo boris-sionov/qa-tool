@@ -1,26 +1,7 @@
 <div class="w-100 h-100 d-flex flex-column overflow-visible">
+  @if (selected) {
   <div class="manager-toolbar bg-panel border-bottom">
-    <!-- Device Selector -->
-    <div class="device-selector-container" ngbDropdown>
-      <button class="device-dropdown-btn" ngbDropdownToggle>
-        <i class="bi bi-hdd-network"></i>
-        <span class="device-name">{{ selected ? selected.name : 'No device selected' }}</span>
-        <i class="bi bi-chevron-down chevron"></i>
-      </button>
-      <div ngbDropdownMenu class="device-dropdown-menu">
-        @if (devices.length === 0) {
-          <span class="device-dropdown-empty">No devices saved</span>
-        }
-        @for (dev of devices; track dev.ip) {
-          <button ngbDropdownItem class="device-dropdown-item"
-                  [class.active]="selected && selected.ip === dev.ip && selected.port === dev.port"
-                  (click)="selectDevice(dev.ip + ':' + dev.port)">
-            <i class="bi bi-check2 check-icon" [class.invisible]="!(selected && selected.ip === dev.ip && selected.port === dev.port)"></i>
-            <span>{{ dev.name }}</span>
-          </button>
-        }
-      </div>
-    </div>
+    <app-device-chip [name]="selected.name" [status]="chipStatus" (back)="state.select(null)"></app-device-chip>
 
     <!-- Install APK Button -->
     <div class="install-btn-container">
@@ -30,6 +11,7 @@
       <app-install-menu [sources]="installSources" [disabled]="!serial" (choose)="install($event)"></app-install-menu>
     </div>
   </div>
+  }
 
   <div class="p-4 flex-fill overflow-auto">
     @if (connection.status === 'failed') {
@@ -42,7 +24,8 @@
       <app-error-card title="Unable to get installed apps" [error]="packagesError" (retry)="retry()">
       </app-error-card>
     } @else if (!serial) {
-      <app-empty-state [link]="['../devices']"></app-empty-state>
+      <app-device-picker kicker="Android TV" [devices]="pickerDevices" [statuses]="(state.statuses$ | async) ?? {}"
+                         (pick)="pick($event)"></app-device-picker>
     } @else if (loading || packages === null) {
       <app-loading-card></app-loading-card>
     } @else if (packages.length === 0) {

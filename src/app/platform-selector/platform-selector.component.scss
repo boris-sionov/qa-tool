@@ -201,11 +201,18 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   padding: 9px 12px;
+  border: 0;
   border-radius: 12px;
+  background: transparent;
+  text-align: left;
   color: #A8B8CC;
 
-  &:hover { background: var(--glass); }
+  // The global no-select.scss gives every element `cursor: default`, which would cover the row's contents.
+  &, & * { cursor: pointer !important; }
+
+  &:hover, &:focus-visible { background: var(--glass); outline: none; }
   b { color: #fff; font-weight: 600; }
   code { margin-left: auto; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: #6F819B; }
 }

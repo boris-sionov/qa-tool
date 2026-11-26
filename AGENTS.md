@@ -250,9 +250,11 @@ transparent), used by the home page and beside every platform shell (Android TV,
 VIDAA, Android Phone). A Home tile heads the rail (it opens `/`); a shell passes `active` and `compact` (smaller tiles).
 
 The home page (`platform-selector/`) opens on an overview — what the tool does, in four lines, and the
-five logos to start from — and shows the picked platform on a stage: big logo with a glow, **Open apps** (VIDAA: *Connect to a TV*), **Manage devices**, **Device info**, and the
-saved devices of Android TV and Samsung (`getSavedDevices()`); LG, VIDAA and Android Phone have no
-list the home page can read cheaply.
+five logos to start from — and shows the picked platform on a stage: big logo with a glow, **Choose a device** (VIDAA: *Connect to a TV*), **Manage devices**, **Device info**, and the
+saved devices of Android TV, Samsung and LG (phones are plugged in, not saved; VIDAA has none). **Choose
+a device** clears that platform's selection and opens its Apps page, which shows the device list — it
+never opens a device. A saved device on the stage is a button: it picks that device and opens its Apps.
+Each row carries a status dot (see Device Picker).
 
 ### Buttons
 
@@ -356,16 +358,54 @@ events. Used by `RemoteShellService` for WebOS PTY shells.
 ### Device State Persistence
 
 Android TV and Tizen device lists are stored in `localStorage` (not a Tauri store or file):
-- `TizenStateService` — keys `smart-tv-qa-tizen-devices`, `smart-tv-qa-tizen-selected-device`, `smart-tv-qa-tizen-studio-path`, `smart-tv-qa-tizen-cert-profile`
-- `AdbStateService` — keys `freetv-android-tv-devices`, `freetv-android-tv-selected-device`
+- `TizenStateService` — keys `smart-tv-qa-tizen-devices`, `smart-tv-qa-tizen-studio-path`, `smart-tv-qa-tizen-cert-profile`
+- `AdbStateService` — key `freetv-android-tv-devices`
 
-A saved selection is not a connection: the adb server outlives the app and keeps listing a TV
-that has since slept or left the network as `device`. `AdbStateService.connection$` checks the
-selected TV whenever the selection changes, the one restored at startup included
-(`AdbService.ensureConnected`: listed *and* answering a `getprop` within 5 s, otherwise
-`disconnect` + `connect`, capped at 10 s because `adb connect` to a dead address waits out the
-75 s TCP timeout). Apps and Info load only once it says `connected`; `unauthorized` means the TV is
-showing its "Allow USB debugging?" prompt.
+**No platform persists, restores or guesses a selection.** Which device is open is in memory for the
+session (`selected$` in each state service; `DeviceManagerService.select()` for LG; `PhoneStateService.select()`
+for phones) and starts empty. The old keys (`freetv-android-tv-selected-device`,
+`smart-tv-qa-tizen-selected-device`, `smart-tv-qa-phone-selected`) are deleted at startup, and LG's
+`default` flag in `novacom-devices.json` (older versions opened that TV) is ignored: there is **no default
+device anywhere**. Rust's `set_default` and the `default` field remain only so old files stay readable.
+Removing the open device clears the selection. Moving between pages of a platform keeps it; **Choose a
+device** on Home and the **Devices** back button clear it.
+
+A saved TV is not a connection. **Opening the Android TV section** (`AndroidTvComponent.ngOnInit`
+→ `AdbStateService.scan()`) selects nothing and fills `statuses$` for every saved TV: adb is asked which
+TVs it holds (`AdbService.liveStates`: listed as `device` *and* answering a `getprop` within 5 s — `adb
+devices` alone is not enough, the adb server outlives the app and keeps listing a TV that has since slept)
+while the port is probed in parallel; `mergeStatus()` combines them (adb holding it or waiting for Allow
+wins, otherwise a port that answers counts as reachable). **It never runs `adb connect` for a TV the user
+has not picked.** A TV the user picks meanwhile keeps its fresher check. `connection$` is the selected
+TV's detail that Apps and Info wait on (they load only once it says `connected`; `unauthorized` means the
+TV is showing its "Allow USB debugging?" prompt). `choose(device)` is a row click: pick it, or re-check it
+when it is already picked.
+
+`<app-device-list>` (`shared/components/device-list/`) is the card list used by the Manage pages (name,
+address, status badge, per-card Edit / Remove). Do not use it for picking. Editing a TV without changing its address only renames it: no `adb connect`, so a disconnected TV can be renamed (`renameOnly` in the wizard).
+
+### Device Picker
+
+Every platform's Apps and Info pages show the same thing until a device is open, and nothing is opened,
+selected or connected before QA clicks a row:
+
+- `<app-device-picker>` (`shared/components/device-picker/`) — rows of icon, name, address, a status
+  dot and a chevron, a live search by name and IP (`<app-list-filter>` + `matches()`; **Enter does
+  nothing**), and an *Add new device* row to the Manage page (`emptyLink`, `null` for phones). With no
+  devices it renders `<app-empty-state>` itself. Inputs: `devices: PickerDevice[]` (`picker-device.ts`;
+  `key` is what `pick` emits), optional `statuses` (without them the picker probes the devices that
+  carry a `port`), `kicker`, `icon`. Give it a field, not a getter: a fresh array every change
+  detection breaks Angular's checks.
+- `<app-device-chip>` — starts the toolbar once a device is open: a **Devices** button (back to the
+  list) and the name. **There is no device dropdown anywhere.**
+- `<app-status-dot>` — a dot, no text: filled green = answers, hollow grey = does not, pulsing grey =
+  checking, amber (phones) = waiting for Allow; the tooltip says *Reachable* / *Not answering*.
+- `ReachabilityService` (`core/services/`) → Rust `port_probe` (`plugins/net_scan.rs`, on `adb-manager`):
+  opens a TCP connection to each `ip:port` and closes it, all at once, 1 s timeout. Ports: Android TV
+  5555, Samsung 26101, LG its SSH port. It proves the port answers, not that adb or SDB will connect.
+  Phones need no probe: `phoneStatus()` maps adb's USB state.
+- The LG **Terminal** page keeps its own per-tab device list (a tab per device); only its `+` button needs
+  a picked device and does nothing without one.
 
 `unauthorized` gets `AdbApprovalComponent` (`android-tv/approval/`) — in the add-device dialog, Apps
 and Info — instead of an error: it asks QA to press Allow on the TV, polls `adb devices` every 2 s
@@ -780,12 +820,13 @@ to hand an installed app back over `sdb`.
 ### Android Phone (ADB over USB)
 
 `/android-phone` (`src/app/android-phone/`) has the same Apps / Info / Manage pages as the other
-platforms. `PhoneStateService` polls the USB phones every 2 s while the section is open and picks
-the **current** phone: the last one picked (`smart-tv-qa-phone-selected`) while it is connected,
-otherwise the first ready one. Apps and Info open straight on it and follow it; with none ready
-they show `PhoneStatusComponent` — adb broken (it is the bundled sidecar, so that means a broken
-install: reinstall, or `npm run setup`), no phone (numbered setup steps, keeps waiting), waiting for
-Allow, or connecting. Manage lists every phone. The shell owns the "Allow USB debugging?" popup.
+platforms. `PhoneStateService` polls the USB phones every 2 s while the section is open. The **current**
+phone is only the one QA picked, while it is still plugged in — nothing is picked for QA, not even a single
+ready phone. With none picked, Apps and Info show `PhoneStatusComponent`: adb broken (it is the bundled
+sidecar, so that means a broken install: reinstall, or `npm run setup`), no phone (numbered setup steps,
+keeps waiting), or the list of plugged-in phones (`<app-device-picker>`, dots from `phoneStatus()`).
+A picked phone waiting for Allow or still connecting gets its card with a **Devices** back button.
+Manage lists every phone. The shell owns the "Allow USB debugging?" popup.
 
 It shows the few apps QA tests on phones. It shares the bundled adb and the install / uninstall / force-stop
 commands with Android TV; what differs lives in `plugins/adb_phone.rs` (on `adb-manager`):

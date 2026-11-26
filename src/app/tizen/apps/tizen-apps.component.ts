@@ -8,6 +8,7 @@ import {SdbAppInfo, SdbService, WgtIcon} from '../../core/services/sdb.service';
 import {MessageDialogComponent} from '../../shared/components/message-dialog/message-dialog.component';
 import {ProgressDialogComponent, ProgressStep} from '../../shared/components/progress-dialog/progress-dialog.component';
 import {tizenSerial, TizenDevice, TizenStateService} from '../tizen-state.service';
+import {PickerDevice} from '../../shared/components/device-picker/picker-device';
 import {TizenWizardComponent} from '../wizard/tizen-wizard.component';
 import {TizenRemoteDialogComponent} from '../remote-dialog/tizen-remote-dialog.component';
 import {isPriorityApp} from '../../shared/known-apps';
@@ -38,7 +39,8 @@ export class TizenAppsComponent implements OnInit, OnDestroy {
     readonly minimal = AppConfig.minimal;
     readonly installSources: InstallSource[] = [{id: 'file', label: 'From file', icon: 'bi-folder2-open'}, ...(AppConfig.minimal ? [] : [{id: 'confluence', label: 'From Confluence', icon: 'bi-journal-arrow-down', hint: 'The newest UAT or PREPROD build from Confluence'}])];
     selected: TizenDevice | null = null;
-    devices: TizenDevice[] = [];
+    private devices: TizenDevice[] = [];
+    pickerDevices: PickerDevice[] = [];
     apps: SdbAppInfo[] | null = null;
     search = '';
     appVersions: Map<string, string> = new Map();
@@ -59,10 +61,11 @@ export class TizenAppsComponent implements OnInit, OnDestroy {
         return !!this.serial && !this.certProfile && !this.certBannerDismissed;
     }
 
-    constructor(private sdb: SdbService, private state: TizenStateService, private modalService: NgbModal) {}
+    constructor(private sdb: SdbService, public state: TizenStateService, private modalService: NgbModal) {}
 
     ngOnInit(): void {
         this.devices = this.state.getSavedDevices();
+        this.pickerDevices = this.devices.map(d => ({key: tizenSerial(d), name: d.name, address: d.ip, port: d.port}));
         this.sub = this.state.selected$.subscribe(dev => {
             this.selected = dev;
             this.apps = null;
@@ -140,9 +143,10 @@ export class TizenAppsComponent implements OnInit, OnDestroy {
         this.listIcons = icons;
     }
 
-    selectDevice(serial: string): void {
-        const device = this.devices.find(d => tizenSerial(d) === serial) ?? null;
-        this.state.select(device);
+    /** A click on a row of the picker: open that TV. */
+    pick(key: string): void {
+        const device = this.devices.find(d => tizenSerial(d) === key);
+        if (device) this.state.select(device);
     }
 
     async loadApps(force = false): Promise<void> {

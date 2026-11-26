@@ -1,25 +1,7 @@
 <div class="tizen-apps-page">
+  @if (selected) {
   <div class="manager-toolbar bg-panel border-bottom">
-    <div class="device-selector-container" ngbDropdown>
-      <button class="device-dropdown-btn" ngbDropdownToggle>
-        <span class="samsung-dot">S</span>
-        <span class="device-name">{{ selected ? selected.name : 'No device selected' }}</span>
-        <i class="bi bi-chevron-down chevron"></i>
-      </button>
-      <div ngbDropdownMenu class="device-dropdown-menu">
-        @if (devices.length === 0) {
-          <span class="device-dropdown-empty">No devices saved</span>
-        }
-        @for (dev of devices; track dev.ip + ':' + dev.port) {
-          <button ngbDropdownItem class="device-dropdown-item"
-                  [class.active]="selected && selected.ip === dev.ip && selected.port === dev.port"
-                  (click)="selectDevice(dev.ip + ':' + dev.port)">
-            <i class="bi bi-check2 check-icon" [class.invisible]="!(selected && selected.ip === dev.ip && selected.port === dev.port)"></i>
-            <span>{{ dev.name }}</span>
-          </button>
-        }
-      </div>
-    </div>
+    <app-device-chip [name]="selected.name" (back)="state.select(null)"></app-device-chip>
 
     <div class="install-btn-container toolbar-actions">
       @if (!minimal) {
@@ -31,6 +13,7 @@
       <app-install-menu [sources]="installSources" [disabled]="!serial" [busy]="installing" (choose)="install($event)"></app-install-menu>
     </div>
   </div>
+  }
 
   @if (showCertBanner) {
     <div class="cert-banner">
@@ -47,7 +30,7 @@
 
   <div class="p-4 flex-fill overflow-auto">
     @if (!serial) {
-      <app-empty-state [link]="['../devices']"></app-empty-state>
+      <app-device-picker kicker="Samsung" [devices]="pickerDevices" (pick)="pick($event)"></app-device-picker>
     } @else if (appsError) {
       <app-error-card title="Unable to get installed apps" [error]="appsError" (retry)="loadApps(true)">
       </app-error-card>

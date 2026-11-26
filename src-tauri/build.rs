@@ -91,6 +91,7 @@ fn main() {
                     "play_store_listing",
                     "tailscale_state",
                     "lan_scan",
+                    "port_probe",
                     "local_ip",
                     "confluence_token_saved",
                     "confluence_save_token",
