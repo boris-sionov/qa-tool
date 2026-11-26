@@ -275,6 +275,29 @@ fn is_open(ip: Ipv4Addr, port: u16, timeout: Duration) -> bool {
     TcpStream::connect_timeout(&SocketAddr::new(IpAddr::V4(ip), port), timeout).is_ok()
 }
 
+/// Whether each `ip:port` accepts a TCP connection, all at once, in the order given. Nothing is
+/// sent; an unparsable target counts as closed. Fills the status dots of the device lists.
+fn probe(targets: &[String], timeout: Duration) -> Vec<bool> {
+    std::thread::scope(|s| {
+        let probes: Vec<_> = targets
+            .iter()
+            .map(|t| {
+                s.spawn(move || {
+                    t.parse::<SocketAddr>().is_ok_and(|addr| TcpStream::connect_timeout(&addr, timeout).is_ok())
+                })
+            })
+            .collect();
+        probes.into_iter().map(|p| p.join().unwrap_or(false)).collect()
+    })
+}
+
+#[tauri::command]
+pub(crate) async fn port_probe(targets: Vec<String>) -> Result<Vec<bool>, Error> {
+    tauri::async_runtime::spawn_blocking(move || probe(&targets, Duration::from_millis(1000)))
+        .await
+        .map_err(|e| Error::new(format!("Port probe failed: {e}")))
+}
+
 fn open_ports(ip: Ipv4Addr, timeout: Duration) -> Vec<u16> {
     PORTS.iter().copied().filter(|&port| is_open(ip, port, timeout)).collect()
 }
@@ -328,6 +351,16 @@ mod tests {
         assert_eq!(platform(&[8001, 8002, 8008]), Some(("tizen", false)));
         assert_eq!(platform(&[8008]), None); // Chromecast, or an Android TV with ADB off
         assert_eq!(platform(&[3000]), None); // a dev server, not an LG
+    }
+
+    #[test]
+    fn probe_reports_open_and_closed_ports_in_order() {
+        let open = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let open_addr = open.local_addr().unwrap().to_string();
+        // A listener that is dropped leaves its port closed.
+        let closed_addr = std::net::TcpListener::bind("127.0.0.1:0").unwrap().local_addr().unwrap().to_string();
+        let targets = [open_addr, closed_addr, "not an address".to_string()];
+        assert_eq!(probe(&targets, Duration::from_millis(300)), vec![true, false, false]);
     }
 
     #[test]

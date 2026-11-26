@@ -2,8 +2,6 @@ import {Component, NgZone, OnDestroy, OnInit, QueryList, ViewChildren, ViewEncap
 import {DeviceManagerService} from '../core/services';
 import {firstValueFrom, noop, Subscription} from "rxjs";
 import {Device} from "../types";
-import {filter} from "rxjs/operators";
-import {isNonNull} from "../shared/operators";
 import {RemoteShellService, ShellInfo, ShellToken} from "../core/services/remote-shell.service";
 import {ITerminalDimensions} from "@xterm/addon-fit";
 import {Event, listen, UnlistenFn} from "@tauri-apps/api/event";
@@ -117,7 +115,9 @@ export class TerminalComponent implements OnInit, OnDestroy {
         if (!size) {
             return;
         }
-        const startWith = device ?? await firstValueFrom(this.deviceManager.selected$.pipe<Device>(filter(isNonNull)));
+        // The + button opens the picked TV; with none picked the list beside it is where to choose.
+        const startWith = device ?? await firstValueFrom(this.deviceManager.selected$);
+        if (!startWith) return;
         const progress = ProgressDialogComponent.open(this.modals);
         try {
             const shellInfo = await this.shell.open(startWith, size.rows, size.cols, this.preferDumbShell);

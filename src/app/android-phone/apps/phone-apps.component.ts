@@ -60,18 +60,14 @@ export class PhoneAppsComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        // Opens on the connected phone, and follows it: a phone that becomes ready, is picked in
-        // the dropdown or is unplugged reloads the list.
+        // Opens on the connected phone, and follows it: a phone that is picked and ready, or is
+        // unplugged or sent back to the list, reloads the list.
         this.sub = this.state.changed$.subscribe(() => this.follow());
         this.follow();
     }
 
     ngOnDestroy(): void {
         this.sub?.unsubscribe();
-    }
-
-    switchTo(serial: string): void {
-        this.state.select(serial);
     }
 
     private follow(): void {

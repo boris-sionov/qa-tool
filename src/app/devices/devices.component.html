@@ -63,7 +63,7 @@
                   Cancel
                 </button>
               }
-              @if (device.default) {
+              @if (device.name === (deviceManager.selected$ | async)?.name) {
                 <button class="device-btn secondary" title="Disconnect SSH session"
                         (click)="deviceManager.disconnect(device.name)">
                   <i class="bi bi-plug"></i>

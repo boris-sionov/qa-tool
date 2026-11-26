@@ -6,13 +6,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
     template: `
       <label class="list-filter">
         <i class="bi bi-search"></i>
-        <input type="search" placeholder="Filter by name or ID" aria-label="Filter apps"
+        <input type="search" [placeholder]="placeholder" [attr.aria-label]="placeholder"
                [ngModel]="value" (ngModelChange)="valueChange.emit($event)">
       </label>`,
     styleUrls: ['./list-filter.component.scss'],
 })
 export class ListFilterComponent {
     @Input() value = '';
+    @Input() placeholder = 'Filter by name or ID';
     @Output() valueChange = new EventEmitter<string>();
 }
 

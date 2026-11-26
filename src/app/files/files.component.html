@@ -13,14 +13,8 @@
       <div class="flex-fill mx-2 breadcrumb-bar border rounded">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb my-0 btn-group flex-nowrap">
-            <li>
-              <select class="breadcrumb-item form-select form-select-sm border-0 border-end rounded-end-0"
-                      [value]="device.name" (change)="deviceManager.setDefault(deviceSelect.value)" #deviceSelect>
-                @let devices = deviceManager.devices$ | async;
-                @for (item of devices; track item.name) {
-                  <option [value]="item.name" [selected]="item.name === device.name">{{ item.name }}</option>
-                }
-              </select>
+            <li class="px-2">
+              <app-device-chip [name]="device.name" (back)="deviceManager.select(null)"></app-device-chip>
             </li>
             @if (history) {
               @for (dir of state.breadcrumb; track $index) {
@@ -94,5 +88,8 @@
 </ng-container>
 
 @if (!device) {
-  <app-empty-state class="w-100" [link]="['../devices']"></app-empty-state>
+  <div class="w-100 p-4">
+    <app-device-picker kicker="LG" [devices]="(deviceManager.pickerDevices$ | async) ?? []"
+                       (pick)="deviceManager.select($event)"></app-device-picker>
+  </div>
 }

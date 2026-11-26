@@ -15,6 +15,7 @@ import {ApkLibraryComponent} from './library/apk-library.component';
 import {FirebaseBuildsComponent} from './library/firebase-builds.component';
 import {AndroidTvLogsComponent} from './logs/android-tv-logs.component';
 import {CollectLogsComponent} from './logs/collect-logs.component';
+import {DeviceListComponent} from '../shared/components/device-list/device-list.component';
 import {AdbApprovalComponent} from './approval/adb-approval.component';
 
 const routes: Routes = [
@@ -46,6 +47,7 @@ const routes: Routes = [
     ],
     imports: [
         PlatformRailComponent,
+        DeviceListComponent,
         CommonModule,
         FormsModule,
         SharedModule,

@@ -22,6 +22,10 @@ import {ConfluenceBuildsDialogComponent} from './components/confluence-builds/co
 import {ListFilterComponent} from './components/list-filter/list-filter.component';
 
 import {AppListHeaderComponent} from './components/app-list-header/app-list-header.component';
+import {DevicePickerComponent} from './components/device-picker/device-picker.component';
+import {DeviceChipComponent} from './components/device-chip/device-chip.component';
+import {StatusDotComponent} from './components/status-dot/status-dot.component';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
     declarations: [
@@ -38,8 +42,9 @@ import {AppListHeaderComponent} from './components/app-list-header/app-list-head
         ConfluenceBuildsDialogComponent,
         ListFilterComponent,
         AppListHeaderComponent,
+        DevicePickerComponent,
     ],
-    imports: [CommonModule, FormsModule, NgbModule,
+    imports: [CommonModule, FormsModule, NgbModule, RouterModule, DeviceChipComponent, StatusDotComponent,
         ExternalLinkDirective, SpinnerComponent, InstallMenuComponent, EmptyStateComponent, HostIpComponent],
     exports: [
         HostIpComponent,
@@ -59,6 +64,9 @@ import {AppListHeaderComponent} from './components/app-list-header/app-list-head
         ConfluenceBuildsDialogComponent,
         ListFilterComponent,
         AppListHeaderComponent,
+        DevicePickerComponent,
+        DeviceChipComponent,
+        StatusDotComponent,
     ]
 })
 export class SharedModule {

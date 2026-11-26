@@ -2,6 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {SdbService} from '../../core/services/sdb.service';
 import {tizenSerial, TizenDevice, TizenStateService} from '../tizen-state.service';
+import {PickerDevice} from '../../shared/components/device-picker/picker-device';
 
 interface InfoRow {
     label: string;
@@ -18,17 +19,19 @@ interface InfoRow {
 export class TizenInfoComponent implements OnInit, OnDestroy {
 
     device: TizenDevice | null = null;
-    devices: TizenDevice[] = [];
+    private devices: TizenDevice[] = [];
+    pickerDevices: PickerDevice[] = [];
     info: InfoRow[] = [];
     loading = false;
     error?: Error;
     copySuccess = false;
     private sub?: Subscription;
 
-    constructor(private sdb: SdbService, private state: TizenStateService) {}
+    constructor(private sdb: SdbService, public state: TizenStateService) {}
 
     ngOnInit(): void {
         this.devices = this.state.getSavedDevices();
+        this.pickerDevices = this.devices.map(d => ({key: tizenSerial(d), name: d.name, address: d.ip, port: d.port}));
         this.sub = this.state.selected$.subscribe(dev => {
             this.device = dev;
             this.info = [];
@@ -65,9 +68,10 @@ export class TizenInfoComponent implements OnInit, OnDestroy {
         }
     }
 
-    selectDevice(serial: string): void {
-        const device = this.devices.find(dev => tizenSerial(dev) === serial) ?? null;
-        this.state.select(device);
+    /** A click on a row of the picker: open that TV. */
+    pick(key: string): void {
+        const device = this.devices.find(d => tizenSerial(d) === key);
+        if (device) this.state.select(device);
     }
 
     async copyDeviceInfo(): Promise<void> {

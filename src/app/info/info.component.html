@@ -1,32 +1,14 @@
 <div class="info-page">
-  <!-- Device Selector Toolbar -->
+  @if (device) {
   <div class="manager-toolbar bg-panel border-bottom">
-    <div class="device-selector-container" ngbDropdown>
-      <button class="device-dropdown-btn" ngbDropdownToggle>
-        <i class="bi bi-tv"></i>
-        <span class="device-name">{{ device ? device.name : 'No device selected' }}</span>
-        <i class="bi bi-chevron-down chevron"></i>
-      </button>
-      <div ngbDropdownMenu class="device-dropdown-menu">
-        @let devices = deviceManager.devices$ | async;
-        @if ((devices)?.length === 0) {
-          <span class="device-dropdown-empty">No devices saved</span>
-        }
-        @for (item of devices; track item.name) {
-          <button ngbDropdownItem class="device-dropdown-item"
-                  [class.active]="item.name === device?.name"
-                  (click)="deviceManager.setDefault(item.name)">
-            <i class="bi bi-check2 check-icon" [class.invisible]="item.name !== device?.name"></i>
-            <span>{{ item.name }}</span>
-          </button>
-        }
-      </div>
-    </div>
+    <app-device-chip [name]="device.name" (back)="deviceManager.select(null)"></app-device-chip>
   </div>
+  }
 
   <div class="info-content">
     @if (!device) {
-      <app-empty-state [link]="['../devices']"></app-empty-state>
+      <app-device-picker kicker="LG" [devices]="(deviceManager.pickerDevices$ | async) ?? []"
+                         (pick)="deviceManager.select($event)"></app-device-picker>
     } @else if (loading) {
       <app-loading-card></app-loading-card>
     } @else if (infoError) {

@@ -12,7 +12,7 @@
 
       <div class="info">
         <div class="actions">
-          <button class="action primary" type="button" (click)="open('apps')">
+          <button class="action primary" type="button" (click)="current.id === 'vidaa' ? open('apps') : chooseDevice()">
             @switch (stage.primary.icon) {
               @case ('plug') { <svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6M7 8h10v3a5 5 0 0 1-10 0zM12 16v6"/></svg> }
               @default { <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg> }
@@ -35,8 +35,11 @@
           <div class="recent">
             <h4>Saved devices</h4>
             <div class="list">
-              @for (d of devices; track d.ip) {
-                <div class="dev"><b>{{ d.name }}</b><code>{{ d.ip }}</code></div>
+              @for (d of devices; track d.key) {
+                <button type="button" class="dev" (click)="openDevice(d.key)">
+                  <b>{{ d.name }}</b><code>{{ d.address }}</code>
+                  <app-status-dot [status]="statuses[d.key]"></app-status-dot>
+                </button>
               }
             </div>
           </div>

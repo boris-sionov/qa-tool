@@ -1,3 +1,9 @@
+@if (!device) {
+  <div class="w-100 p-4">
+    <app-device-picker kicker="LG" [devices]="(deviceManager.pickerDevices$ | async) ?? []"
+                       (pick)="deviceManager.select($event)"></app-device-picker>
+  </div>
+} @else {
 <div class="w-100 h-100 d-flex flex-column">
   <ul ngbNav class="nav-tabs pt-2 px-2 bg-panel" #nav="ngbNav" (navChange)="tabChange($event)" [activeId]="activeTab"
       [destroyOnHide]="true">
@@ -31,3 +37,4 @@
 
   <div class="flex-fill overflow-hidden debug-content" [ngbNavOutlet]="nav"></div>
 </div>
+}

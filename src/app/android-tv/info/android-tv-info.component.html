@@ -1,6 +1,10 @@
 <div class="info-page">
+  @if (device) {
+    <app-device-chip class="info-chip" [name]="device.name" [status]="chipStatus" (back)="state.select(null)"></app-device-chip>
+  }
   @if (!device) {
-    <app-empty-state [link]="['../devices']"></app-empty-state>
+    <app-device-picker kicker="Android TV" [devices]="pickerDevices" [statuses]="(state.statuses$ | async) ?? {}"
+                       (pick)="pick($event)"></app-device-picker>
   } @else if (unauthorized) {
     <app-adb-approval [serial]="device.ip + ':' + device.port" [deviceName]="device.name"
                       (approved)="state.checkConnection()"></app-adb-approval>

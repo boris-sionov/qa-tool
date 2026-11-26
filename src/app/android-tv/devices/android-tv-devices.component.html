@@ -32,63 +32,17 @@
     @if (devices.length === 0) {
       <app-empty-state (add)="openAddWizard()"></app-empty-state>
     } @else {
-      <div class="devices-grid">
-        @for (dev of devices; track dev.ip) {
-          <div class="device-card" [class.selected]="isSelected(dev)">
-            <div class="device-card-header">
-              <div class="device-icon" [class.active]="isSelected(dev)">
-                <i class="bi bi-android2"></i>
-              </div>
-              @if (isSelected(dev)) {
-                @switch (state.connection$.value.status) {
-                  @case ('connected') {
-                    <span class="status-badge active">
-                      <i class="bi bi-check-circle-fill"></i>
-                      Connected
-                    </span>
-                  }
-                  @case ('checking') {
-                    <span class="status-badge checking">
-                      <app-spinner size="sm"></app-spinner>
-                      Connecting
-                    </span>
-                  }
-                  @case ('unauthorized') {
-                    <span class="status-badge failed" role="button" title="Accept the prompt on the TV, then click to check again"
-                          (click)="state.checkConnection()">
-                      <i class="bi bi-shield-exclamation"></i>
-                      Allow on TV
-                    </span>
-                  }
-                  @case ('failed') {
-                    <span class="status-badge failed" role="button" title="Click to reconnect"
-                          (click)="state.checkConnection()">
-                      <i class="bi bi-x-circle-fill"></i>
-                      Not connected
-                    </span>
-                  }
-                }
-              }
-            </div>
-            <div class="device-card-body">
-              <h4 class="device-name">{{ dev.name }}</h4>
-              <div class="device-info">
-                <i class="bi bi-router"></i>
-                <span>{{ dev.ip }}</span>
-              </div>
-            </div>
-            <div class="device-card-actions">
-                              <button class="device-btn primary" (click)="editDevice(dev)">
-                  <i class="bi bi-pencil-fill"></i>
-                  Edit
-                </button>
-                              <button class="device-btn danger" (click)="removeDevice(dev)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </div>
-        }
-      </div>
+      <app-device-list [devices]="devices" [statuses]="(state.statuses$ | async) ?? {}" [selected]="selectedSerial"
+                       [actions]="actions" (pick)="state.choose($event)"></app-device-list>
+      <ng-template #actions let-dev>
+        <button class="device-btn primary" (click)="editDevice(dev)">
+          <i class="bi bi-pencil-fill"></i>
+          Edit
+        </button>
+        <button class="device-btn danger" (click)="removeDevice(dev)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </ng-template>
     }
   </div>
 </div>

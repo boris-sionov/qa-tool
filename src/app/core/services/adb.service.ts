@@ -139,6 +139,20 @@ export class AdbService implements DeviceProvider {
         throw connectError ?? new Error(`${serial} is ${s ?? 'not connected'}`);
     }
 
+    /**
+     * Which of `serials` adb holds right now, without trying to connect any: `device` only when it
+     * is listed and also answers (see `ensureConnected`), `unauthorized` when listed so, else `null`.
+     */
+    async liveStates(serials: string[]): Promise<Record<string, 'device' | 'unauthorized' | null>> {
+        const listed = await this.listConnectedDevices();
+        const entries = await Promise.all(serials.map(async serial => {
+            const state = listed.find(d => d.serial === serial)?.state;
+            if (state === 'device') return [serial, await this.responds(serial) ? 'device' : null] as const;
+            return [serial, state === 'unauthorized' ? 'unauthorized' : null] as const;
+        }));
+        return Object.fromEntries(entries);
+    }
+
     private responds(serial: string): Promise<boolean> {
         return Promise.race([
             this.getProp(serial, 'ro.serialno').then(() => true, () => false),

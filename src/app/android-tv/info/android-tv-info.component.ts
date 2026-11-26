@@ -3,6 +3,8 @@ import {Subscription} from 'rxjs';
 import {AdbService} from '../../core/services/adb.service';
 import {AdbStateService, deviceSerial, SavedDevice} from '../adb-state.service';
 import {extractMessage} from '../../core/utils/error.utils';
+import {PickerDevice} from '../../shared/components/device-picker/picker-device';
+import {DeviceStatus} from '../../shared/components/device-list/device-list.component';
 
 interface DeviceInfo {
     label: string;
@@ -19,6 +21,8 @@ interface DeviceInfo {
 export class AndroidTvInfoComponent implements OnInit, OnDestroy {
 
     device: SavedDevice | null = null;
+    private devices: SavedDevice[] = [];
+    pickerDevices: PickerDevice[] = [];
     info: DeviceInfo[] = [];
     loading = false;
     error?: Error;
@@ -29,6 +33,8 @@ export class AndroidTvInfoComponent implements OnInit, OnDestroy {
     constructor(private adb: AdbService, public state: AdbStateService) {}
 
     ngOnInit(): void {
+        this.devices = this.state.getSavedDevices();
+        this.pickerDevices = this.devices.map(d => ({key: deviceSerial(d), name: d.name, address: d.ip}));
         this.sub = this.state.connection$.subscribe(conn => {
             this.device = conn.device;
             this.info = [];
@@ -40,6 +46,18 @@ export class AndroidTvInfoComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void { this.sub?.unsubscribe(); }
+
+    /** A click on a row of the picker: open that TV. */
+    pick(key: string): void {
+        const device = this.devices.find(d => deviceSerial(d) === key);
+        if (device) this.state.choose(device);
+    }
+
+    /** The dot beside the open TV's name. */
+    get chipStatus(): DeviceStatus | undefined {
+        const status = this.state.connection$.value.status;
+        return status === 'none' ? undefined : status;
+    }
 
     async copyDeviceInfo(): Promise<void> {
         const productName = this.info.find(i => i.label === 'Product Name')?.value || '';

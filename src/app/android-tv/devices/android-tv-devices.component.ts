@@ -56,6 +56,7 @@ export class AndroidTvDevicesComponent implements OnInit {
         instance.editMode = true;
         instance.name = dev.name;
         instance.ip = dev.ip;
+        instance.editIp = dev.ip;
         ref.result.then(() => {
             this.devices = this.state.getSavedDevices();
         }).catch(noop);
@@ -73,13 +74,8 @@ export class AndroidTvDevicesComponent implements OnInit {
         this.devices = this.state.getSavedDevices();
     }
 
-    selectDevice(dev: SavedDevice): void {
-        this.state.select(dev);
-        this.adb.connect(deviceSerial(dev)).catch(noop);
-    }
-
-    isSelected(dev: SavedDevice): boolean {
+    get selectedSerial(): string | null {
         const sel = this.state.selected$.value;
-        return !!sel && sel.ip === dev.ip && sel.port === dev.port;
+        return sel && deviceSerial(sel);
     }
 }

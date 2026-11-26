@@ -1,0 +1,99 @@
+$primary-blue: #5B9FF5;
+$text-secondary: #A8B8CC;
+
+.picker {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.picker-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 2px 0 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+  }
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $primary-blue;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pick-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 14px;
+  text-align: left;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  transition: border-color 0.2s, background 0.2s;
+
+  // The global no-select.scss gives every element `cursor: default`, which would cover the row's contents.
+  &, & * { cursor: pointer !important; }
+
+  &:hover, &:focus-visible {
+    outline: none;
+    border-color: rgba(91, 159, 245, 0.55);
+    background: rgba(91, 159, 245, 0.1);
+  }
+
+  &.add {
+    justify-content: center;
+    gap: 8px;
+    color: $text-secondary;
+    font-size: 13px;
+    border-style: dashed;
+    background: transparent;
+  }
+}
+
+.tile {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  color: $primary-blue;
+  background: rgba(91, 159, 245, 0.15);
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  b { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  code { font-size: 12px; color: $text-secondary; background: none; padding: 0; }
+}
+
+.chev { color: $primary-blue; font-size: 14px; }
+
+.none {
+  margin: 20px 0;
+  text-align: center;
+  color: $text-secondary;
+  font-size: 13px;
+}
