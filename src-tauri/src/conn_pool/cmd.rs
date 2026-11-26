@@ -60,19 +60,14 @@ mod test {
 
     #[test]
     fn execute_command_timeout() {
-        // language=json
-        let device = serde_json::from_str::<Device>(
-            r#"
-{
-  "profile": "ose",
-  "name": "test",
-  "host": "0.0.0.0",
-  "port": 22,
-  "username": "root",
-  "password": "12345678"
-}
-"#,
-        )
+        // A listener that accepts the TCP connection and never speaks SSH. Port 22 on this host is
+        // not ours to rely on: a CI runner may have a real sshd there, which answers instead.
+        let silent = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = silent.local_addr().unwrap().port();
+        let device = serde_json::from_str::<Device>(&format!(
+            "{{\"profile\":\"ose\",\"name\":\"test\",\"host\":\"127.0.0.1\",\
+            \"port\": {port},\"username\": \"root\",\"password\": \"12345678\"}}"
+        ))
         .unwrap();
         let conn = DeviceConnection::new(device, None);
         assert_eq!(Error::Timeout, conn.unwrap_err())
