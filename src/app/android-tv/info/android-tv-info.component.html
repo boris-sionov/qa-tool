@@ -4,6 +4,7 @@
   }
   @if (!device) {
     <app-device-picker kicker="Android TV" [devices]="pickerDevices" [statuses]="(state.statuses$ | async) ?? {}"
+                       [loading]="(state.scanning$ | async) ?? false"
                        (pick)="pick($event)"></app-device-picker>
   } @else if (unauthorized) {
     <app-adb-approval [serial]="device.ip + ':' + device.port" [deviceName]="device.name"

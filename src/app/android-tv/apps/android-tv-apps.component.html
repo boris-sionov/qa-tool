@@ -25,6 +25,7 @@
       </app-error-card>
     } @else if (!serial) {
       <app-device-picker kicker="Android TV" [devices]="pickerDevices" [statuses]="(state.statuses$ | async) ?? {}"
+                         [loading]="(state.scanning$ | async) ?? false"
                          (pick)="pick($event)"></app-device-picker>
     } @else if (loading || packages === null) {
       <app-loading-card></app-loading-card>

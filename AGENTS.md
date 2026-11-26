@@ -396,6 +396,13 @@ selected or connected before QA clicks a row:
   `key` is what `pick` emits), optional `statuses` (without them the picker probes the devices that
   carry a `port`), `kicker`, `icon`. Give it a field, not a getter: a fresh array every change
   detection breaks Angular's checks.
+  **Order:** connected devices first, then the one connected most recently (`PickerDevice.lastConnected`,
+  `orderDevices()` in `picker-device.ts`), then the rest in saved order; `<app-device-list>` orders the
+  same way. **Loading:** the picker shows a spinner instead of the list while the page is still finding
+  out who is connected — `[loading]` (Android TV passes `state.scanning$`) or, without `statuses`, its
+  own port probe — so rows never reorder under the cursor.
+  Android TV stamps `lastConnected` (in the saved device, `localStorage`) when adb holds a TV at scan
+  time or a TV QA picked connects; `saveDevice` keeps it across an edit.
 - `<app-device-chip>` — starts the toolbar once a device is open: a **Devices** button (back to the
   list) and the name. **There is no device dropdown anywhere.**
 - `<app-status-dot>` — a dot, no text: filled green = answers, hollow grey = does not, pulsing grey =

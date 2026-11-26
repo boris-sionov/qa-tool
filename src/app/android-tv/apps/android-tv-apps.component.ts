@@ -93,7 +93,7 @@ export class AndroidTvAppsComponent implements OnInit, OnDestroy {
         }));
 
         this.devices = this.state.getSavedDevices();
-        this.pickerDevices = this.devices.map(d => ({key: deviceSerial(d), name: d.name, address: d.ip}));
+        this.pickerDevices = this.devices.map(d => ({key: deviceSerial(d), name: d.name, address: d.ip, lastConnected: d.lastConnected}));
     }
 
     ngOnDestroy(): void {
