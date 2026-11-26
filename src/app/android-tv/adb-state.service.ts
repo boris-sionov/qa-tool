@@ -9,6 +9,8 @@ export interface SavedDevice {
     name: string;
     ip: string;
     port: number;
+    /** When this TV was last seen connected (ms since epoch); orders the lists. */
+    lastConnected?: number;
 }
 
 export function deviceSerial(d: SavedDevice): string {
@@ -51,6 +53,8 @@ export class AdbStateService {
     statuses$ = new BehaviorSubject<Record<string, DeviceStatus>>({});
     /** Pages load from the TV once this says `connected`, not as soon as a device is selected. */
     connection$ = new BehaviorSubject<AdbConnection>({device: null, status: 'none'});
+    /** True while `scan()` is finding out which saved TVs are connected. */
+    scanning$ = new BehaviorSubject(false);
     private checkSeq = 0;
     private scanSeq = 0;
     private packagesCache = new Map<string, AdbPackageInfo[]>();
@@ -90,12 +94,14 @@ export class AdbStateService {
     async scan(): Promise<void> {
         const seq = ++this.scanSeq;
         const devices = this.getSavedDevices();
+        this.scanning$.next(true);
         this.statuses$.next(Object.fromEntries(devices.map(d => [deviceSerial(d), 'checking'])));
         const [live, open] = await Promise.all([
             this.adb.liveStates(devices.map(deviceSerial)).catch(() => ({} as Awaited<ReturnType<AdbService['liveStates']>>)),
             this.reach.statuses(devices.map(d => ({key: deviceSerial(d), host: d.ip, port: d.port}))),
         ]);
         if (seq !== this.scanSeq) return;
+        this.stampConnected(devices.map(deviceSerial).filter(key => live[key] === 'device'));
         const picked = this.selected$.value && deviceSerial(this.selected$.value);
         this.statuses$.next(Object.fromEntries(devices.map(d => {
             const key = deviceSerial(d);
@@ -103,6 +109,15 @@ export class AdbStateService {
             if (key === picked && this.statuses$.value[key] !== 'checking') return [key, this.statuses$.value[key]];
             return [key, mergeStatus(live[key] ?? null, open[key] === 'connected')];
         })));
+        this.scanning$.next(false);
+    }
+
+    /** Remembers that these TVs are connected now, for the "most recently connected first" order. */
+    private stampConnected(serials: string[]): void {
+        if (serials.length === 0) return;
+        const now = Date.now();
+        const list = this.getSavedDevices().map(d => serials.includes(deviceSerial(d)) ? {...d, lastConnected: now} : d);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
     }
 
     /** A click on a TV in the list: pick it, or check it again when it is already the picked one. */
@@ -126,6 +141,7 @@ export class AdbStateService {
         this.connection$.next({device, status: 'checking'});
         const next = await this.probe(device);
         this.setStatus(device, next.status);
+        if (next.status === 'connected') this.stampConnected([deviceSerial(device)]);
         // A newer check (another device picked meanwhile) wins.
         if (seq === this.checkSeq) this.connection$.next(next);
     }
@@ -164,7 +180,7 @@ export class AdbStateService {
         const list = this.getSavedDevices();
         const idx = list.findIndex(d => d.ip === device.ip && d.port === device.port);
         if (idx >= 0) {
-            list[idx] = device;
+            list[idx] = {...list[idx], ...device};
         } else {
             list.push(device);
         }

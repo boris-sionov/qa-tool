@@ -1,5 +1,7 @@
 @if (devices.length === 0) {
   <app-empty-state [link]="emptyLink"></app-empty-state>
+} @else if (waiting) {
+  <app-spinner size="lg" [center]="true"></app-spinner>
 } @else {
   <section class="picker">
     <header class="picker-head">

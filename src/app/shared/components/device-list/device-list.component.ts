@@ -1,11 +1,14 @@
 import {NgTemplateOutlet} from '@angular/common';
 import {Component, EventEmitter, Input, Output, TemplateRef} from '@angular/core';
 import {SpinnerComponent} from '../spinner/spinner.component';
+import {orderDevices} from '../device-picker/picker-device';
 
 export interface ListedDevice {
     name: string;
     ip: string;
     port: number;
+    /** When it was last seen connected (ms since epoch). */
+    lastConnected?: number;
 }
 
 /** What the list says about a device's connection; no entry means "nothing known yet". */
@@ -35,4 +38,9 @@ export class DeviceListComponent {
     @Output() pick = new EventEmitter<ListedDevice>();
 
     readonly serialOf = serialOf;
+
+    /** Connected first, then the most recently connected. */
+    get ordered(): ListedDevice[] {
+        return orderDevices(this.devices, d => this.statuses[serialOf(d)] === 'connected', d => d.lastConnected);
+    }
 }

@@ -1,5 +1,5 @@
 <div class="device-grid">
-  @for (dev of devices; track serialOf(dev)) {
+  @for (dev of ordered; track serialOf(dev)) {
     <article class="device-card" role="button" tabindex="0" [class.selected]="selected === serialOf(dev)"
              (click)="pick.emit(dev)" (keydown.enter)="pick.emit(dev)">
       <div class="device-card-header">

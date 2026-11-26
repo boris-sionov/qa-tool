@@ -34,7 +34,7 @@ export class AndroidTvInfoComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.devices = this.state.getSavedDevices();
-        this.pickerDevices = this.devices.map(d => ({key: deviceSerial(d), name: d.name, address: d.ip}));
+        this.pickerDevices = this.devices.map(d => ({key: deviceSerial(d), name: d.name, address: d.ip, lastConnected: d.lastConnected}));
         this.sub = this.state.connection$.subscribe(conn => {
             this.device = conn.device;
             this.info = [];

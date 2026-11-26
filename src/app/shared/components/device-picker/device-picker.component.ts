@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {ReachabilityService} from '../../../core/services/reachability.service';
 import {DeviceStatus} from '../device-list/device-list.component';
-import {filterDevices, PickerDevice} from './picker-device';
+import {filterDevices, orderDevices, PickerDevice} from './picker-device';
 
 /**
  * What every Apps / Info page shows while no device is open: the saved devices as rows — name,
@@ -21,17 +21,25 @@ export class DevicePickerComponent implements OnChanges {
     @Input() icon = 'bi-tv';
     /** The Manage page: where "Add new device" goes. `null` hides that row (phones are plugged in, not added). */
     @Input() emptyLink: unknown[] | null = ['../devices'];
+    /** The page is still finding out which devices are connected: show a spinner instead of a list that would reorder. */
+    @Input() loading = false;
     @Output() pick = new EventEmitter<string>();
 
     search = '';
     private probed: Record<string, DeviceStatus> = {};
     private signature = '';
     private seq = 0;
+    private probing = false;
 
     constructor(private reach: ReachabilityService) {}
 
     get shown(): PickerDevice[] {
-        return filterDevices(this.devices, this.search);
+        return orderDevices(filterDevices(this.devices, this.search),
+            d => this.statusOf(d) === 'connected', d => d.lastConnected);
+    }
+
+    get waiting(): boolean {
+        return this.loading || this.probing;
     }
 
     statusOf(device: PickerDevice): DeviceStatus | undefined {
@@ -50,9 +58,12 @@ export class DevicePickerComponent implements OnChanges {
     private async probe(): Promise<void> {
         const seq = ++this.seq;
         this.probed = {};
+        this.probing = true;
         const targets = this.devices.filter(d => d.port).map(d => ({key: d.key, host: d.address, port: d.port!}));
         const result = await this.reach.statuses(targets);
         // The list changed while the probe ran: its answer is for devices that are no longer shown.
-        if (seq === this.seq) this.probed = result;
+        if (seq !== this.seq) return;
+        this.probed = result;
+        this.probing = false;
     }
 }
