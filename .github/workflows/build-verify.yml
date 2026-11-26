@@ -131,4 +131,8 @@ jobs:
       # missing from the three permission lists. After Build because compiling the crate needs dist/.
       - name: Rust tests
         if: runner.os == 'Linux' && matrix.variant == 'full'
-        run: cargo test -p qa-tool
+        run: |
+          # The ssh tests start one sshd container each, in parallel. Pull the image once, with
+          # retries, so they do not all hit the registry's rate limit at the same moment.
+          for i in 1 2 3 4 5; do docker pull public.ecr.aws/panubo/sshd:latest && break; sleep 20; done
+          cargo test -p qa-tool
